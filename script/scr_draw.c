@@ -1,78 +1,11 @@
 /* draw_frame.c  - Draw a frame (render effects in correct order) */
 
-#define FX_DB 10
+// fx_struct *current_fx=&fxlist[0];
 
-#define FXTYPE_NONE 0
-#define FXTYPE_SCENE 1
-#define FXTYPE_FDTUNNEL 2
-#define FXTYPE_BLOB 3
-#define FXTYPE_PICTURE 4
-#define FXTYPE_SPLINESURFACE 5
-#define FXTYPE_SMOKE 6
-#define FXTYPE_SINPART 7
-#define FXTYPE_GREETS 8
-
-typedef struct {
-  int type;        /* 0=linear  1=sinus */
-  float *ptr;
-  float blend;          /* 0..1 megy */
-  float speed;          /* blend+=speed*relative_time */
-  float start,end;
-  float offs,amp;  /* sinus-hoz */
-} fade_struct;
-
-#define MAX_FADER 32
-fade_struct fader[MAX_FADER];
-
-
-typedef struct {
-  int type;
-  float x1,y1,x2,y2,z;
-  int id;
-  float rgb[3];
-  int alphamode,zbuffer;
-  float alphalevel;
-} pic_struct;  
-
-typedef struct {
-  int type;
-  float blend;
-  float fps;
-  float frame;
-  fx_blob_struct blob;
-  fx_smoke_struct smoke;
-  fx_sinpart_struct sinpart;
-  fx_fdtunnel_struct fdtunnel;
-  fx_greets_struct greets;
-  /* 3DS player: */
-  c_SCENE *scene;
-  int loop_scene;
-  /* PIC: */
-  pic_struct pic;
-  /* Spline surface */
-  float face_blend,wire_blend,spline_size,spline_n;
-} fx_struct;
-
-
-fx_struct fxlist[FX_DB];
-fx_struct *current_fx=&fxlist[0];
-
-void fx_init(){
-int f;
-  for(f=0;f<FX_DB;f++){
-    fx_struct* fx=&fxlist[f];
-    fx->type=FXTYPE_NONE;
-    fx->blend=1.0;
-    fx->fps=25.0;
-    fx->frame=0.0;
-    fx->scene=NULL;
-    fx->loop_scene=1;
-//    fx->texture1=fx->texture2=0;
-  }
-}
-
+#ifdef FX_DEBUG
 float fx_debug_time=0.0f;
 float fx_debug_lasttime=0.0f;
+#endif
 
 void draw_scene(){
 float rel_time=GetRelativeTime();
@@ -99,7 +32,7 @@ int active_faders=0;
   }
 
 
-#if 1
+#ifdef FX_DEBUG
   if(fx_debug) if(fx_debug_time>=0.1){
     int f;
     fprintf(fx_debug,"%6.2f [%5d] |",adk_time,(int)(MP3_FRAMES));

@@ -1,53 +1,40 @@
-Astral Script System 3.0  - belsô használatra!   (C) 1999.12.20. by A'rpi/Astral
-========================
-Alapvetôen 3 féle parancstípus létezik:
-1. globális parancsok, változók
+==============================================================================
+Astral Script System 3.0  - belsô használatra!   (C) 1900.1.1. by A'rpi/Astral
+==============================================================================
+1. Globális parancsok, változók.
    az aktuális effekttôl, scene-tôl függetlenül használható
-2. effekt parancsok, változók
-   a kiválasztott effekt (scene) típusát, paramétereit befolyásolják
-3. light és object specifikus változók
-   a kiválasztott fényforrás vagy object paramétereit befolyásolják
-----------------
+2. Effekt parancsok, változók. Szinkronizálás.
+   az aktuális effekt (vagy scene) típusát, paramétereit befolyásolják
+3. Scene, light és object specifikus változók, vertexlights, particle system.
+   a kiválasztott scene fényforrás vagy object paramétereit befolyásolják
+4. Mire figyeljünk 3DS scene-k készítésekor.  TRACEREKNEK!
+------------------------------------------------------------------------------
+
+Még mielôtt belekezdenék, egy fontos "apróság":
+Az Alpha II elôtti enginek a scriptet a script1.scr fileban, az Alpha II
+pedig az alpha2.scr fileban keresi. A linuxos verzionak megadhato parancssorban
+a scriptfile neve.
+Script fejleszto IDE-t (engine+editor) win-re fog irni Strepto... remeljuk :)
+
+Még valami:
+A windozos verzió outputjat (üzeneteit) csak akkor tudod elolvasni, ha fileba
+irányítod át:    demo-win.exe > messages.txt
+és utána azt olvasod el.
+
 
 1. Globális parancsok:
 ======================
 Ide tartoznak a betöltô, engine vezérlô parancsok:
 
+INFO:
+
 - ; <megjegyzés>
   Bármikor bárhova írható megjegyzés, pontosvesszô után.
   (a megj. a sor végéig tart, több sorosnál minden sor elejére kell!)
-- load_scene <változó> <név>
-  Betölti a <név> nevû .3DS file-t, és hozzárendeli a <változó>-hoz,
-  ezután csak a <változó>-val hivatkozhatunk rá (nem a file-névvel)!
-  Pl.:  load_scene part1 proba.3ds
-  A változó neve tetszôleges lehet, de nem lehet parancsnév vagy korábban
-  definált változónév. Ebbôl követekzik hogy minden .3ds-t másik változóba
-  kell betölteni, akkor is ha a régire már nincs szükség!
-
-- loadpic <változó> <név>           
-  Kép betöltése. A kép egyenlôre csak truecolor lehet, RAW vagy JPG formátumú.
-  Pl.:  loadpic logo1 astral18.jpg
-  A kép méretei 2 hatványa kell legyen, tehát 64x64, 128x128, 256x256
-  vagy 512x512 méretû lehet!!!  Betölthetô más méretû kép is, de át
-  lesz konvertálva a fenti felbontások közül a legkisebb de nagyobbra.
-  A képre a késôbbiekben (az effektekben) a <változó> névvel hivatkozhatunk.
-
-- loadRGBA <változó> <név> <név2>
-  Hasonló a loadpic-hez, de ez nem RGB, hanem RGBA képet tölt be, azaz
-  alphamap-et (átlátszósági maszk) is tölt be. A <név> a kép, a <név2>
-  az alphamap neve.
-  Pl.:  loadpic logo1 astral18.jpg a18maszk.raw
-  Az alphamap 256 szürkeskálás vagy truecolor lehet, utóbbi esetben csak
-  a zöld komponenst veszi figyelembe. fekete=opaque (nem átlátszó),
-  fehér/zöld=transparent (teljesen átlátszó).
-
-- start_music <név>
-  Betölti és elindítja a <név> nevû zenét. Jelenleg csak az MP3 támogatott!
-  Célszerû a betöltések (load...) után írni.
-  Nosound esetén a pattern-re szinkronizálás még nem mûködik!!!
-
-- stop_music
-  Leállítja a zenét - ha épp szól. különben nem csinál semmit.
+  Pl.:
+    ; most töltjük be a scene 1-et:
+    load_scene scene1 xyz.3ds
+    ; be van töltve. dejó.
 
 - write <szöveg>    és   writeln <szöveg>
   Kiírja az üzenetablakba a <szöveg>-et. A writeln soremelést is csinál!
@@ -60,10 +47,70 @@ Ide tartoznak a betöltô, engine vezérlô parancsok:
      load_scene part1 proba.3ds
      writeln OK!
 
+LOAD:
+
+- mount <type> <path>
+  Elôször is célszerû kijelölni hogy honnan akarjuk betölteni a fileokat.
+  Akárhány mount parancs kiadható, és mindig a legutolsóban keres elôször.
+  Funkciója kicsit hasonlít a DOS-os PATH environment változóéhoz.
+  3 tipus lehet:
+    mount dat valami.DAT      - a régi (Alpha partyver-ben használt) pak formátum
+    mount pak valami.PAK      - az ASTRAL.PAK formátuma (lásd. make-pak progi)
+    mount dir [drive:]path\  - tetszôleges könyvtár megadása amiben keresheti
+
+  Alapból "ki van adva" 2 ilyen parancs:
+    mount pak astral.pak       ; keresés az astral.pak fileban
+    mount dir ""               ; keresés az aktuális könyvtárban
+  Tehát ha ez neked megfelel, akkor egyáltalán nem kell a mount parancsot
+  használnod!!!
+
+  Még egy fontos dolog: a textúrákat mindig MAPS alkönyvtárban keresi.
+  Tehát ha valami.jpg-re hivatkozol, akkor azt úgy veszi mintha
+  maps/valami.jpg-t írtál volna!!!
+
+- load_scene <változó> <név>
+  Betölti a <név> nevû .3DS file-t, és hozzárendeli a <változó>-hoz,
+  ezután csak a <változó>-val hivatkozhatunk rá (nem a file-névvel)!
+  Pl.:  load_scene part1 proba.3ds
+  A változó neve tetszôleges lehet, de nem lehet parancsnév vagy korábban
+  definált változónév. Ebbôl követekzik hogy minden .3ds-t másik változóba
+  kell betölteni, akkor is ha a régire már nincs szükség!
+
+- loadpic <változó> <név>           
+  Kép betöltése. A kép egyenlôre csak truecolor lehet, RAW vagy JPG formátumú.
+  Palettás (max 256 szin), greyscale és truecolor képek is támogatottak.
+  Pl.:  loadpic logo1 astral18.jpg
+  A kép méretei 2 hatványa kell legyen, tehát 64x64, 128x128, 256x256
+  vagy 512x512 méretû lehet!!!  Betölthetô más méretû kép is, de át
+  lesz konvertálva a fenti felbontások közül a legkisebb de nagyobbra.
+  Megj: a felfelé konvertálást nem célszerû az enginere bízni, tehát
+  jobb eleve 256x256 vagy 512x512 méretû képeket használni.
+  A képre a késôbbiekben (az effektekben) a <változó> névvel hivatkozhatunk.
+
+- loadRGBA <változó> <név> <név2>
+  Hasonló a loadpic-hez, de ez nem RGB, hanem RGBA képet tölt be, azaz
+  alphamap-et (átlátszósági maszk) is tölt be. A <név> a kép, a <név2>
+  az alphamap neve.
+  Pl.:  loadpic logo1 astral18.jpg a18maszk.raw
+  Az alphamapot greyscale-ként veszi figyelembe, ha szines, átkonvertálja.
+  fekete=opaque (nem átlátszó), fehér=transparent (teljesen átlátszó).
+
+MUSIC:
+
+- start_music <név>
+  Betölti és elindítja a <név> nevû zenét. Jelenleg csak az MP3 támogatott!
+  Célszerû a betöltések (load...) után írni.
+  Nosound esetén a pattern-re szinkronizálás még nem mûködik!!!
+
+- stop_music
+  Leállítja a zenét - ha épp szól. különben nem csinál semmit.
+
+PLAY:
+
 - play <esemény> [<esemény2...>]
   Elkezdi játszani a beállított effekteket, addig amíg a megadott esemény(ek)
   be nem következik. Ha nem adunk meg egy eseményt se akkor az ESC lenyomásáig
-  megy. Ha több esemény van megadva akkor az elsô teljesülésekor hagyja abba
+  megy. Ha több esemény van megadva akkor bármelyik teljesülésekor megáll,
   és folytatja a script következô sorával.
   Az esemény típusa 6 (2x3) féle lehet:       # = decimális szám
     #s       # másodpercen keresztül megy
@@ -75,9 +122,52 @@ Ide tartoznak a betöltô, engine vezérlô parancsok:
   Pl:   play 3s       ; 3 másodpercig megy
         play -1180p   ; a 1180-adik pattern-ig (mp3 frame-ig) játszik
   Lásd még a "szinkronizálás" részt!
+  Megjegyzés: az Alpha II engineje óta "time correction" is van, azaz ha
+  az esemény teljesülésének észrevételekor már túlment, akkor a következô
+  idôzítésnél (play vagy fade) ezt beleszámolja, így nem fog nagyon lassú
+  gépeken elcsúszni a sok relatív idôzítés.
 
 - end
-  Demó vége (leállítja a zenét és kilép. Ugyanaz mint az ESC billentyûnél.
+  Demó vége (leállítja a zenét és kilép. Ugyanaz mint az ESC billentyûnél,
+  vagy Alpha II óta a bal egérgombnál.
+  Nem kötelezô, a script vegén úgyis kilép.
+
+EGYÉB:
+
+- clear_buffer <0/1>
+  A képernyôtörlést lehet vele ki/bekapcsolni. Kikapcsolni egyedül a
+  motion-blur vagy kifehéredés effekthez kell. Alpha II-ben van mindkettô.
+
+- time <time>
+  A globális idôt lehet vele beállítani.
+  Az idôzítésekre van hatással (time-re való abszolút és relatív
+  idôzítés), ezért a betöltések után _mindenképp_ meg kell hívni egy
+  'time 0' parancsot. Célszerû rögtön a start_music után tenni ezt.
+  Ha nem hívjuk meg, akkor a relatív idôzítések nem fognak jól mûködni. :(
+  FIGYELEM! Régebben ezt egy 'play 0s' oldotta meg, de az Alpha II óta
+  a time correction miatt az már nem jó.
+
+- fade <var> <start> <end> <time>
+  Lineáris interpolátor. Nevét onnan kapta hogy 2 érték között fadel,
+  azaz a <var> nevû változó értékét <start>-ról <end>-re változtatja
+  folyamatosan, <time> másodperc alatt.
+  Az effekt változók (blend, fps, stb) értékének változtatására jó.
+
+- sinfade <var> <start> <end> <time> [<amp> [<offset>]]
+  Szinuszos interpolátor. A szög érték <start>-tól <end>-ig megy
+  <time> másodperc alatt. Az értékek fokban vannak megadva, nem radiánban!
+  Az így kapott szög érték szinuszát szorozza <amp>-al, hozzáadja az
+  <offset>-et és ez kerül a <var> változóba.
+  Használatához nem árt ismerni a szinusz függvény pontos alakját :)
+  pl.:  a blend változtatása 0-ról 0.7-re lassulva 5s alatt:
+    sinfade blend 0 90 5 0.7 0
+  ellenôrzés:  sin(0)*0.7+0 = 0
+               sin(30)*0.7+0 = 0.35
+               sin(90)*0.7+0 = 0.7
+  Hasznos:
+  - lineáris interpolátor (fade) helyett, ha gyorsulni vagy lassulni kell
+  - ha valamit 2 érték között kell sokszor oda-vissza változtatni folytonosan
+
 
 2. Effekt parancsok:
 ====================
@@ -86,6 +176,7 @@ Jelenleg _egyidejûleg_ max. 10 effekt támogatott, 0..9-ig számozva.
 Minden effektnek van típusa, blend (átlátszóság) értéke, frame (pozíció)
 és fps (frame/sec, azaz sebesség) értéke. Ezen felül vannak speciális,
 csak bizonyos effekteknél érvényes változók.
+
 A változók/parancsok mindig a _kiválasztott_ effektre vonatkoznak: egy
 effektet kiválasztani úgy lehet, hogy beírjuk a sor elejére az effekt számát
 és egy kettôspontot. Ha rögtön utána (még abban a sorban) jön egy utasítás,
@@ -100,30 +191,111 @@ Effekt típusok:
   a <változó>-ba betöltött 3DS-re.
   Pl:  load_scene part1 proba.3ds
        1: scene part1
-  ez betölti a proba.3ds-t a part1 változóba, majd az 1-es számú effektet
-  beállítja hogy ezt a 3ds-t játssza!
+    ez betölti a proba.3ds-t a part1 változóba, majd az 1-es számú
+    effektet beállítja hogy ezt a 3ds-t játssza!
+  A scenee paramétereivel késôbb külön foglalkozunk... ez a legbonyolultabb.
 
 - blob
   Az effekt típusát blob-ra állítja. :)
+  A blob típusát, "viselkedését" beállító változók:
+     FLOAT  vlimit                     a blob mérete. default: 200000
+     FLOAT  blob_alpha                 a blob "szétszakadása"  0..1
+     INT    line_blob                  tipusa:  0=envmapos  1=wireframe
+     FLOAT  blob_ox,blob_oy,blob_oz    a blob rendszer középpontja (xyz)
+     FLOAT  blob_rx,blob_ry,blob_rz    blobok távolsága a középponttól (xyz)
 
 - picture <változó>
-  Az effekt típusát kép megjelenítésére állítja. A <változó>-ba betöltött
-  kép fullscreen-re lesz skálázva, tehát mérettôl függetlenül 640x480-ra
-  (vagy akármekkorára) lesz konvertálva.
-  MEGJEGYZÉS: MOST NEM IGAZÅN MÿKÖDIK!
-  Használd helyette a "sprite <változó> 0 480 640 0" parancsot!!!
+  sprite <változó> <x1> <y1> <x2> <y2>
+  addsprite <változó> <x1> <y1> <x2> <y2>
+  colorbox <x1> <y1> <x2> <y2> [r g b]
+  addcolorbox <x1> <y1> <x2> <y2> [r g b]
 
-- sprite <változó> <x1> <y1> <x2> <y2>
-  Az effekt típusát kép megjelenítésére állítja. A <változó>-ba betöltött
-  kép az x1;y1 - x2;y2 téglalapba lesz skálázva, konvertálva.
-  Megj: y=0 a képernyô alja, y=480 a képe. teteje!!
+  Ennek az "effektnek" 5 altipusa van.
+  A 'sprite' és a 'picture' egy képet (loadpic-el vagy loadRGBA-val betöltöttet)
+  tud kirakni a képernyôre, a 'sprite' tetszôleges méretben míg a 'picture'
+  mindig fullscreen.  Az 'add'-al kezdôdôek annyiban különböznek, hogy
+  additívak, tehát nem blendeli ôket hanem hozzáadja a háttérhez.
+  A 'colorbox' is hasonló, de ez nem egy képet, hanem egy egyszínû téglalapot
+  tud kirakni, melynek színe vagy közvetlenül megadható (r g b paraméterek,
+  értékük FLOAT, tehát 0..1 lehet) vagy késôbb változókon keresztül.
 
-- addsprite <változó> <x1> <y1> <x2> <y2>
-  Ugyanaz mint a sprite, de a blend érték nem befolyásolja a mögötte levô
-  effektet. Lásd késôbb a blend-nél!
+  A betöltött képet tartalmazó változó nevét a <változó> paraméterhez kell írni.
+  Az x1 y1 x2 y2 a kép négy sarkát jelenti, a bal _alsó_ sarok a (0;0).
+  (tehát a 'picture <pic>' a 'sprite <pic> 0 480 640 0' paranccsal egyezik meg)
 
-- fdtunnel
-  Egyelôre nem mûködik :(  Kölönben fdtunnel-re állítaná az effektet :))
+  Változók:
+  FLOAT pic_r, pic_g, pic_b         A kép vagy egyszinû terület szine
+  INT   pic_zbuffer                 Zbuffer bekapcsolása (1=be  0=ki)
+  FLOAT pic_z                       Z érték, ha zbuffer=1
+  INT   pic_alphamode               Alphatest bekapcsolása (1=be  0=ki)
+  FLOAT pic_alphalevel              Alpha érték, ha alphamdode=1
+
+  Zbuffer:
+    Speciális fade effektekhez használható, ugyanis a kép kirakásakor
+    bekapcsolható a zbuffer-be írás, ami a következô effekt kirajzolására
+    hatással lehet. (Pl. a 3D object átjön a képen, stb...)
+  Alphamode:
+    Speciális fade effektekhez használható. Csak alphachanneles képeknél
+    van értelme, lényege hogy az alphalevel értéknál kisebb alpha
+    értékû pixeleket nem rajzolja ki, így "szétszakad" a kép ha ezt
+    fadeljük. (lásd Alpha II végén az endpic.)
+    Zbufferrel együtt használva egy fekete képet pl. scene-re is alkalmazható.
+
+- fdtunnel <texture1> <texture2>
+  FDTUNNEL (free-direction tunnel) effekt.
+  Egy fdtunnel effekt 2 db tunnelt tud kezelni egyszerre, az elsô
+  alphablendelt, a második additív. Morpoláson és átmérôn kívül a többi
+  paraméterük közös.
+  A <texture1> és <texture2> a 2 tunnel texturáját tartalmazó változó.
+  Ha valamelyik 0 akkor az a tunnel ki lesz kapcsolva.
+
+  Változók:  (minden FLOAT)
+
+  fdtunnel_speedx, fdtunnel_speedy, fdtunnel_speedz
+    a forgás sebessége. a z-t érdemes 0-ra állítani mert bugzik :(
+  fdtunnel_bright
+    fényerô. gyakor;atban azt állítja hogy milyen messzire látunk el
+    a tunnelbe, tehát milyen gyorsan sötétedik a távolban.
+  fdtunnel_persp, fdtunnel_fovx, fdtunnel_fovy
+    a perspektívát, X és Y irányú látószöget állíthatjuk.
+    szép torz unneleket lehet csinálni, fôleg ha fadelgetjük is.
+  fdtunnel_radius
+    a csô átmérôje.
+  fdtunnel_rad_speed, fdtunnel_rad_amp, fdtunnel_rad_szog
+    morpholás. rad_speed=sebesség, rad_amp=átmérôváltozás mértéke,
+    a rad_szog pedig hogy hány behorpadás legyen.
+
+  A sebesség kivátelével mindegyik változó a kijelölt tunnelre vonatkozik!
+  A tunnel kijelölése a fdtunnel_select <0/1> paranccsal lehetséges.
+
+- splinesurface <speed> <amp>
+  Morpholó spline-felület effekt. A speed paraméter a változás sebessége,
+  az amp a mértéke.
+  Egyéb paraméterek: (mind FLOAT)
+    spline_n        - felbontás...  4..16
+    spline_size     - méret. default 100
+    wire_blend      - wireframe láthatósága (0..1)
+    face_blend      - flatshaded poligonok láthatósága (0..1)
+
+- sinusparticle <texture> <num> <sins>
+  FFT sinus mozgású particle system.  (mint az Alpha II elején)
+  <num> darab, <texture> mintájú sprite lesz kirajzolva, mellyek
+  mozgását (xyz), fényerejét és méretét (scale) <sins> darab
+  sinus függvény összege határozza meg.
+
+  Paraméterek:  (mind FLOAT)
+   sinpart_ox, sinpart_oy, sinpart_oz     - a rendszer középpontja
+   sinpart_size                           - a rendszer mérete
+   sinpart_scale                          - a sprite-ok max. mérete
+   sinpart_size                           - a spriteok sebessége a görbe mentén
+   sinpart_sinspeed                       - a morpholás sebessége
+
+- smoke <texture> <movespeed> <rotationspeed> <distance> <scale> <additive>
+  Füst/starfield/egyéb légköri hatások érhetôk el vele.
+  Alpha II-ben van belôle rendesen :)
+  pl.:  smoke smoketxt1 0.1 0 5 0.5 1
+
+
 
 Effektek átlátszósága:
 ----------------------
@@ -155,6 +327,7 @@ Akkor a script:
   loadpic hatter hatter.jpg        ; a háttérkép betöltése
   loadpic logo astral.raw          ; a logó kép betöltése
   start_music megesz.mp3           ; Itt indul a demo! zene indítása
+  time 0                           ; innen indul az idôzítés
   1: sprite hatter 0 480 640 0     ; 1-es effekt: háttérkép
   2: scene test                    ; 2-es effekt: 3D
   3: sprite logo 100 300 300 100   ; 3-as effekt: kis logó
@@ -179,7 +352,7 @@ Az alapvetô kérdés, hogy mire szinkronizáljunk, és hogyan.
 - Idôre? Sok esetben nehézkes lehet, fôleg ha a zene jellemzô részeivel
   szeretnénk szinkronban maradni. Hogyan: abszolút vagy relatív?
   Ha abszolút (azaz a demó kezdetéhez képest adjuk meg a váltások helyét)
-  akkor egy effekt áthelyezésével írhatunk át mindent! Ha relatív, akkor
+  akkor egy effekt áthelyezésekor írhatunk át mindent! Ha relatív, akkor
   pedig a zenére szinkron. lesz qrva nehéz...
 - Frame-re? [frame alatt azt a számot értem, amit az effektek és a 3D studio,
   tehát az elméleti képkocka sorszámot, ami azért elméleti, mert gyorsabb
@@ -203,7 +376,7 @@ az fps-t sosem változtatjuk meg a demó közben!!!
   Ennek megfelelôen a demóban van egy globális time, és effektenként egy
 frame és egy fps változó. Az egyes effektek mindig a frame-ra vannak
 szinkronizálva, sebességük így az fps-tôl függ. A váltások (lásd. a "play"
-parancsnál) pedig szinkronizálhatók time-ra, frame-ra (bármelyikre!) és
+parancsnál) pedig szinkronizálhatók time-ra, frame-ra (bármelyik fx-re!) és
 pattern-re (zene pozició) is! Effektben ugrálni (pl. dobütésre visszatekerni
 az elejére vagy pl. elôreugrani 100 framet) a frame értékének változtatásával
 lehet. A pattern értéke nem változtatható (az MP3 player változtatja),
@@ -213,6 +386,7 @@ Az elôbbi példa script kicsit módosítva:
   loadpic hatter hatter.jpg        ; a háttérkép betöltése
   loadpic logo astral.raw          ; a logó kép betöltése
   start_music megesz.mp3           ; Itt indul a demo! zene indítása
+  time 0                           ; idôzítés kezdete
   play -5p                         ; várunk az 5-ös patternig (zene kezdete)
   1: sprite hatter 0 480 640 0     ; 1-es effekt: háttérkép megjelenik
   play 2s                          ; várunk 2 másodpercig (háttér látszik csak)
@@ -231,46 +405,88 @@ Ez nem csak azért tanulságos, mert mindenféle idôzítési mód látható ben
 hanem mert az effekt-kiválasztás 2 féle módja is látható:
 Amikor a sor elején az utasítás elôtt ott van pl. a 2:, az azt jelenti hogy
 az az utasítás a 2-es effektre vonatkozik. Amikor viszonta  2: után
-nincs semmi abban a sorban, az a defaultot állítaj át, tehát utána minden
+nincs semmi abban a sorban, az a defaultot állítja át, tehát utána minden
 olyan utasítás ami elôtt nincs külön megadva melyikre vonatkozik, az arra fog!
 Tehát az utolsó 4 sor elejérôl a 2:-ok elhagyhatóak!
 Másrészt amikor a play-ban frame-ra szinkrinizálunk, akkor meg kell adni hogy
 melyik effekt frame-jára! Mivel ez effektenként különbözô lehet...
 
-Egyéb effektenkénti változók:
-=============================
+
+3. scene, light és object specifikus változók:
+==============================================
+Ahogy a SCENE effektnél ígértem, erre külön fejezetben van leírás. Itt.
+Mivel az engine legfontosabb (és legbonyolultabb) része a 3DS player,
+ennek beállítására van a legtöbb parancs és változó.
+
+Scene specifikus változók:
+--------------------------
+- loop_scene <0/1>
+  A scene ismétlését (loop-olást) állítja be.
+  Default: bekapcsolva (1).
+  FONTOS: ha a scene vége felé akarunk frame-ra idôzíteni, akkor ki kell
+  kapcsolni, mert elôfordulhat hogy elôbb ugrik az elejére mint észrevenné
+  az EVENT teljesülését.  MEGJ: asszem ez Alpha II engine óta nem számít. :)
+
 - directional_lighting <0|1>
   A fényszámolás módját állítja be, 1=gyorsabb de bénább
   Csak scene típusú effektnél van jelentôsége!
+  FONTOS: CSAK OpenGL-es fényszámolás esetén mûködik. (tehát a Beta óta nem:))
+
 - fixUV
   Az aktuális scene textúra koordinátáit kijavítja. Nem jól mûködik
-  facemapping (teljes textúra ráfeszítav 1-2 facera) esetén.
-  Csak scene típusú effektnél mûködik!
-- vlimit=szám
-  A BLOB isolevel-jét (méretét) adja meg. default=200000
-  Hatásos fade-val kombinálva:  fade vlimit 200000 120000 4
-- line_blob=<0|1>
-  A BLOB típusát: 0=felület / 1=drótváz állítja be.
+  facemapping (teljes textúra ráfeszítve 1-2 facera) esetén.
+  MEGJ: megadható egy vagy több object neve is, ekkor csak azok
+  textúráját korrigálja! Különben az összeset.
+  pl. 'fixUV Object03 Talaj Emberke'
 
-3. light változók:
-==================
+- znear=<szám>   és   zfar=<szám>
+  A megjelenítéskor használandó legkisebb és legnagyobb Z érték megadása.
+  Ezen a tartományon kívül esô dolgok le lesznek vágva, nem fognak látszani.
+  Túl nagyra viszont nem szabad állítani, mert akkor a közeli dolgok
+  távolságát hibásan (pontatlanul) számolja, sôt az egymésba metszô
+  objectek tejesen bugosak lesznek.
+  Default: znear=10  zfar=10000
+
+- fog_type=<0|1>
+  Ködöt lehet ki/bekapcsolni.  0=ki, 1=be.
+
+- fog_znear=<szám>   és   fog_zfar=<szám>
+  A köd kezdete és vége állítható be:
+  a fog_znear értékénél kisebb Z értékeknél egyáltalán nem lesz köd,
+  a fog_zfar értéknél nagyobbaknál pedig csak köd lesz, tehát nem
+  látszik semmi. A 2 érték közt pedig megfelelô arányban.
+
+- frustum_culling=<0|1>
+  A frustum culling (látómezôn kívülesô facek, objectek elrejtése)
+  kapcsolható ki vele. Nagyon ritkán kell, csak ha valamiert bugzik
+  és eltünedeznek objectek amiknek nem kéne akkor.
+
+
+Light specifikus változók:
+--------------------------
 A fényforrások paramétereit állítják be.
 Fényforrás kiválasztása:  "light #"  ahol # a fény száma 0-tól számozva.
 
-A kiválasztott fényforrásokra a következô paraméetrek állíthatóak:
+A kiválasztott fényforrásokra a következô paraméterek állíthatóak:
+- corona_scale=<szám>
+  A fényforrás képének nagyítása. Åltalában jó a default=1, de ha extra nagy
+  fényeket akarunk vagy valamiért rosszul van skálázva a scene, akkor ez kell.
+  Ha 0-ra állítod akkor nem rajzol rá corona-t csak számol vele.
 - light_zbuffer=<0|1>
-  Számoljon-e zbuffer-t a fényekre - azaz a fény belemehete- a tárgyba.
+  Számoljon-e zbuffer-t a lightcorona-kra - azaz a fény belemehet-e a tárgyba.
   default=1
+- light_enabled=<0|1>
+  fényszámolás kikapcsolása  (default=1 azaz bekapcsolva)
+  ha ki van kapcsolva, akkor csak lightcorona-t rajzol, de nem számol
+  vele, így lehet fake fényeket csinálni. Pl. egy sceneben vagy 20
+  fényforrás, de csak 4 valódi, így gyors is és sokan beveszik :)
 - attenuation0=<szám>      ; constant
   attenuation1=<szám>      ; linear
   attenuation2=<szám>      ; quadratic
   Fényszámolás polinom paraméterei. Ha constant van akkor akárhol van a
-  fény ugyanúgy világítaj meg, ha quadratic, akkor ahogy távolodik a fény
+  fény ugyanúgy világítja meg, ha quadratic, akkor ahogy távolodik a fény
   a tárgytól egyre csökken a fényerô...
   default: a0=1  a1=0  a2=0
-- corona_scale=<szám>
-  A fényforrás képének nagyítása. Åltalában jó a default=1, de ha extra nagy
-  fényeket akarunk vagy valamiért rosszul van skálázva a scene, akkor ez kell.
 
 pl.:
     2: scene part1
@@ -280,10 +496,219 @@ pl.:
     attenuation0=0
     attenuation2=0.001
 
+Object specifikus változók:
+---------------------------
+Az object-ek (testek) paramétereit állítják be.
+Object kiválasztása:  "object <név>"  ahol <név> az object neve.
+Megj: kisbetû-nagybetû megkülönböztetés van, és ha spec karakter
+(space, = jel) van az obj névben akkor tedd idézôjelbe: pl. "Ember 1."
+
+- bumpdepth=<szám>
+  Bumpmapping esetén a bump mélységét és irányát (dudor/horpadás) lehet
+  állítani, sôt akár fadelni is.
+
+- additivetexture=<0|1>
+  Textúrázás típusa állítható vele. default=0 azaz normál, de ha 1-re
+  állítod akkor nem blendeli a textúrát hanem add-olja. Fôleg
+  fake volumetrikus fényekhez jó.
+
+- zbuffer=<0|1>
+  Zbuffer számolás kapcsolható ki/be objectenként.
+  2 eset amikor hasznos:
+   - háttérnek egy nagy gömb vagy hasonló konvex test van betéve, amire
+     teljesen felesleges zbuffert számolni, viszont nagy felület esetén
+     már jelentôs sebességkülönbség van.
+   - ha bugzik a zbuffer, pl. átlátszó testek esetén. nem mindig, de
+     sokszor megoldja a problémát.
+
+- transparency=<szám>
+  HACK!!! ne használd ha nem muszáj, csak tesztelésre.
+  Az object material tarnsparency értékét lehet vele megváltoztatni.
+  Csak azért van hogy próbálgatáshoz ne kelljen mindig 3DS-t indítani.
+
+Speciális object effektek:
+--------------------------
+Ezek a 3D sceneben található objectek speciális kezelésére, megjelenítésére
+vonatkoznak:
+
+Vertexlights:
+~~~~~~~~~~~~~
+Lehetôség van arra, hogy az objectet nem felületként, poligonokból jelenítse
+meg, hanem a vertexekbe rakjon 1-1 lightcorona-t.
+Változók:
+  - vertexlights=<szám>
+    ha 0 akkor kikapcsolva, különben pedig <szám> méretû spriteokat rak ki.
+    megjegyzés: a spriteok mérete attól is függ, hogy az adott vertex mekkora
+    összterületû face-k alkotórésze, így a részletesebben kidolgozott részeken
+    (ahol több vertex van) kisebb sprite lesz.
+  - explode_frame=<szám>
+    Lehetôség van az ilyen vertexekbôl álló testek szétrobbantására is!
+    a robbanás fázisát az explode_frame adja meg. Ezt célszerû a 'fade'
+    paranccsal változtatni folyamatosan 0-tól valameddig.  0 értéknél
+    a vertexek a helyükön vannak, ennél nagyobb értéknél arányosan szét van
+    esve.
+  - explode_speed=<szám>
+    A szétrobbanásnál a kilövés sebességét adja meg.
+    A kilövés iránya mindig a normálvektor.
+
+Particle system:
+~~~~~~~~~~~~~~~~
+A 3DS sceneben létrehozhatunk particle systemeket is. Gyakorlatban
+ez úgy néz ki, hogy egy akármilyen objectet (pl. kocka) kell létrehozni,
+és ezt keyframelni (scale, forgatás mozgatás stb) ahogy akarod.
+Az object középpontja lesz a particle system kilövési pontja.
+
+Beállítás:
+1. az object neve PARTICLE-vel kell kezdôdjön  (pl "PARTICLE01")
+2. a scriptben egy particle parancsot kell kiadni:
+
+  particle <objnév> <textúra> <maxnum>
+Ez lefoglal memóriát és inicializál egy particle effektet az <objnév>
+objecthez hozzárendelve. A maxnum azt adja meg hogy maximálisan hány
+darab part (kis mozgó sprite) lehet.
+
+Változók:
+  INT   part_num                ; part-ok száma (maximum <maxnum> lehet)
+  INT   part_texture            ; textúra megadása (ha változtatni akarjuk közben)
+  FLOAT part_eject_r            ; kilövési terület átmérôje
+  FLOAT part_eject_vy           ; kilövés y irányû sebessége
+  FLOAT part_eject_vl           ; kilövés oldalirányû sebessége
+  FLOAT part_ridtri             ; ?
+  FLOAT part_energy             ; kezdeti energia - méretet befolyásolja
+  FLOAT part_dieratio           ; energiacsökkenés
+  FLOAT part_agrav              ; gravitációs gyorsulás (default 9.81)
+  FLOAT part_colordecrement     ; fényerô csökkenés  (default 0.999)
+  INT   part_sizelimit          ; sprite maximális mérete
+
+Egyéb:
+mivel a particle system az elején csúnya (még nem érvényesül a random
+hatás, és egy csomóban robban az egész), ezért van egy "gyorstekerés" utasítás:
+  particle_preplay <objnév> <dt> <hányszor>
+Ez az utasítás <hányszor> db framera kiszámolja a particle-k mozgását, úgy
+hogy 2 frame között dt idô telik el. Közben perze nem rajzol, csak számol,
+így nagyon gyorsan végrehajtható, akár meg a betöltéskor.
+A dt értéke 0.015 legyen. A <hányszor> kb 600-nál jó.
+
+
+4. Mire figyeljünk 3DS scene-k készítésekor.
+============================================
+Végül néhány megjegyzés, tanács, FAQ:
+
+MATERIAL:
+- Ha az objectre valamilyen map-et (envmap/bump/lightmap/specular stb)
+  akarunk tenni, akkor mindenképpen kell textúrát is tenni rá!!!
+  (Ez a korlát a jövôben meglesz szüntetve)
+- BUMP esetén a bumpmapon és a textúrán kívûl más map nem használható!
+  (de opacitymap igen!? ki kéne próbálni...)
+  A textúra pedig legyen jól elsmootholva/blurozva, különben picit
+  mozogni fog az objecten ahogy a fényforrás mozog.
+  Továbbá bumpmap esetén a MASZK-okat nem veszi figyelembe az engine.
+  A bump amountof-ját nem veszi figyelembe, helyette az scriptbôl állítható.
+- egy objecten csak egyféle material lehet. Mégpedig az lesz figyelembe
+  véve ami a legelsô face-n (a 0-ás számún) van.
+- lightmap-et selfilluminationmap-ként lehet definálni. Ezzel megadható
+  minden pixelre a textúra szine/fényereje. Mérete lehet sokkal kisebb
+  mint a texúráé, így kis helyet foglal, a textúra többször felhasználható,
+  és még gyors is lesz.
+
+Åtlátszó testek:  (transparency>0 vagy opacitymapes)
+- Az objectek sorrendje ilyenkor nagyon fontos: elôbb legyenek azok amik
+  nem átlátszóak, és végül megjelenítési sorrendben az átlátszók.
+  Megoldása 3DS-ben:
+    1. elmented a scene-t
+    2. kitörlöd az összes átlátszó objectet
+    3. File/MERGE-vel _egyenként_ hozzáadod az átlátszó objecteket az
+       elôbb elmentett fileból. Amilyen sorrendben merge-zed olyanban
+       fogja kirajzolni ôket. Tehát hátulról elôrefelé vagy egymásban levô
+       testeknél belülrôl kifelé haladj!
+    4. mentsd el. :)
+- átlátszó objectek faceit az engine Z-Sortolja, de csak 16 bites
+  felbontásban, 0..10000 Z tartományban. Tehát ha 10000-nél nagyobb
+  Z-ben dolgozol, akkor nem fog mûködni, összekeveri a facekat.
+  Szintén bugzani fog ha
+  - a facek torz alakúak (aránytalanul hossú vagy széles)
+  - párhuzamos facek túl közel vannak egymáshoz
+
+OBJECT MORPH
+  Az Alpha II engine már Spline-os object morphot csinál.
+- Ebbôl következôen _LEGALÅBB HÅROM_ object fázis (keypoint) kell legyen.
+  A 3DS megenged 2-t is (sôt 1-et is), de ettôl az enginünk elszáll... :(
+- A LOOP-olás se támogatott még.
+
+Sok kis object vagy kevés nagy?
+  Az utóbbi! Mivel az engine úgy van megírva, hogy amit lehet precalcol
+  objectenként, még ha ez többször annyi számolás is mint amit facenként kéne,
+  de még mindig sokkal kevesebb, mint ha minden facera elvlgezné.
+  De ez csak akkor éri meg, ha sok face van! Éppen ezért a kevés (<50)
+  faceból álló objecteket relatíve lassan számolja. (magyarul ugyanannyi
+  ideig tart egy 1 faces object kirajzolása mint egy 50 faceból állóé)
+  Attól még lehetnek, de ha van pl. egy csigalépcsô, akkor azt ne
+  lépcsôfokonként külön objectekben hanem inkább egy objectként mentsd el.
+  Amikor ne egyesíts objecteket:
+  - ha nagyon messze vannak egymástól, és egyszerre csak az egyik látszik
+  - ha különbözô a material-juk.
+
+Falak, nagy síkok:
+- Ha olyan falakat, padlót stb rajzolsz, ami vastagsága reltíve sokkal kisebb
+  mint szélessége és/vagy hossza, akkor azt semmiképp se lapos hasábnak rajzold,
+  hanem egy síknak (pl. kitörlöd a hasáb 5 oldalát)!!! A textúrát állítsd
+  2-sided -ra ha mind2 oldalról látszania kell.
+- ha a falakat külön objectként rajzolod meg, akkor figyelj nagyon az
+  illesztésekre, tehát a sarkokban levô vertexek pontosan ugyanott legyenek,
+  ha lehet, kerüld a rácsos ( # alakú) túllógós elrendezést.
+- nagy felületû síkokat csinald inkább sok kicsibôl. Ez a fényszámolás miatt
+  fontos, mivel a fényt csak a vertexekben számolja az engine, közte csak
+  interpolál. Fôleg mozgó fényforrásoknál érdekes ez.
+  Ilyet legegyszerûbben a 3DS Shaper+Lofter használatával lehet szerintem.
+  Másik módszer ha egy hasábot/kis síkot ARRAY-al sokszorosítasz, de ennek
+  hátránya hogy 6-szor annyi vertexbôl fog állni!!!
+
+Hány face, hány vertex, hány fps?
+  Attól függ... :)   ...hogy:
+  - milyen gépen
+  - milyen kártyával
+  - milyen driverrel
+  - melyik enginnel
+  - milyen felbontásban
+  - milyen szinmélységgel
+  és:
+  - hány map/textúra van (0/1/2/3/4) az objecten
+  - átlátszó-e
+  - morphol-e
+  - mekkora része látszik egyszerre (pl. 80%-a kilóg mindig...)
+  - sok kis obj vagy kevés nagy?
+  - hány fényforrás világítja meg
+  Itt egy par gyakorlati példa, de jobb ha inkabb te magad kipróbálod:
+  Celeron550 + G400 + Linux/GLX + Alpha2 engine, 640x480x16bpp:
+  - textura+specularmap, 10000 vertex, 20000 face:  18fps  (macska2y.3ds)
+  - 0 vagy 1 textura, nagyon sok kis object, kb 37000 face: 7fps  (chevy.3ds)
+  - textura+envmap, SPLINE obj morph, 1750 vertex, 3484 face:  30fps  (logo.3ds)
+  - textura+lightmap, sok átlátszó, nagy facek. 3500vert,6500 faces: 57fps (terem2.3ds)
+  - textura+envmap+specularmap,átlátszó,spline objmorph, 1573vert/2880faces: 32fps
+  - text+env+spec+lightmap, 1 db kis object, 1544vert/3090faces: 30fps  (2light.3ds)
+  Åltalánosan nehéz megmondani, a lényeg hogy a compogépen legalább
+  20fps-el menjen, de inkább több, hogy más effektet is rá lehessen tenni,
+  meg ha 2 ilyen scenet egymásba blendelsz akkor se akadjon le.
+! Viszont amit nem szabad: túl kevés facet használni, szögletes objecteket
+  csinálni. Annál még a lassú de szép obj is jobb.
+
+És végül itt egy egyszerû script a 3DS-ek tesztelésére:
+
+load_scene teszt akarmi.3ds
+1:
+scene teszt
+fixUV          ; ez csak akkor kell ha rossz a textura rafeszites
+fps=20         ; ezt allitsd ha tul gyors/lassu
+play
+
+------------------------------------------------------------------------------
 Na ennyit egyelôre a scriptrendszerrôl.
 Ha bármi kérdésed van, vagy valamiben nem látod a logikát (pedig van!:))
 akkor mailto: arpi@banki1.banki.hu, vagy IRC: Arpi_AST  #demoscene, #scene
+A változók, parancsok elnevezése nem mindig a legjobb, ha jobb 5leted van
+azt is írd meg.
 
 A'rpi of Astral
-
+===============================================================================
+                          *  T H E  *  E N D  *
 

@@ -1,6 +1,4 @@
 // ====================== EVENT handler ===============================
-float adk_time=0.0;
-float adk_time_corrected=0.0;
 
 float adk_mp3_frame=0.0;
 #define MP3_FRAMES (nosound?adk_mp3_frame:(MP3_frames))
@@ -42,7 +40,7 @@ int scrTestEvent(scrEventStruct* event){
   return 0;
 }
 
-int scrSetEvent(scrEventStruct* event,byte* s){
+int scrSetEvent(scrEventStruct* event,char* s){
 int slen=strlen(s)-1;
 float x;
 int i;

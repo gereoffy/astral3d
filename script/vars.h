@@ -1,100 +1,134 @@
 /* Special script variables linked to real variables */
 
-// fx-dependent variables:
-SCR_FLOAT_PTR(fx_ptr_frame,"frame");
-SCR_FLOAT_PTR(fx_ptr_fps,"fps");
-SCR_FLOAT_PTR(fx_ptr_blend,"blend");
-SCR_INT_PTR(fx_ptr_loop_scene,"loop_scene");
+//=============================
+// globals:
+#define VAR_GLOB(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_global,(void*)(&realname))
 
-SCR_FLOAT_PTR(fx_ptr_vlimit,"vlimit");
-SCR_FLOAT_PTR(fx_ptr_blob_alpha,"blob_alpha");
-SCR_INT_PTR(fx_ptr_line_blob,"line_blob");
-SCR_FLOAT_PTR(fx_ptr_blob_ox,"blob_ox");
-SCR_FLOAT_PTR(fx_ptr_blob_oy,"blob_oy");
-SCR_FLOAT_PTR(fx_ptr_blob_oz,"blob_oz");
-SCR_FLOAT_PTR(fx_ptr_blob_rx,"blob_rx");
-SCR_FLOAT_PTR(fx_ptr_blob_ry,"blob_ry");
-SCR_FLOAT_PTR(fx_ptr_blob_rz,"blob_rz");
+VAR_GLOB(scrTYPE_float,"time",adk_time);
+VAR_GLOB(scrTYPE_int  ,"clear_buffer",adk_clear_buffer_flag);
 
-SCR_FLOAT_PTR(fx_ptr_pic_r,"pic_r");
-SCR_FLOAT_PTR(fx_ptr_pic_g,"pic_g");
-SCR_FLOAT_PTR(fx_ptr_pic_b,"pic_b");
-SCR_FLOAT_PTR(fx_ptr_pic_z,"pic_z");
-SCR_INT_PTR(fx_ptr_pic_alphamode,"pic_alphamode");
-SCR_INT_PTR(fx_ptr_pic_zbuffer,"pic_zbuffer");
-SCR_FLOAT_PTR(fx_ptr_pic_alphalevel,"pic_alphalevel");
+#undef VAR_GLOB
 
-SCR_FLOAT_PTR(fx_ptr_face_blend,"face_blend");
-SCR_FLOAT_PTR(fx_ptr_wire_blend,"wire_blend");
-SCR_FLOAT_PTR(fx_ptr_spline_size,"spline_size");
-SCR_FLOAT_PTR(fx_ptr_spline_n,"spline_n");
+//=============================
+// global FX vars:
+#define VAR_FX(vartype,varname,realname,defval) scrAddNewVar(varname,vartype,scrCLASS_fx,(void*)(&fx->realname));fxdefault.realname=defval
 
-SCR_FLOAT_PTR(fx_ptr_fd_speedx,"fdtunnel_speedx");
-SCR_FLOAT_PTR(fx_ptr_fd_speedy,"fdtunnel_speedy");
-SCR_FLOAT_PTR(fx_ptr_fd_speedz,"fdtunnel_speedz");
-SCR_FLOAT_PTR(fx_ptr_fd_bright,"fdtunnel_bright");
-SCR_FLOAT_PTR(fx_ptr_fd_persp,"fdtunnel_persp");
-SCR_FLOAT_PTR(fx_ptr_fd_fovx,"fdtunnel_fovx");
-SCR_FLOAT_PTR(fx_ptr_fd_fovy,"fdtunnel_fovy");
-SCR_FLOAT_PTR(fx_ptr_fd_radius,"fdtunnel_radius");
-SCR_FLOAT_PTR(fx_ptr_fd_rad_speed,"fdtunnel_rad_speed");
-SCR_FLOAT_PTR(fx_ptr_fd_rad_amp,"fdtunnel_rad_amp");
-SCR_FLOAT_PTR(fx_ptr_fd_rad_szog,"fdtunnel_rad_szog");
+VAR_FX(scrTYPE_float,"frame",frame,0.0);
+VAR_FX(scrTYPE_float,"fps",fps,25.0);
+VAR_FX(scrTYPE_float,"blend",blend,1.0);
+VAR_FX(scrTYPE_int,  "loop_scene",loop_scene,1);
 
-SCR_FLOAT_PTR(fx_ptr_greets_blend_speed,"greets_blend_speed");
-SCR_FLOAT_PTR(fx_ptr_greets_move_speed,"greets_move_speed");
-SCR_FLOAT_PTR(fx_ptr_greets_rot_speed,"greets_rot_speed");
-SCR_FLOAT_PTR(fx_ptr_greets_dist,"greets_dist");
-SCR_FLOAT_PTR(fx_ptr_greets_scale,"greets_scale");
+// BLOB:
+VAR_FX(scrTYPE_float,"vlimit",blob.vlimit,200000);
+VAR_FX(scrTYPE_float,"blob_alpha",blob.blob_alpha,0);
+VAR_FX(scrTYPE_int  ,"line_blob",blob.line_blob,0);
+VAR_FX(scrTYPE_float,"blob_ox",blob.pos[0],17000);
+VAR_FX(scrTYPE_float,"blob_oy",blob.pos[1],17000);
+VAR_FX(scrTYPE_float,"blob_oz",blob.pos[2],17000);
+VAR_FX(scrTYPE_float,"blob_rx",blob.rad[0],6000);
+VAR_FX(scrTYPE_float,"blob_ry",blob.rad[1],6000);
+VAR_FX(scrTYPE_float,"blob_rz",blob.rad[2],2000);
 
-SCR_FLOAT_PTR(fx_ptr_sinpart_ox,"sinpart_ox");
-SCR_FLOAT_PTR(fx_ptr_sinpart_oy,"sinpart_oy");
-SCR_FLOAT_PTR(fx_ptr_sinpart_oz,"sinpart_oz");
-SCR_FLOAT_PTR(fx_ptr_sinpart_size,"sinpart_size");
-SCR_FLOAT_PTR(fx_ptr_sinpart_scale,"sinpart_scale");
-SCR_FLOAT_PTR(fx_ptr_sinpart_speed,"sinpart_speed");
-SCR_FLOAT_PTR(fx_ptr_sinpart_sinspeed,"sinpart_sinspeed");
+// PICTURE:
+VAR_FX(scrTYPE_float,"pic_r",pic.rgb[0],1.0);
+VAR_FX(scrTYPE_float,"pic_g",pic.rgb[1],1.0);
+VAR_FX(scrTYPE_float,"pic_b",pic.rgb[2],1.0);
+VAR_FX(scrTYPE_float,"pic_z",pic.z,10.0);
+VAR_FX(scrTYPE_int  ,"pic_alphamode",pic.alphamode,0);
+VAR_FX(scrTYPE_float,"pic_alphalevel",pic.alphalevel,0);
+VAR_FX(scrTYPE_int  ,"pic_zbuffer",pic.zbuffer,0);
 
+// SPLINE:
+VAR_FX(scrTYPE_float,"fade_blend",face_blend,1.0);
+VAR_FX(scrTYPE_float,"wire_blend",wire_blend,0.5);
+VAR_FX(scrTYPE_float,"spline_size",spline_size,100.0);
+VAR_FX(scrTYPE_float,"spline_n",spline_n,16);
+
+// FDtunnel:
+VAR_FX(scrTYPE_float,"fdtunnel_speedx",fdtunnel.speed[0],0.008);
+VAR_FX(scrTYPE_float,"fdtunnel_speedy",fdtunnel.speed[1],0.009736);
+VAR_FX(scrTYPE_float,"fdtunnel_speedz",fdtunnel.speed[2],6);
+
+VAR_FX(scrTYPE_float,"fdtunnel_bright",fdtunnel.bright[1],4*65536/1556);
+VAR_FX(scrTYPE_float,"fdtunnel_persp",fdtunnel.persp[1],3.0);
+VAR_FX(scrTYPE_float,"fdtunnel_fovx",fdtunnel.fovx[1],120.0);
+VAR_FX(scrTYPE_float,"fdtunnel_fovy",fdtunnel.fovy[1],120.0);
+VAR_FX(scrTYPE_float,"fdtunnel_radius",fdtunnel.radius[1],768);
+VAR_FX(scrTYPE_float,"fdtunnel_rad_speed",fdtunnel.rad_speed[1],0.02354);
+VAR_FX(scrTYPE_float,"fdtunnel_rad_amp",fdtunnel.rad_amp[1],128);
+VAR_FX(scrTYPE_float,"fdtunnel_rad_szog",fdtunnel.rad_szog[1],5);
+
+// GREETS:
+VAR_FX(scrTYPE_float,"greets_blend_speed",greets.blend_speed,1.0);
+VAR_FX(scrTYPE_float,"greets_move_speed",greets.move_speed,0);
+VAR_FX(scrTYPE_float,"greets_rot_speed",greets.rot_speed,0);
+VAR_FX(scrTYPE_float,"greets_dist",greets.dist,0);
+VAR_FX(scrTYPE_float,"greets_scale",greets.scale,1.0);
+
+// SINPARTicle:
+VAR_FX(scrTYPE_float,"sinpart_ox",sinpart.ox,0);
+VAR_FX(scrTYPE_float,"sinpart_oy",sinpart.oy,0);
+VAR_FX(scrTYPE_float,"sinpart_oz",sinpart.oz,-1000);
+VAR_FX(scrTYPE_float,"sinpart_size",sinpart.size,300);
+VAR_FX(scrTYPE_float,"sinpart_scale",sinpart.scale,10);
+VAR_FX(scrTYPE_float,"sinpart_speed",sinpart.speed,1);
+VAR_FX(scrTYPE_float,"sinpart_sinspeed",sinpart.sinspeed,0.01);
+
+#undef VAR_FX
+
+//=============================
 // light-dependent variables:
-SCR_FLOAT_PTR(light_ptr_corona_scale,"corona_scale");
-SCR_FLOAT_PTR(light_ptr_attenuation0,"attenuation0");
-SCR_FLOAT_PTR(light_ptr_attenuation1,"attenuation1");
-SCR_FLOAT_PTR(light_ptr_attenuation2,"attenuation2");
-SCR_INT_PTR(light_ptr_zbuffer,"light_zbuffer");
-SCR_INT_PTR(light_ptr_enabled,"light_enabled");
+#define VAR_LIGHT(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_light,(void*)(&light->realname))
 
+VAR_LIGHT(scrTYPE_float,"corona_scale",corona_scale);
+VAR_LIGHT(scrTYPE_float,"attenuation0",attenuation[0]);
+VAR_LIGHT(scrTYPE_float,"attenuation1",attenuation[1]);
+VAR_LIGHT(scrTYPE_float,"attenuation2",attenuation[2]);
+VAR_LIGHT(scrTYPE_float,"light_zbuffer",use_zbuffer);
+VAR_LIGHT(scrTYPE_float,"light_enabled",enabled);
+
+#undef VAR_LIGHT
+
+//=============================
 // object-dependent:
-SCR_FLOAT_PTR(object_ptr_bumpdepth,"bumpdepth");
-SCR_INT_PTR(object_ptr_additivetexture,"additivetexture");
-SCR_INT_PTR(object_ptr_zbuffer,"zbuffer");
-SCR_FLOAT_PTR(object_ptr_vertexlights,"vertexlights");
-SCR_FLOAT_PTR(object_ptr_explode_frame,"explode_frame");
-SCR_FLOAT_PTR(object_ptr_explode_speed,"explode_speed");
-SCR_FLOAT_PTR(object_ptr_transparency,"transparency");
+#define VAR_OBJ(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_object,(void*)(&obj->realname))
+
+VAR_OBJ(scrTYPE_float,"bumpdepth",bumpdepth);
+VAR_OBJ(scrTYPE_int  ,"additivetexture",additivetexture);
+VAR_OBJ(scrTYPE_int  ,"zbuffer",enable_zbuffer);
+
+// Vertex lights
+VAR_OBJ(scrTYPE_float,"vertexlights",vertexlights);
+VAR_OBJ(scrTYPE_float,"explode_frame",explode_frame);
+VAR_OBJ(scrTYPE_float,"explode_speed",explode_speed);
+//VAR_OBJ(scrTYPE_float,"transparency",transparency);
 
 // particle system
-SCR_INT_PTR(particle_ptr_np,"part_num");
-SCR_INT_PTR(particle_ptr_texture_id,"part_texture");
-SCR_FLOAT_PTR(particle_ptr_eject_r,"part_eject_r");
-SCR_FLOAT_PTR(particle_ptr_eject_vy,"part_eject_vy");
-SCR_FLOAT_PTR(particle_ptr_eject_vl,"part_eject_vl");
-SCR_FLOAT_PTR(particle_ptr_ridtri,"part_ridtri");
-SCR_FLOAT_PTR(particle_ptr_energy,"part_energy");
-SCR_FLOAT_PTR(particle_ptr_dieratio,"part_dieratio");
-SCR_FLOAT_PTR(particle_ptr_agrav,"part_agrav");
-SCR_FLOAT_PTR(particle_ptr_colordecrement,"part_colordecrement");
-SCR_INT_PTR(particle_ptr_sizelimit,"part_sizelimit");
+VAR_OBJ(scrTYPE_int  ,"part_num",particle.np);
+VAR_OBJ(scrTYPE_int  ,"part_texture",particle.texture_id);
+VAR_OBJ(scrTYPE_float,"part_eject_r",particle.eject_r);
+VAR_OBJ(scrTYPE_float,"part_eject_vy",particle.eject_vy);
+VAR_OBJ(scrTYPE_float,"part_eject_vl",particle.eject_vl);
+VAR_OBJ(scrTYPE_float,"part_ridtri",particle.ridtri);
+VAR_OBJ(scrTYPE_float,"part_energy",particle.energy);
+VAR_OBJ(scrTYPE_float,"part_dieratio",particle.dieratio);
+VAR_OBJ(scrTYPE_float,"part_agrav",particle.agrav);
+VAR_OBJ(scrTYPE_float,"part_colordecrement",particle.colordecrement);
+VAR_OBJ(scrTYPE_int  ,"part_sizelimit",particle.sizelimit);
 
-// scene-dependent variables:
-SCR_INT_PTR(scene_ptr_directional_lighting,"directional_lighting");
-SCR_INT_PTR(scene_ptr_fog_type,"fog_type");
-SCR_FLOAT_PTR(scene_ptr_fog_znear,"fog_znear");
-SCR_FLOAT_PTR(scene_ptr_fog_zfar,"fog_zfar");
-SCR_FLOAT_PTR(scene_ptr_znear,"znear");
-SCR_FLOAT_PTR(scene_ptr_zfar,"zfar");
-SCR_INT_PTR(scene_ptr_frustumcull,"frustum_culling");
+#undef VAR_OBJ
 
-#ifdef SCR_DEFINE_NOW
-//scrCreateVar_float("time",0,&adk_time);
-scrCreateVar_int("clear_buffer",1,&adk_clear_buffer_flag);
-#endif
+//=============================
+// scene-dependent:
+#define VAR_SCENE(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_scene,(void*)(&scene->realname))
+
+VAR_SCENE(scrTYPE_int  ,"directional_lighting",directional_lighting);
+VAR_SCENE(scrTYPE_float,"znear",znear);
+VAR_SCENE(scrTYPE_float,"zfar",zfar);
+VAR_SCENE(scrTYPE_int  ,"fog_type",fog.type);
+VAR_SCENE(scrTYPE_float,"fog_znear",fog.fog_znear);
+VAR_SCENE(scrTYPE_float,"fog_zfar",fog.fog_zfar);
+VAR_SCENE(scrTYPE_int,  "frustum_culling",frustum_cull);
+
+#undef VAR_SCENE
+

@@ -325,21 +325,40 @@ v3.3  99/12/22  by A'rpi & Strepto  - TP demo
   zbuffert is bekapcsolni ra.
 - blob pozicio es mozgasi sugar allithato scriptbol.  (alpha2-hoz kellett)
 
+v3.4  00/01/01-05  by  A'rpi    - uj scriptrendszer!!!
+- elkeszult az uj scriptsystem!
+  new features:
+  - nagyon konnyu uj valtozok, parancsok hozzaadasa  (vars.h es cmds.h)
+  - automatikus szintaxis ellenorzes, sokatmondo hibauzenet, help  (file.c)
+  - default ertekek kezelese... lasd. fxdefault
+    effekt-tipus allitaskor beallit mindent a defaultra
+  - include parancs tamogatasa - sok kicsi script atlathatobb
+  - 10-nel tobb fx (most 20 a max.) tamogatasa. hatar a csillagos sky-effect :)
+  - kepek kezelese texture_st strukturaval -> meret+pixelsize megmarad!
+  - minden beallitas, struktura a script2.c elejen
+
+
+TERVEK a 4.0-ba:
+- fdtunnel modositas: 2-nel tobb tunnel, fdtunnel_select most nem muxik
+- greets effekt befejezese
+- opengl state manager, multitexture?
+- sphere es cube fx  (egymasban forgo gombok, es 6 texturas kocka)
+- camera valtas scriptbol
+- gyorstekeres scriptrendszerbe
+- commandline opciok: window/fullscreen, felbontas, mipmap on/off, fps
+- textura caching (betolti a texturakat a kartyaba)
+
 
 KELL MEG:
 - profiling: meg mindig "elveszik" neha ido a 'draw' reszben. pl chevy, szoba
 - optimalt directional lighting attenuation nelkul, normal forgatas nelkul
 - objectek sortolasa: eloszor tomor obj-k, utana atlatszok z-sort-olva
   megpedig nem sulypont hanem bbox.min.Z szerint!
-- uj picture formatum (xsize,ysize,alpha_flag,hany db texturabol,tomb ID-knek)
 - scriptbol vezerelheto lassu texturabetoltes (3ds play kozben tolti le
   oket egyenkent)
 - 2D effektek
 - animalt texturak (FLI/FLC?)
-- camera valtas scriptbol, scriptsys forras (foleg scr_exec.c) letisztazasa
 - tobb fenyforras parametereinek 1ideju allitasa!  (bitmaszk kell light-nal)
-- commandline opciok: window/fullscreen, felbontas, mipmap on/off, fps
-- gyorstekeres scriptrendszerbe
 - multitextura  (textura+lightmap esetre legalabb)
 - morph transzformaciot attenni render.c-be! meg a pre-trans cull-t is!
 - keyframer bug: LOOP-ot nem tamogat (spline.c tudja de ami hivja az nem igazan)

@@ -1,3 +1,5 @@
+#define FULLSCREEN
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -89,7 +91,9 @@ int main(int argc,char* argv[]){
 #endif
 
 
+#ifdef FULLSCREEN
     glutFullScreen();
+#endif
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
     glClearDepth( 1.0 );
