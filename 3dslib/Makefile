@@ -3,7 +3,7 @@
 SRCS = ast3d.c camera.c file_3ds.c quatern.c spline.c
 OBJS = ast3d.o camera.o file_3ds.o quatern.o spline.o
 CC   = gcc
-CFLAGS = -O2 -Wall -mpentiumpro -pipe
+CFLAGS = -g -O2 -Wall -mpentiumpro -pipe
 
 .SUFFIXES: .c .o
 
@@ -47,9 +47,9 @@ ast3d.o: /usr/include/ctype.h /usr/include/math.h
 ast3d.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
 ast3d.o: /usr/include/bits/mathcalls.h
 ast3d.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
-ast3d.o: ast3d.h ast3di.h ../afs/afs.h vector.h matrix.h fix_uv.c uv_grad.c
-ast3d.o: optimvert.c normals.c do_trans.c morph-new.h morph-old.c morph-new.c
-ast3d.o: visibchk.c update.c
+ast3d.o: ast3d.h ast3di.h ../afs/afs.h vector.h matrix.h uv_grad.c fix_uv.c
+ast3d.o: optimvert.c normals.c getkey.c do_trans.c morph-new.h morph-new.c
+ast3d.o: morph-old.c visibchk.c update.c
 camera.o: /usr/include/math.h /usr/include/features.h
 camera.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
 camera.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
@@ -88,14 +88,13 @@ quatern.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/stdarg.h
 quatern.o: /usr/include/bits/types.h /usr/include/libio.h
 quatern.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h ast3d.h
 quatern.o: ast3di.h ../afs/afs.h
-spline.o: /usr/include/math.h /usr/include/features.h
+spline.o: /usr/include/stdio.h /usr/include/features.h
 spline.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
-spline.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
-spline.o: /usr/include/bits/mathcalls.h
-spline.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
-spline.o: /usr/include/stdio.h
 spline.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/stddef.h
 spline.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/stdarg.h
 spline.o: /usr/include/bits/types.h /usr/include/libio.h
-spline.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h ast3d.h
-spline.o: ast3di.h ../afs/afs.h vector.h spl_quat.c
+spline.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h
+spline.o: /usr/include/math.h /usr/include/bits/huge_val.h
+spline.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
+spline.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
+spline.o: ast3d.h ast3di.h ../afs/afs.h spl_quat.c

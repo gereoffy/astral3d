@@ -1,11 +1,13 @@
+// spline_type:   1=first  2=last  3=normal
+
 /*----------------------- NEW SPLINE MORPH --------------------------*/
   t_KEY *key=obj->morph.key;
-  t_KEY *keyn=key->next;
+  t_KEY *keyn=key->loop_next;
   float t2,t3;
   float h[4];
 
 //  printf("MORPH: new-style   key1=%d  key2=%d\n",key->spline_type,keyn->spline_type);
-  
+
   t2 = alpha * alpha; t3 = t2 * alpha;
   h[0] =  2 * t3 - 3 * t2 + 1;
   h[1] = -2 * t3 + 3 * t2;
@@ -13,7 +15,7 @@
   h[3] = t3 - t2;
 
   if(key->spline_type==1){   /* first, normal */
-    t_KEY *keynn=keyn->next;
+    t_KEY *keynn=keyn->loop_next;
     /* Find third object */
     ast3d_byid(keynn->val._int, &from);
     o3=(c_OBJECT *)from->object; v3=o3->vertices;
@@ -35,7 +37,7 @@
 #undef MINTERP
   } else
   if(keyn->spline_type==2){   /* normal, last */
-    t_KEY *keyp=key->prev;
+    t_KEY *keyp=key->loop_prev;
     /* Find prev object */
     ast3d_byid(keyp->val._int, &from);
     o0=(c_OBJECT *)from->object; v0=o0->vertices;
@@ -56,8 +58,8 @@
     }
 #undef MINTERP
   } else {   /* normal, normal */
-    t_KEY *keyp=key->prev;
-    t_KEY *keynn=keyn->next;
+    t_KEY *keyp=key->loop_prev;
+    t_KEY *keynn=keyn->loop_next;
     /* Find prev & third object */
     ast3d_byid(keyp->val._int, &from);
     o0=(c_OBJECT *)from->object; v0=o0->vertices;

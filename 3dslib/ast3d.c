@@ -16,29 +16,16 @@
   char    ast3d_version[]   = "Astral 3DS Loader v4.0";
   char    ast3d_copyright[] = "copyright (c) 1998-2000 Astral";
 
-  c_SCENE  *ast3d_scene;  /* current active scene  */
-  c_CAMERA *ast3d_camera; /* current active camera */
-  int32     ast3d_flags;  /* curreng flags         */
-
-#if 0
-struct {
-  char   *name;                       /* file extension        */
-  int32 (*load_mesh)   (afs_FILE *f); /* loads mesh            */
-  int32 (*load_motion) (afs_FILE *f); /* loads motion          */
-  int32 (*save_scene)  (afs_FILE *f); /* saves the whole scene */
-} ast3d_drivers[] = {
-  {"3DS", ast3d_load_mesh_3DS, ast3d_load_motion_3DS, NULL},
-//  {"AST", ast3d_load_mesh_AST, ast3d_load_motion_AST, ast3d_save_AST}
-//  {"AST", NULL, NULL, NULL}
-};
-#endif
+c_SCENE  *ast3d_scene=NULL;  /* current active scene  */
+c_CAMERA *ast3d_camera=NULL; /* current active camera */
+int32     ast3d_flags=0;     /* curreng flags         */
 
 /*****************************************************************************
   internal functions
 *****************************************************************************/
 
-#include "fix_uv.c"
 #include "uv_grad.c"
+#include "fix_uv.c"
 
 #ifdef TRIANGLE_STRIP
 #include "sortface.c"
@@ -50,9 +37,7 @@ struct {
 
 #include "normals.c"
 
-
-static void calc_normals ()
-{
+static void calc_normals (){
 /*
   calc_normals: calculates face/vertex normals.
 */
@@ -64,14 +49,10 @@ static void calc_normals ()
       optimize_vertex ((c_OBJECT *)node->object);
 #endif
       calc_objnormals ((c_OBJECT *)node->object);
-//      ast3d_NOfixUV((c_OBJECT *)node->object);
-//      calc_uv_grads((c_OBJECT *)node->object);
     }
-
 }
 
-static void calc_bbox ()
-{
+static void calc_bbox (){
 /*
   calc_bbox: calculate bounding boxes for objects.
 */
@@ -106,10 +87,7 @@ static void calc_bbox ()
     }
 }
 
-#include "do_trans.c"
-
-static void ast3d_free_track (t_TRACK *track)
-{
+static void ast3d_free_track (t_TRACK *track){
 /*
   ast3d_free_track: deallocated memory used by track.
 */
@@ -221,48 +199,33 @@ int32 ast3d_getframe (float *frame){
   return ast3d_err_ok;
 }
 
-int32 ast3d_setactive_scene (c_SCENE *scene)
-{
-/*
-  ast3d_setactive_scene: set active scene.
-*/
+int32 ast3d_setactive_scene (c_SCENE *scene){
+/*  ast3d_setactive_scene: set active scene.*/
   if (!scene) return ast3d_err_nullptr;
   ast3d_scene = scene;
   return ast3d_err_ok;
 }
 
-int32 ast3d_setactive_camera (c_CAMERA *cam)
-{
-/*
-  ast3d_setactive_camera: set active camera.
-*/
+int32 ast3d_setactive_camera (c_CAMERA *cam){
+/*  ast3d_setactive_camera: set active camera.*/
   ast3d_camera = cam;
   return ast3d_err_ok;
 }
 
-int32 ast3d_getactive_scene (c_SCENE **scene)
-{
-/*
-  ast3d_getactive_scene: get active scene.
-*/
+int32 ast3d_getactive_scene (c_SCENE **scene){
+/*  ast3d_getactive_scene: get active scene.*/
   *scene = ast3d_scene;
   return ast3d_err_ok;
 }
 
-int32 ast3d_getactive_camera (c_CAMERA **camera)
-{
-/*
-  ast3d_getactive_camera: get active camera.
-*/
+int32 ast3d_getactive_camera (c_CAMERA **camera){
+/*  ast3d_getactive_camera: get active camera.*/
   *camera = ast3d_camera;
   return ast3d_err_ok;
 }
 
-int32 ast3d_byname (char *name, w_NODE **node)
-{
-/*
-  ast3d_byname: find object by name (world tree).
-*/
+int32 ast3d_byname (char *name, w_NODE **node){
+/*  ast3d_byname: find object by name (world tree).*/
   if (!ast3d_scene || !ast3d_scene->world) return ast3d_err_notloaded;
   for (*node = ast3d_scene->world; *node; *node = (*node)->next) {
     switch ((*node)->type) {
@@ -286,11 +249,8 @@ int32 ast3d_byname (char *name, w_NODE **node)
   return ast3d_err_ok; /* return NULL */
 }
 
-int32 ast3d_byid (int32 id, w_NODE **node)
-{
-/*
-  ast3d_byid: find object by id (world tree).
-*/
+int32 ast3d_byid (int32 id, w_NODE **node){
+/*  ast3d_byid: find object by id (world tree).*/
   if (!ast3d_scene || !ast3d_scene->world) return ast3d_err_notloaded;
   for (*node = ast3d_scene->world; *node; *node = (*node)->next) {
     switch ((*node)->type) {
@@ -313,22 +273,16 @@ int32 ast3d_byid (int32 id, w_NODE **node)
   return ast3d_err_ok; /* return NULL */
 }
 
-int32 ast3d_findfirst (int32 attr, w_NODE **node)
-{
-/*
-  ast3d_findfirst: finds first node with attribute "attr" (world tree).
-*/
+int32 ast3d_findfirst (int32 attr, w_NODE **node){
+/*  ast3d_findfirst: finds first node with attribute "attr" (world tree).*/
   if (!ast3d_scene || !ast3d_scene->world) return ast3d_err_notloaded;
   for (*node = ast3d_scene->world; *node; *node = (*node)->next)
     if ((*node)->type & attr) return ast3d_err_ok;
   return ast3d_err_ok; /* return NULL */
 }
 
-int32 ast3d_findnext (int32 attr, w_NODE **node)
-{
-/*
-  ast3d_findnext: finds next node with attribute "attr" (world tree).
-*/
+int32 ast3d_findnext (int32 attr, w_NODE **node){
+/*  ast3d_findnext: finds next node with attribute "attr" (world tree).*/
   if (!ast3d_scene || !ast3d_scene->world) return ast3d_err_notloaded;
   for (*node = (*node)->next; *node; *node = (*node)->next)
     if ((*node)->type & attr) return ast3d_err_ok;
@@ -339,11 +293,8 @@ int32 ast3d_findnext (int32 attr, w_NODE **node)
   astral 3d library (world/keyframer constructors)
 *****************************************************************************/
 
-int32 ast3d_add_world (int32 type, void *obj)
-{
-/*
-  ast3d_add_world: add object to world list.
-*/
+int32 ast3d_add_world (int32 type, void *obj){
+/*  ast3d_add_world: add object to world list.*/
   w_NODE *node;
 
   if (!ast3d_scene) return ast3d_err_notloaded;
@@ -364,11 +315,8 @@ int32 ast3d_add_world (int32 type, void *obj)
   return ast3d_err_ok;
 }
 
-int32 ast3d_add_track (int32 type, int32 id, int32 parent, void *track, void *obj)
-{
-/*
-  ast3d_add_track: add track to keyframer list.
-*/
+int32 ast3d_add_track (int32 type, int32 id, int32 parent, void *track, void *obj){
+/*  ast3d_add_track: add track to keyframer list.*/
   k_NODE *node, *pnode;
 
   if (!ast3d_scene) return ast3d_err_notloaded;
@@ -403,11 +351,8 @@ int32 ast3d_add_track (int32 type, int32 id, int32 parent, void *track, void *ob
   return ast3d_err_ok;
 }
 
-int32 ast3d_set_track (int32 type, int32 id, t_TRACK *track)
-{
-/*
-  ast3d_set_track: assign a track to keyframer node.
-*/
+int32 ast3d_set_track (int32 type, int32 id, t_TRACK *track){
+/*  ast3d_set_track: assign a track to keyframer node.*/
   k_NODE *node = ast3d_scene->keyframer;
   void   *obj;
 
@@ -467,11 +412,8 @@ int32 ast3d_set_track (int32 type, int32 id, t_TRACK *track)
   astral 3d library (scene load/save/free functions)
 *****************************************************************************/
 
-int32 ast3d_alloc_scene (c_SCENE **scene)
-{
-/*
-  ast3d_alloc_scene: allocates memory for a new scene.
-*/
+int32 ast3d_alloc_scene (c_SCENE **scene){
+/*  ast3d_alloc_scene: allocates memory for a new scene.*/
   if ((*scene = (c_SCENE *)malloc (sizeof (c_SCENE))) == NULL)
     return ast3d_err_nomem;
   (*scene)->world = NULL;
@@ -488,11 +430,8 @@ int32 ast3d_alloc_scene (c_SCENE **scene)
   return ast3d_err_ok;
 }
 
-int32 ast3d_load_world (char *filename, c_SCENE *scene)
-{
-/*
-  ast3d_load_world: loads mesh data from file "filename" into scene "scene".
-*/
+int32 ast3d_load_world (char *filename, c_SCENE *scene){
+/*  ast3d_load_world: loads mesh data from file "filename" into scene "scene".*/
   afs_FILE    *f;
   int32    error;
 
@@ -517,8 +456,7 @@ int32 ast3d_load_world (char *filename, c_SCENE *scene)
   return ast3d_err_ok;
 }
 
-int32 ast3d_load_motion (char *filename, c_SCENE *scene)
-{
+int32 ast3d_load_motion (char *filename, c_SCENE *scene){
 /*
   ast3d_load_motion: loads motion data from file "filename"
                     into scene "scene".
@@ -540,8 +478,7 @@ int32 ast3d_load_motion (char *filename, c_SCENE *scene)
 }
 
 #if 0
-int32 ast3d_load_scene (char *filename, c_SCENE *scene)
-{
+int32 ast3d_load_scene (char *filename, c_SCENE *scene){
 /*
   ast3d_load_scene: loads mesh and keyframer data from file "filename"
                    into scene "scene".
@@ -553,8 +490,7 @@ int32 ast3d_load_scene (char *filename, c_SCENE *scene)
 #endif
 
 #if 0
-int32 ast3d_save_scene (char *filename, c_SCENE *scene)
-{
+int32 ast3d_save_scene (char *filename, c_SCENE *scene){
 /*
   ast3d_save_scene: saves scene "scene" to filename "filename".
 */
@@ -581,8 +517,7 @@ int32 ast3d_save_scene (char *filename, c_SCENE *scene)
 }
 #endif
 
-int32 ast3d_free_world (c_SCENE *scene)
-{
+int32 ast3d_free_world (c_SCENE *scene){
 /*
   ast3d_free_world: release all memory used by world.
 */
@@ -630,8 +565,7 @@ int32 ast3d_free_world (c_SCENE *scene)
   return ast3d_err_ok;
 }
 
-int32 ast3d_free_motion (c_SCENE *scene)
-{
+int32 ast3d_free_motion (c_SCENE *scene){
 /*
   ast3d_free_motion: release all memory used by keyframer.
 */
@@ -693,8 +627,7 @@ int32 ast3d_free_motion (c_SCENE *scene)
   return ast3d_err_ok;
 }
 
-int32 ast3d_free_mesh (c_SCENE *scene)
-{
+int32 ast3d_free_mesh (c_SCENE *scene){
 /*
   ast3d_free_mesh: release all memory used by meshes.
 */
@@ -715,8 +648,7 @@ int32 ast3d_free_mesh (c_SCENE *scene)
   return ast3d_err_ok;
 }
 
-int32 ast3d_free_scene (c_SCENE *scene)
-{
+int32 ast3d_free_scene (c_SCENE *scene){
   int32 error;
 
   if ((error = ast3d_free_world (scene)) != ast3d_err_ok) return error;
@@ -724,215 +656,10 @@ int32 ast3d_free_scene (c_SCENE *scene)
 }
 
 /*****************************************************************************
-  astral 3d library (track handling)
+  astral 3d keyframer:   (track handling)
 *****************************************************************************/
 
-int32 ast3d_getkey_float (t_TRACK *track, float frame, float *out)
-{
-/*
-  ast3d_getkey_float: return float key at frame "frame".
-*/
-  t_KEY *keys;
-
-  if (frame < 0.0) return ast3d_err_badframe;
-  if (!track || !track->keys) return ast3d_err_nullptr;
-  keys = track->keys;
-
-  if (track->flags != 0) frame = fmod (frame, track->frames);
-
-  if (!keys->next || frame < keys->frame) {
-    *out = keys->val._float;
-    return ast3d_err_ok;
-  }
-  /* more than one key, spline interpolation */
-  return spline_getkey_float (track, frame, out);
-}
-
-int32 ast3d_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out)
-{
-/*
-  ast3d_getkey_vect: return vector key at frame "frame".
-*/
-  t_KEY *keys;
-
-  if (frame < 0.0) return ast3d_err_badframe;
-  if (!track || !track->keys) return ast3d_err_nullptr;
-  keys = track->keys;
-
-  if (track->flags != 0) frame = fmod (frame, track->frames);
-
-  if (!keys->next || frame < keys->frame) {
-    vec_copy (&keys->val._vect, out);
-    return ast3d_err_ok;
-  }
-  /* more than one key, spline interpolation */
-  return spline_getkey_vect (track, frame, out);
-}
-
-int32 ast3d_getkey_rgb (t_TRACK *track, float frame, c_RGB *out)
-{
-/*
-  ast3d_getkey_rgb: return rgb key at frame "frame".
-*/
-  c_VECTOR vect;
-  int32    aa;
-
-  aa = spline_getkey_vect (track, frame,&vect);
-  out->rgb[0]=vect.x;
-  out->rgb[1]=vect.y;
-  out->rgb[2]=vect.z;
-  return aa;
-}
-
-int32 ast3d_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
-{
-/*
-  ast3d_getkey_quat: return quaternion key at frame "frame".
-*/
-  t_KEY *keys;
-  float  alpha;
-
-  if (frame < 0.0) return ast3d_err_badframe;
-  if (!track || !track->keys) return ast3d_err_nullptr;
-  keys = track->keys;
-
-  if (track->flags != 0) frame = fmod (frame, track->frames);
-
-  if (ast3d_flags & ast3d_slerp) {
-    if (frame < track->last->frame) keys = track->keys; else
-      keys = track->last;
-    while (keys->next && frame > keys->next->frame) keys = keys->next;
-    track->last = keys;
-    if (!keys->next || frame < keys->frame) {
-      qt_copy (&keys->qa, out);
-      return ast3d_err_ok;
-    }
-    alpha = (frame - keys->frame) / (keys->next->frame - keys->frame);
-    alpha = spline_ease (alpha, keys->easefrom, keys->next->easeto);
-    qt_slerp (&keys->qa, &keys->next->qa, 0, alpha, out);
-    return ast3d_err_ok;
-  } else {
-    if (!keys->next || frame < keys->frame) {
-      qt_copy (&keys->qa, out);
-      return ast3d_err_ok;
-    }
-    return spline_getkey_quat (track, frame, out);
-  }
-}
-
-int32 ast3d_getkey_hide (t_TRACK *track, float frame, int32 *out)
-{
-/*
-  ast3d_getkey_hide: return hide key at frame "frame".
-*/
-  t_KEY *keys;
-
-  if (frame < 0.0) return ast3d_err_badframe;
-  if (!track || !track->keys) {
-    *out = 0;
-    return ast3d_err_nullptr;
-  }
-  keys = track->keys;
-  if (track->flags != 0) frame = fmod (frame, track->frames);
-  if (frame < keys->frame) {
-    *out = 0;
-    return ast3d_err_ok;
-  }
-  if (frame < track->last->frame) keys = track->keys; else
-    keys = track->last;
-  while (keys->next && frame > keys->next->frame) keys = keys->next;
-  track->last = keys;
-  *out = keys->val._int;
-  return ast3d_err_ok;
-}
-
-int32 ast3d_getkey_morph (t_TRACK *track, float frame, c_MORPH *out)
-{
-/*
-  ast3d_getkey_morph: return morph key at frame "frame".
-*/
-  t_KEY *keys;
-  float  alpha;
-
-  if (frame < 0.0) return ast3d_err_badframe;
-  if (!track || !track->keys) return ast3d_err_nullptr;
-  if (frame < track->last->frame) keys = track->keys; else keys = track->last;
-  while (keys->next && frame > keys->next->frame) keys = keys->next;
-  track->last = keys;
-
-  if (!keys->next || frame < keys->frame) {
-    if(!keys->prev){
-      out->from = keys->val._int;
-    } else {
-      out->from = keys->prev->val._int;
-    }
-    out->to = keys->val._int;
-    out->alpha = 1.0;
-    out->key=(t_KEY*) NULL;
-    return ast3d_err_ok;
-  }
-  
-//printf("2\n");  
-  out->from = keys->val._int;
-  out->to = keys->next->val._int;
-  alpha = (frame - keys->frame) / (keys->next->frame - keys->frame);
-  out->alpha = spline_ease (alpha, keys->easefrom, keys->next->easeto);
-  out->key = keys;
-  return ast3d_err_ok;
-}
-
-/*****************************************************************************
-  astral 3d library (keyframer)
-*****************************************************************************/
-
-int32 ast3d_collide (w_NODE *a, w_NODE *b, int32 *result)
-{
-/*
-  ast3d_collide: collision detection (using bounding box).
-*/
-  c_OBJECT *o, *obj;
-  c_CAMERA *cam;
-  c_LIGHT  *light;
-  int32     type;
-
-  if (a->type != ast3d_obj_object && b->type != ast3d_obj_object)
-    return ast3d_err_invparam;
-  if (a->type == ast3d_obj_object) {
-    o = (c_OBJECT *)a->object;
-    obj = (c_OBJECT *)b->object;
-    cam = (c_CAMERA *)b->object;
-    light = (c_LIGHT *)b->object;
-    type = b->type;
-  } else {
-    o = (c_OBJECT *)b->object;
-    obj = (c_OBJECT *)a->object;
-    cam = (c_CAMERA *)a->object;
-    light = (c_LIGHT *)a->object;
-    type = a->type;
-  }
-  switch (type) {
-    case ast3d_obj_object:
-      *result = (ast3d_insidebox (&o->pbbox, &obj->pbbox.min) ||
-                 ast3d_insidebox (&o->pbbox, &obj->pbbox.max) ||
-                 ast3d_insidebox (&obj->pbbox, &o->pbbox.min) ||
-                 ast3d_insidebox (&obj->pbbox, &o->pbbox.max));
-      return ast3d_err_ok;
-    case ast3d_obj_camera:
-      *result = (ast3d_insidebox (&o->pbbox, &cam->pos) ||
-                 ast3d_insidebox (&o->pbbox, &cam->target));
-      return ast3d_err_ok;
-    case ast3d_obj_light:
-      if (light->flags == ast3d_light_spot)
-        *result = (ast3d_insidebox (&o->pbbox, &light->pos) ||
-                   ast3d_insidebox (&o->pbbox, &light->target));
-      else
-        *result = (ast3d_insidebox (&o->pbbox, &light->pos));
-      return ast3d_err_ok;
-    case ast3d_obj_material:
-    case ast3d_obj_ambient: return ast3d_err_invparam;
-  }
-  return ast3d_err_undefined;
-}
-
+#include "getkey.c"
+#include "do_trans.c"
 #include "update.c"
 

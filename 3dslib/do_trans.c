@@ -5,8 +5,7 @@
 #include "morph-new.h"
 #endif
 
-static void do_transform ()
-{
+static void do_transform (){
 /*
   do_transform: transform all world (see notes in the documentation).
 */
@@ -61,12 +60,10 @@ static void do_transform ()
 
 #ifdef SPLINE_MORPH
 
-if(!obj->morph.key){
-/*----------------------- OLD LINEAR MORPH --------------------------*/
-#include "morph-old.c"
-} else {
-/*----------------------- NEW SPLINE MORPH --------------------------*/
+if(obj->morph.key){
 #include "morph-new.c"
+} else {
+#include "morph-old.c"
 }
 
 #else

@@ -418,11 +418,49 @@ Ami meg problema lesz/lehet: ha 360 fok tobbszorosevel forgatsz ugyanaz a
 tengely korul, akkor a 2 quaternion altal bezart szog 0 lesz, es ezert
 nem fog forogni sehogy (mert nem tudja az iranyt kiszamolni).
 
-
+v3.6  00/01/13  by  A'rpi    - bugfixing... & optimize
+- morph fix: mostmar muxik a 2 keypointos morph is
+  (kicsit hack, de mukodik.)
+- morph: loop es repeat tamogatasa
+  lenyege: a 0-as frametol az utolso key framejeig tart az anim, ezt
+  ismetelgeti egymas utan.
+  kulonbseg: a loop interpolal az utolsorol az elso key-re, a repeat pedig
+  az elso key-t mutatja folyamatosan a "holt zonaban"
+  0.......K1....K2....K3..........................................END
+  [-------------------][-----------------][-----------------][-----]
+  ^^^^^^^^^-<-holt zona (az elso key elotti resz)
+  Megj.: a 3ds kicsit mashogy implementalja a dolgot:
+    - repeatnal a holt zonaban az anim vege megy, nem az elso key-en all.
+    - morphnal a loop is pont ugy viselkedik mint a repeat :((((
+    - az anim az elso key framejetol az utolso key framejeig tart,
+      nekunk pedig a 0-as frametol az utolso key framejeig tart.
+- ast3d.c-bol ast3d_getkey_* rutinok atteve getkey.c-be
+  uj rutin: ast3d_update_track(), ez ellenorzi a frame hatarokat,
+  es kiszamitja az ALPHA erteket, figyelembe veve a loop/repeat-ot is.
+  -> hasznalataval jelentosen egyszerusodtek a getkey rutinok!
+  -> elvileg float, vect es rgb is tamogat mostantol loop/repeat-ot
+     (nem teszteltem meg)
+- spl_quat.c-bol kiszedve minden felesleges cucc, a maradek optimalizalva...
+  elvileg mostmar tudja a loop-ot is.
+- spline.c-bol a Loop-os derivalok kiszedve, mivel felesleges (ugyanaz mint
+  a nem loopos, csak a frame-hoz hozza kell adni a total framet)
+- spline.c: CompElementDeriv() mostantol makro, meg egy kis speed optim.
 
 
 TERVEK a 4.0-ba:
-- voodoo3 fix
+- CLAX kiolese, ujrairasa
+- uj .3ds loader  (memoriaba olvassa egyben, lancolt lista chunkokrol.)
+- BUGok javitasa:
+  - loop mindenre (rotation, float, vect)
+  - ambient light/color
+  - voodoo 3 texturesize detect fix
+  - fdtunnel
+  - frustum_cull / backface cull bug (lasd beta-ban eltuno facek + particle)
+- hierarchy-t ellenornizni, szerintem csak 1 szintig muxik. es nem mindenre.
+- render-bol lighting es transformations-t attenni 3dslib-be? (do_trans.c)
+  elony: szepen szet lenne valasztva a calc es a draw code
+  hatrany: opengl-es lighting, material optim stb... ?
+  ki kene adni a 3dslib forrasat, mint clax 2.0 vagy ast3dlib! ?
 - fdtunnel modositas: 2-nel tobb tunnel, fdtunnel_select most nem muxik
 - greets effekt befejezese
 - opengl state manager, multitexture?
@@ -432,22 +470,27 @@ TERVEK a 4.0-ba:
 - commandline opciok: window/fullscreen, felbontas, mipmap on/off, fps
 - textura caching (betolti a texturakat a kartyaba)
 - bbox helyett bounding sphere (gyorsabb sokkal, es egyszerubb, nincs gond forgatassal stb)
+  nem biztos hogy egyszerubb... foleg frustum-sphere metszes vizsgalatnal.
+  bar a FOV ismereteben konnyu kiszamolni a 4 erintesi pontot, ahol a
+  gomb es a frustum eloszor talalkozik (illetve 6, ha near/far clippinget is
+  nezunk), es eleg ezeket vizsgalni.
+  A gomb pedig jobban kozeliti a legtobb 3d objectet. meg sokat nem jol... :(
+  igazibol ellipszoidot kene nezni, kulon Rx,Ry,Rz sugarral, amit elotte
+  objmat-al transzformalunk. igy viszont bonyolultabb lesz mint a bbox... :(
+  5let: megnezni precalc idoben hogy melyik terfogata a kisebb, es azt
+  kell hasznalni (flag jelzi...)
 
 KELL MEG:
+- hair (szor) effekt
+- wireframe,flat
 - profiling: meg mindig "elveszik" neha ido a 'draw' reszben. pl chevy, szoba
 - optimalt directional lighting attenuation nelkul, normal forgatas nelkul
 - objectek sortolasa: eloszor tomor obj-k, utana atlatszok z-sort-olva
   megpedig nem sulypont hanem bbox.min.Z szerint!
-- scriptbol vezerelheto lassu texturabetoltes (3ds play kozben tolti le
-  oket egyenkent)
 - 2D effektek
 - animalt texturak (FLI/FLC?)
 - tobb fenyforras parametereinek 1ideju allitasa!  (bitmaszk kell light-nal)
 - multitextura  (textura+lightmap esetre legalabb)
-- morph transzformaciot attenni render.c-be! meg a pre-trans cull-t is!
-- keyframer bug: LOOP-ot nem tamogat (spline.c tudja de ami hivja az nem igazan)
-  lehet hogy megis tamogatja! le kene mar tesztelni...
-- 2 keypointos morph miert szall el?
 
 EGYEB:
 - bug: chevy szelvedojen nincs specular!  -- specularmap-al van!!!!!

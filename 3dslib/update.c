@@ -1,8 +1,6 @@
-int32 ast3d_update ()
-{
-/*
-  ast3d_update: update all keyframer data.
-*/
+/*  ast3d_update: update all keyframer data.  */
+
+int32 ast3d_update (){
   k_NODE      *node, *child;
   c_CAMERA    *cam;
   t_CAMERA    *tcam;
@@ -16,12 +14,10 @@ int32 ast3d_update ()
   c_OBJECT    *obj,*cobj;
   t_OBJECT    *tobj;
   float        frame = ast3d_scene->f_current;
-//  c_MATRIX     c, d;
   int32        hidden;
 
   if (!ast3d_scene) return ast3d_err_notloaded;
-  if (!ast3d_scene->world || !ast3d_scene->keyframer)
-    return ast3d_err_notloaded;
+  if (!ast3d_scene->world || !ast3d_scene->keyframer) return ast3d_err_notloaded;
 
   /* update objects */
   for (node = ast3d_scene->keyframer; node; node = node->next) {
@@ -62,24 +58,13 @@ int32 ast3d_update ()
         ast3d_getkey_vect (tobj->translate, frame, &obj->translate);
         ast3d_getkey_vect (tobj->scale, frame, &obj->scale);
         ast3d_getkey_quat (tobj->rotate, frame, &obj->rotate);
-        ast3d_getkey_hide (tobj->hide, frame, &hidden);
-        if (ast3d_getkey_morph (tobj->morph, frame, &obj->morph) ==
-            ast3d_err_ok) obj->flags |= ast3d_obj_morph;
-            else obj->flags &= ~ast3d_obj_morph;
-        if (hidden) obj->flags |= ast3d_obj_hidden; else
-          obj->flags &= ~ast3d_obj_hidden;
-
         qt_make_objmat(obj);
-/*
-        qt_i (&obj->rotate, obj->matrix);
-        obj->matrix[X][W] = obj->translate.x;
-        obj->matrix[Y][W] = obj->translate.y;
-        obj->matrix[Z][W] = obj->translate.z;
-        obj->matrix[X][X]*=obj->scale.x;
-        obj->matrix[Y][Y]*=obj->scale.y;
-        obj->matrix[Z][Z]*=obj->scale.z;
-        mat_copy(c,obj->matrix);
-*/
+        ast3d_getkey_hide (tobj->hide, frame, &hidden);
+        if (ast3d_getkey_morph (tobj->morph, frame, &obj->morph) == ast3d_err_ok)
+          obj->flags |= ast3d_obj_morph;
+        else 
+          obj->flags &= ~ast3d_obj_morph;
+        if (hidden) obj->flags |= ast3d_obj_hidden; else obj->flags &= ~ast3d_obj_hidden;
         break;
       case ast3d_track_ambient:
         amb = (c_AMBIENT *)node->object;
@@ -144,12 +129,10 @@ int32 ast3d_update ()
 
   /* update camera matrices */
   for (node = ast3d_scene->keyframer; node; node = node->next)
-    if (node->type == ast3d_track_camera) {
-      cam = (c_CAMERA *)node->object;
-      cam_update (cam);
-    }
+    if (node->type == ast3d_track_camera)
+      cam_update ( (c_CAMERA *)node->object );
 
   /* do transformation if neccesary */
-  if (ast3d_flags & ast3d_transform) do_transform ();
+  if (ast3d_flags & ast3d_transform) do_transform();
   return ast3d_err_ok;
 }

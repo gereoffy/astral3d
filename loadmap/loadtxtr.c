@@ -87,6 +87,7 @@ int i;
   map_st map_alp,map_alpm;
   unsigned char *remix_base;
   unsigned char *remix;
+  int max_txtsize=512;
 
   t->texture1=txt1; t->texture1_mask=txt1m; t->texture1_amount=txt1a;
   t->texture2=txt2; t->texture2_mask=txt2m; t->texture2_amount=txt2a;
@@ -108,8 +109,12 @@ int i;
   if(!(t->flags&15)) return t;
   t->pixelsize= (t->flags&4)? 4 : 3;
 
+  glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_txtsize);
+  printf("GL_MAX_TEXTURE_SIZE=%d\n",max_txtsize);
+  if(max_txtsize<64 || max_txtsize>512) max_txtsize=512;
+  
   /* Find optimal size */
-  if(t->xsize>256 || t->ysize>256) t->xsize=t->ysize=512; else
+  if(t->xsize>256 || t->ysize>256) t->xsize=t->ysize=max_txtsize; else
   if(t->xsize>128 || t->ysize>128) t->xsize=t->ysize=256; else
   if(t->xsize> 64 || t->ysize> 64) t->xsize=t->ysize=128; else
   if(t->xsize> 32 || t->ysize> 32) t->xsize=t->ysize=64;  else

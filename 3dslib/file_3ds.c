@@ -273,6 +273,7 @@ static void vec_swap (c_VECTOR *a)
 #endif
 }
 
+#if 0
 static void qt_swap (c_QUAT *a)
 {
 /*
@@ -286,6 +287,7 @@ static void qt_swap (c_QUAT *a)
   a->z = tmp;
 #endif
 }
+#endif
 
 static void mat_swap (c_MATRIX a)
 {
@@ -376,12 +378,12 @@ static t_TRACK *alloc_track ()
   track->last = NULL;
   track->flags = 0;
   track->frames = 0.0;
+  track->total_frames = ast3d_scene->f_end;
   track->numkeys = 0;
   return track;
 }
 
-static int add_key (t_TRACK *track, t_KEY *key, int frame)
-{
+static int add_key (t_TRACK *track, t_KEY *key, int frame){
 /*
   add_key: add a key to track.
 */
@@ -389,12 +391,19 @@ static int add_key (t_TRACK *track, t_KEY *key, int frame)
   key->frame = frame;
   key->next = NULL;
   if (track->keys == NULL) {
-    key->prev = NULL;
+    // first key
+    key->loop_prev = key->prev = NULL;
     track->keys = key;
   } else {
-    key->prev = track->last;
-    track->last->next = key;
+    key->loop_prev = key->prev = track->last;
+    track->last->loop_next = track->last->next = key;
   }
+  
+  if(track->flags&ast3d_track_loop){
+    track->keys->loop_prev = key;  // az 1. key-nek az utolso az elozo...
+    key->loop_next = track->keys;  // az utolsonak a kovetekezoje az elso
+  } else key->loop_next=NULL;
+  
   track->frames = key->frame;
   track->last = key;
   track->numkeys++;
@@ -1283,7 +1292,7 @@ static int read_TFLAGS (afs_FILE *f, t_TRACK *track, word *n)
   word flags[7];
 
   if (afs_fread (flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
-  if ((flags[0] & 0x02) == 0x02) track->flags = ast3d_track_repeat;
+  if ((flags[0] & 0x03) == 0x02) track->flags = ast3d_track_repeat; else
   if ((flags[0] & 0x03) == 0x03) track->flags = ast3d_track_loop;
   *n = flags[5];
   return ast3d_err_ok;
@@ -1521,9 +1530,9 @@ static int read_CHUNK (afs_FILE *f, c_CHUNK *h)
 /*****************************************************************************
   chunk readers control
 *****************************************************************************/
+static int chunk_level=0;
 
-static int ChunkReaderWorld (afs_FILE *f, long p, word parent)
-{
+static int ChunkReaderWorld (afs_FILE *f, long p, word parent){
 /*
   ChunkReaderWorld: Recursive chunk reader (world).
 */
@@ -1532,34 +1541,33 @@ static int ChunkReaderWorld (afs_FILE *f, long p, word parent)
   int     n, i, error;
 
   c_chunk_last = parent;
-  while ((pc = afs_ftell (f)) < p) {
+  pc = afs_ftell (f);
+  while (pc < p) {
     if (read_CHUNK (f, &h) != 0) return ast3d_err_badfile;
-    c_chunk_curr = h.chunk_id;
-    n = -1;
+    c_chunk_curr=h.chunk_id;
+    pc+=h.chunk_size;
+    printf("%*s%04X (%ld)\n",chunk_level*2,"",h.chunk_id,h.chunk_size);
+    n=-1;
     for (i = 0; i < sizeof (world_chunks) / sizeof (world_chunks[0]); i++)
-      if (h.chunk_id == world_chunks[i].id) {
-        n = i;
-        break;
-      }
+      if (h.chunk_id == world_chunks[i].id){ n = i; break; }
     if (n < 0) {
 #if 0
       int i;
-      for (i = 0; i < sizeof (key_chunks) / sizeof (key_chunks[0]); i++)
+      for (i=0; i < sizeof (key_chunks) / sizeof (key_chunks[0]); i++)
         if (h.chunk_id == key_chunks[i].id) goto key_chunk;
       printf("Unknown chunk: %04X  parent=%04X  size=%ld\n",h.chunk_id,parent,h.chunk_size-6);
       key_chunk:
 #endif
-      afs_fseek (f, pc + h.chunk_size, SEEK_SET);
     } else {
-      pc = pc + h.chunk_size;
       if ((error = world_chunks[n].func (f)) != 0) return error;
-      if (world_chunks[n].sub)
-        if ((error = ChunkReaderWorld (f, pc, h.chunk_id)) != 0)
-          return error;
-      afs_fseek (f, pc, SEEK_SET);
+      if (world_chunks[n].sub){
+        ++chunk_level;
+        if ((error = ChunkReaderWorld (f, pc, h.chunk_id)) != 0) return error;
+        --chunk_level;
+      }
       c_chunk_prev = h.chunk_id;
     }
-//    if (ferror (f)) return ast3d_err_badfile;
+    afs_fseek (f, pc, SEEK_SET);
   }
   return ast3d_err_ok;
 }

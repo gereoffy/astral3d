@@ -1,4 +1,4 @@
-#define FULLSCREEN
+//#define FULLSCREEN
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -385,7 +385,8 @@ typedef struct _t_KEY { /* key struct */
 #endif
   c_QUAT         ds, dd;
   c_QUAT         qa;
-  struct _t_KEY *next, *prev;
+  struct _t_KEY *next, *prev;            /* elozo/kovetkezo key vagy NULL */
+  struct _t_KEY *loop_next, *loop_prev;  /* loop eseten mindig mutat valahova */
 } t_KEY;
 
 typedef struct _c_MORPH { /* morph struct */
@@ -398,7 +399,9 @@ typedef struct _c_MORPH { /* morph struct */
 typedef struct _t_TRACK { /* track struct */
   int32  flags;                          /* track flags              */
   int32  numkeys;                        /* number of keys           */
-  float  frames;                         /* number of frames         */
+  float  frames;                         /* frame of last key        */
+  float  total_frames;                   /* total number of frames   */
+  float  alpha;
   t_KEY *keys;                           /* the track                */
   t_KEY *last;                           /* pointer to last used key */
 } t_TRACK;
@@ -599,7 +602,6 @@ void ast3d_fixUV(char *objname,int uvflag);
   int32 ast3d_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out);
   int32 ast3d_getkey_quat (t_TRACK *track, float frame, c_QUAT *out);
   int32 ast3d_alloc_scene (c_SCENE **scene);
-  int32 spline_getkey_quat (t_TRACK *track, float frame, c_QUAT *out);
   int32 ast3d_set_track (int32 type, int32 id, t_TRACK *track);
   int32 ast3d_update ();
   int32 ast3d_free_scene (c_SCENE *scene);
@@ -785,25 +787,10 @@ void qt_slerp (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out);
   see also: t_KEY structure
 */
 
-  int32 spline_getkey_float (t_TRACK *track, float frame, float *out);
-/*
-  int32 spline_getkey_float (t_KEY *keys, float frame, float *out)
-  returns one-dimensional interpolated value for "frame", giving
-  result in "out".
-  returns error codes: ast3d_ok, ast3d_badframe, ast3d_undefined.
+  int32 spline_getkey_quat (t_KEY *keys,float t, c_QUAT *out);
+  int32 spline_getkey_float (t_KEY *keys,float t, float *out);
+  int32 spline_getkey_vect (t_KEY *keys,float t, c_VECTOR *out);
 
-  the value interpolated is t_KEY.a
-*/
-
-  int32 spline_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out);
-/*
-  int32 spline_getkey_vect (t_KEY *keys, float frame, float *out)
-  returns three-dimensional interpolated value for "frame", giving
-  result in "out".
-  returns error codes: ast3d_ok, ast3d_badframe, ast3d_undefined.
-
-  the values interpolated are t_KEY.a, t_KEY.b, t_KEY.c
-*/
 
 #ifdef __cplusplus
 }
