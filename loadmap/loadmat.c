@@ -120,7 +120,10 @@ void LoadMaterials(c_SCENE *scene){
                         (mat->selfillmap.flags&8)?1:0 + 512
                       );
         mat->lightmap_id=t->id;
-        if(t->flags&15) mat->flags|=ast3d_mat_lightmap;
+        if(t->flags&15){
+           mat->flags|=ast3d_mat_lightmap;
+           printf("Using lightmap: %s  id: %d  amount: %f\n",mat->selfillmap.file,t->id,mat->selfillmap.amountof);
+        }
 
         /* specularmap */
 #if 0

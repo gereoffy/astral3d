@@ -7,6 +7,12 @@
 VAR_GLOB(scrTYPE_float,"time",adk_time);
 VAR_GLOB(scrTYPE_int  ,"clear_buffer",adk_clear_buffer_flag);
 
+// .3ds loader defaults:
+VAR_GLOB(scrTYPE_int  ,"default_mat_flags",default_mat_flags);
+VAR_GLOB(scrTYPE_int  ,"default_obj_flags",default_obj_flags);
+VAR_GLOB(scrTYPE_int  ,"default_track_flags",default_track_flags);
+VAR_GLOB(scrTYPE_float,"default_corona_scale",default_corona_scale);
+
 #undef VAR_GLOB
 
 //=============================
@@ -89,6 +95,11 @@ VAR_LIGHT(scrTYPE_float,"light_enabled",enabled);
 VAR_LIGHT(scrTYPE_int,"lightmap_calc_normal",lightmap_calc_normal);
 
 VAR_LIGHT(scrTYPE_int,"light_laser",laser);
+
+// nem muxik keyframeles miatt:
+//VAR_LIGHT(scrTYPE_float,"light_color_r",color.rgb[0]);
+//VAR_LIGHT(scrTYPE_float,"light_color_g",color.rgb[1]);
+//VAR_LIGHT(scrTYPE_float,"light_color_b",color.rgb[2]);
 
 #undef VAR_LIGHT
 

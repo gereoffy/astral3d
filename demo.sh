@@ -23,4 +23,4 @@ setenv OBJS "script/script2.o blob/blob.o fdtunnel/fdtunnel.o spline/spline.o sm
 
 gcc -g -O2 demo-lin.c -o demo $OBJS $LIBS $LIBS2 $XLIBS >& errors
 cat errors
-# strip demo
+strip demo

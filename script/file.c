@@ -614,6 +614,16 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         return;
       }
 //===============================================================================
+// 26:  V("ambient_light_color",scrCLASS_global,26,0,0,3); P_CONST(1,0);P_CONST(2,0);P_CONST(3,0);
+      if(cmdp->code==26){
+        if(ambient){
+          ambient->color.rgb[0]=pval[1];
+          ambient->color.rgb[1]=pval[2];
+          ambient->color.rgb[2]=pval[3];
+        }
+        return;
+      }
+//===============================================================================
 
 
 //      return;

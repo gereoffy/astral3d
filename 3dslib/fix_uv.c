@@ -63,11 +63,11 @@ if(uvflag&2){ PREUV(v1,v2,v3); MINMAX(v1,v2,v3); FIXUV(v1); FIXUV(v2); FIXUV(v3)
       obj->faces[i].lu3=u3;obj->faces[i].lv3=v3;
 #else
       obj->faces[i].u1=tUo+tUs*(u1-0.5); obj->faces[i].v1=tVo-tVs*(v1-0.5);
-//      obj->faces[i].lu1=lUo+lUs*(u1-0.5); obj->faces[i].lv1=lVo-lVs*(v1-0.5);
+      obj->faces[i].lu1=lUo+lUs*(u1-0.5); obj->faces[i].lv1=lVo-lVs*(v1-0.5);
       obj->faces[i].u2=tUo+tUs*(u2-0.5); obj->faces[i].v2=tVo-tVs*(v2-0.5);
-//      obj->faces[i].lu2=lUo+lUs*(u2-0.5); obj->faces[i].lv2=lVo-lVs*(v2-0.5);
+      obj->faces[i].lu2=lUo+lUs*(u2-0.5); obj->faces[i].lv2=lVo-lVs*(v2-0.5);
       obj->faces[i].u3=tUo+tUs*(u3-0.5); obj->faces[i].v3=tVo-tVs*(v3-0.5);
-//      obj->faces[i].lu3=lUo+lUs*(u3-0.5); obj->faces[i].lv3=lVo-lVs*(v3-0.5);
+      obj->faces[i].lu3=lUo+lUs*(u3-0.5); obj->faces[i].lv3=lVo-lVs*(v3-0.5);
 #endif
 
     } // for

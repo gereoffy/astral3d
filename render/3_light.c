@@ -59,6 +59,7 @@
 //------------------------- END OF BUMP -----------------------
 
   } else {
+    int ast3d_blend_byte=255.0*ast3d_blend;
 
     if(specular){
       specular_limit=pow(0.004,(1.0/specular_coef));
@@ -233,27 +234,19 @@ if(l->flags&ast3d_light_attenuation){
 
 	    }
           }
-#if 1
           obj->vertices[i].rgb[0]=clip_255(r);
           obj->vertices[i].rgb[1]=clip_255(g);
           obj->vertices[i].rgb[2]=clip_255(b);
           obj->vertices[i].rgb[3]=src_alpha;
-          if(matflags&(ast3d_mat_reflect|ast3d_mat_bump)){
+          if(matflags&(ast3d_mat_reflect_light|ast3d_mat_bump)){
             obj->vertices[i].refl_rgb[0]=clip_255_blend(r,ast3d_blend);
             obj->vertices[i].refl_rgb[1]=clip_255_blend(g,ast3d_blend);
             obj->vertices[i].refl_rgb[2]=clip_255_blend(b,ast3d_blend);
+          } else {
+            obj->vertices[i].refl_rgb[0]=
+            obj->vertices[i].refl_rgb[1]=
+            obj->vertices[i].refl_rgb[2]=ast3d_blend_byte;
           }
-#else
-// lightmap hack
-          obj->vertices[i].refl_rgb[0]=
-          obj->vertices[i].refl_rgb[1]=
-          obj->vertices[i].refl_rgb[2]=
-          obj->vertices[i].rgb[0]=
-          obj->vertices[i].rgb[1]=
-          obj->vertices[i].rgb[2]=255;
-          obj->vertices[i].rgb[3]=src_alpha;
-
-#endif
 //          printf("Lighting vertex %d color=%f %f %f\n",i,r,g,b);
         }
       }

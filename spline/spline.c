@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
+#ifndef __GNUC__
+#include <windows.h>
+#define M_PI 3.1415926527
+#endif
+
 #include "../agl/agl.h"
 
 #define Local static
@@ -192,8 +197,8 @@ void splinesurface_init(float rnd_scale,float szog_scale){
   for(i=0;i<=nu;i++)
   for(j=0;j<=nv;j++)
   for(k=0;k<3;k++){
-    rndtabla[i][j][k]=rnd_scale*((float)random())/((float)RAND_MAX);
-    szogtabla[i][j][k]=szog_scale*((float)random())/((float)RAND_MAX);
+    rndtabla[i][j][k]=rnd_scale*((float)rand())/((float)RAND_MAX);
+    szogtabla[i][j][k]=szog_scale*((float)rand())/((float)RAND_MAX);
   }
 
 }

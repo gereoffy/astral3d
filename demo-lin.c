@@ -70,6 +70,16 @@ GLvoid IdleFunc(){
 
 
 int main(int argc,char* argv[]){
+int fullscreen=1;
+char* scriptname="astral.scr";
+
+    { int i;
+      for(i=1;i<argc;i++){
+        if(strcmp(argv[i],"-window")==0) fullscreen=0; else
+        if(strcmp(argv[i],"-nosound")==0) nosound=1; else
+        scriptname=argv[i];
+      }
+    }
 
     afs_init("",AFS_TYPE_FILES);
     afs_init("astral.pak",AFS_TYPE_PAK);
@@ -94,9 +104,7 @@ int main(int argc,char* argv[]){
 #endif
 
 
-#ifdef FULLSCREEN
-    glutFullScreen();
-#endif
+    if(fullscreen) glutFullScreen();
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
     glClearDepth( 1.0 );
@@ -131,7 +139,7 @@ int main(int argc,char* argv[]){
     blob_init();
     scrInit();
     fx_init();
-    if(argc>1) scrLoad(argv[1]); else scrLoad("astral.scr");
+    scrLoad(scriptname);
     adk_time=0.0; // adk_frame=0.0;
     
 //    fx_debug=fopen("effects.log","wt");

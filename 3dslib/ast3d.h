@@ -147,7 +147,8 @@ enum ast3d_mat_flags_ { /* astral 3d material flags */
   ast3d_mat_lightmap  = 1024,             /* object has lightmap */
   ast3d_mat_bump      = 2048,             /* object has bump map */
   ast3d_mat_env_positional = 4096,        /* envmap is positional */
-  ast3d_mat_env_sphere = 8192             /* envmap uses sphere mapping */
+  ast3d_mat_env_sphere = 8192,            /* envmap uses sphere mapping */
+  ast3d_mat_reflect_light = 16384         /* lightning on reflection map */
 };
 
 enum ast3d_map_flags_ { /* astral 3d map flags */
@@ -181,7 +182,8 @@ enum ast3d_obj_flags_ { /* astral 3d object flags */
   ast3d_obj_trianglestrip = 256,           /* triangle-stip capable   */
   ast3d_obj_frustumcull = 512,             /* frustum cull faces      */
   ast3d_obj_particle = 1024,               /* particle system */
-  ast3d_obj_lmapmake = 2048                /* force lightmap generation */
+  ast3d_obj_lmapmake = 2048,               /* force lightmap generation */
+  ast3d_obj_smoothing = 4096               /* skip smoothing group */
 };
 
 enum ast3d_light_flags_ { /* astral 3d light flags */
@@ -552,6 +554,12 @@ extern "C" {
   extern char ast3d_version[];
   extern char ast3d_copyright[];
   extern c_MATERIAL *Default_MATERIAL;
+
+extern int default_mat_flags;
+extern int default_obj_flags;
+extern int default_track_flags;
+extern float default_corona_scale;
+
 
 /*****************************************************************************
   library functions (astral 3d api)

@@ -111,6 +111,8 @@ V("render_lightmaps",scrCLASS_scene,24,0,0,1); P_CONST(1,0);
 // 25:
 V("corona_sprite",scrCLASS_global,25,0,1,1); P_PIC(1);
 
+// 26:
+V("ambient_light_color",scrCLASS_global,26,0,0,3); P_CONST(1,0);P_CONST(2,0);P_CONST(3,0);
 
 //===========================================================================
 #undef V

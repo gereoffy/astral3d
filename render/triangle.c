@@ -8,8 +8,8 @@
 #define TRI_TEX2(p) glTexCoord2fv(&f->u2)
 #define TRI_TEX3(p) glTexCoord2fv(&f->u3)
 #define TRI_BUMP_COLOR(p) glColor4ubv(p->refl_rgb)
-// #define TRI_REFL_COLOR(p) glColor4ubv(p->refl_rgb)
-#define TRI_REFL_COLOR(p) 
+#define TRI_REFL_COLOR(p) glColor4ubv(p->refl_rgb)
+//#define TRI_REFL_COLOR(p) 
 #define TRI_REFL_TEX(p) glTexCoord2fv((float*)&p->pnorm)
 #define TRI_REFL_EUV(p) glTexCoord2fv(&p->env_u)
 #define TRI_SPEC_TEX(p) glTexCoord2fv((float*)&p->specular)
@@ -97,7 +97,6 @@ INLINE void ast3d_DrawGLTriangle_real_envmap(c_FACE *f){
 #endif
 }
 
-
 INLINE void ast3d_DrawGLTriangle_spheremap(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
@@ -106,7 +105,7 @@ INLINE void ast3d_DrawGLTriangle_spheremap(c_FACE *f){
         p=f->pc; TRI_NORMAL(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
 #else
         p=f->pa; TRI_NORMAL(p); TRI_VERTEX(p);
-	p=f->pb; TRI_NORMAL(p); TRI_VERTEX(p);
+        p=f->pb; TRI_NORMAL(p); TRI_VERTEX(p);
         p=f->pc; TRI_NORMAL(p); TRI_VERTEX(p);
 #endif
 }
