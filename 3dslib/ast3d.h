@@ -10,7 +10,7 @@
 #define SPLINE_MORPH
 
 /* Enable removing duplicated vertices */
-//#define OTIMIZE_VERTEX
+#define OTIMIZE_VERTEX
 
 /* Sort faces for triangle strip. Not works yet... :( */
 // #define TRIANGLE_STRIP
@@ -404,6 +404,7 @@ typedef struct _c_PARTICLE {
   float agrav; // -9.8  gravitation
   float colordecrement; // 0.999
   int type; // hogyan mozog  0=regi(mesa)  1=uj(hjb)
+  float max_y;
 } c_PARTICLE;
 
 typedef struct _c_OBJECT { /* object struct */
@@ -428,7 +429,7 @@ typedef struct _c_OBJECT { /* object struct */
   c_MAPPING  mapping;                    /* texture mapping info       */
   float      bumpdepth;
   c_PARTICLE particle;
-  int        enable_zbuffer;         /* 1=use zbuffer */
+  int        enable_zbuffer;         /* 1=use zbuffer 2=readonly */
   float      vertexlights;           /* 0=disable   other=vertex light scale */
   float      explode_speed;
   float      explode_frame;
@@ -532,7 +533,15 @@ typedef struct _k_NODE { /* keyframer node */
   struct _k_NODE *next, *prev;           /* next/previous node     */
 } k_NODE;
 
-
+typedef struct {
+    int nummaps;
+    void *maps;
+    float animphase;
+    float uoffs;
+    float voffs;
+    float scale;
+    float amount;
+} c_projmap;
 
 typedef struct _c_SCENE { /* scene (world, keyframer) */
   float    f_start, f_end, f_current;    /* start/end/current frame */
@@ -547,15 +556,7 @@ typedef struct _c_SCENE { /* scene (world, keyframer) */
 //  int sphere_map;
   float znear,zfar;
   int frustum_cull;
-  struct {
-    int nummaps;
-    void *maps;
-    float animphase;
-    float uoffs;
-    float voffs;
-    float scale;
-    float amount;
-  } projmap;
+  c_projmap projmap;
 } c_SCENE;
 
 /*****************************************************************************
@@ -817,6 +818,9 @@ void qt_slerp (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out);
 */
 
 void make_lightmap_uv(c_OBJECT *obj,int xsize,int ysize);
+
+extern float vtxoptim_threshold;
+extern int vtxoptim_uvcheck;
 
 
 /*****************************************************************************

@@ -183,7 +183,7 @@ for(i=0;i<CTRLPOINTS_U;i++){
 
   for(j=0;j<CTRLPOINTS_V;j++){
     float s=2*3.14169265*(float)j/CTRLPOINTS_V;
-    float R=1.0f+5*(float)rand()/RAND_MAX;
+    float R=1.5f+5*(float)rand()/RAND_MAX;
     ctrlpoints[i][j].x=p.x + R*( n.x*sin(s) + up.x*cos(s) );
     ctrlpoints[i][j].y=p.y + R*( n.y*sin(s) + up.y*cos(s) );
     ctrlpoints[i][j].z=p.z + R*( n.z*sin(s) + up.z*cos(s) );
@@ -226,8 +226,6 @@ void BSPTUNNEL_Render(float pos,int texture){
 }
 
 //  aglBlend(AGL_BLEND_ADD);
-  aglBlend(AGL_BLEND_NONE);
-  aglTexture(texture);
   aglZbuffer(AGL_ZBUFFER_NONE);
 
 { int i,j,k;
@@ -250,6 +248,25 @@ void BSPTUNNEL_Render(float pos,int texture){
     interp_spline_now(u);
     if(i){
       float c=i*0.02;
+
+      aglBlend(AGL_BLEND_ADD);
+      aglTexture(0);
+      glLineWidth(2);
+//      glColor3f(0.5,0.5,0.5);
+      glColor3f(0.5*c,0.5*c,0.5*c);
+      glBegin(GL_LINE_LOOP);
+      vp=tunnelpoints;
+      for(j=0;j<CTRLPOINTS_V;j++) for(k=0;k<CTRLPOINTS_V_SUB;k++){
+          //glTexCoord2f(tu,v); 
+          glVertex3fv(&vp->x);
+          ++vp;
+          v+=1.0f/(float)(CTRLPOINTS_V*CTRLPOINTS_V_SUB);
+      }
+      glEnd();
+
+      vp=tunnelpoints;
+      aglBlend(AGL_BLEND_NONE);
+      aglTexture(texture);
       glColor3f(c,c,c);
       glBegin(GL_TRIANGLE_STRIP);
       for(j=0;j<CTRLPOINTS_V;j++) for(k=0;k<CTRLPOINTS_V_SUB;k++){
@@ -262,6 +279,7 @@ void BSPTUNNEL_Render(float pos,int texture){
       glTexCoord2f(eu,v); glVertex3fv(&tempv.x);
       glTexCoord2f(tu,v); glVertex3fv(&tunnelpoints->x);
       glEnd();
+      
     } else {
       for(j=0;j<CTRLPOINTS_V;j++)
         for(k=0;k<CTRLPOINTS_V_SUB;k++)

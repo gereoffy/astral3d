@@ -1,2 +1,2 @@
 
-gcc -g -c -Wall fdwater.c
+gcc -O3  -c -Wall fdwater.c

@@ -3,6 +3,8 @@
 //#define SCR_DEBUG
 #define FX_DEBUG
 
+#define MAX_SUPPORT
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,6 +27,9 @@
 #include "../loadmap/load_map.h"
 #include "../loadmap/loadtxtr.h"
 
+#include "../MAX/max3d.h"
+#include "../MAX/render.h"
+
 #include "../blob/blob.h"
 #include "../fdtunnel/fdtunnel.h"
 #include "../spline/spline.h"
@@ -36,6 +41,7 @@
 #include "../bsptunel/bsptunel.h"
 #include "../swirl/swirl.h"
 #include "../fdwater/fdwater.h"
+#include "../sinzoom/sinzoom.h"
 
 
 // ------ LIMITS ---------------
@@ -58,6 +64,7 @@
 #define scrTYPE_scene 6
 #define scrTYPE_flag 7
 #define scrTYPE_picanim 8
+#define scrTYPE_maxscene 9
 #define scrTYPE_const 10
 #define scrTYPE_newvar 11
 
@@ -67,6 +74,7 @@
 #define scrCLASS_light 3
 #define scrCLASS_object 4
 #define scrCLASS_material 5
+#define scrCLASS_maxscene 6
 
 #define FXTYPE_NONE 0
 #define FXTYPE_SCENE 1
@@ -81,6 +89,8 @@
 #define FXTYPE_SWIRL 10
 #define FXTYPE_BSPTUNNEL 11
 #define FXTYPE_FDWATER 12
+#define FXTYPE_SINZOOM 13
+#define FXTYPE_MAXSCENE 14
 
 #define MAX_PDB 20
 
@@ -122,6 +132,7 @@ typedef struct {
 typedef struct {
   int type;
   float x1,y1,x2,y2,z;
+  float tx1,ty1,tx2,ty2;
   int id;
   float rgb[3];
   int alphamode,zbuffer;
@@ -142,26 +153,41 @@ typedef struct {
   fx_greets_struct greets;
   fx_swirl_struct swirl;
   fx_fdwater_struct fdwater;
+  fx_sinzoom_struct sinzoom;
   /* 3DS player: */
   c_SCENE *scene;
+  c_CAMERA *cam;
   int loop_scene;
+  Scene *maxscene;
   /* PIC: */
   pic_struct pic;
   /* Spline surface */
   float face_blend,wire_blend,spline_size,spline_n;
 } fx_struct;
 
+
 fx_struct fxlist[FX_DB];
 fx_struct fxdefault;
 fx_struct *current_fx=&fxlist[0];
+
+void print_currentfx_params(){
+  if(!current_fx) return;
+  printf("frame=%8.4f   blend=%5.3f   fps=%5.2f\n",current_fx->frame,current_fx->blend,current_fx->fps);
+}
+
 
 c_LIGHT*  current_light=(c_LIGHT*)NULL;
 c_OBJECT* current_object=(c_OBJECT*)NULL;
 c_SCENE*  current_scene=(c_SCENE*)NULL;
 c_MATERIAL* current_material=(c_MATERIAL *)NULL;
 
+c_SCENE *scene_debug_ptr=NULL;
+
+Scene*  current_maxscene=(Scene*)NULL;
+
 float adk_time=0.0;
 float adk_time_corrected=0.0;
+float adk_mp3_frame_correction=0;
 
 int nosound=0;
 int scr_playing=0;
@@ -232,6 +258,7 @@ int i;
     c_LIGHT *light=(c_LIGHT *)NULL;
     c_SCENE *scene=(c_SCENE *)NULL;
     c_MATERIAL *mat=(c_MATERIAL *)NULL;
+    Scene *maxscene=(Scene *)NULL;
 #include "vars.h"
   }
   { scrCmdStruct *cmd=(scrCmdStruct *)NULL;

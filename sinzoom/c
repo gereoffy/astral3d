@@ -1,5 +1,5 @@
 
-gcc -c -O2 -Wall sinpart.c
+gcc -c -Wall sinzoom.c
 
 # cd ..;./demo.sh;cd smoke
 

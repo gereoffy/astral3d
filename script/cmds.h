@@ -8,6 +8,7 @@
 #define P_SCENE(i) cmd->ptype[i]=scrTYPE_scene;
 #define P_CONST(i,dv) cmd->ptype[i]=scrTYPE_const; cmd->defval[i]=dv;
 #define P_NEW(i) cmd->ptype[i]=scrTYPE_newvar;
+#define P_MAXSCENE(i) cmd->ptype[i]=scrTYPE_maxscene;
 //===========================================================================
 // Usage:  V("command",class,code,type,min.params,max.params);
 
@@ -54,18 +55,20 @@ P_CONST(2,0.1); P_CONST(3,0); P_CONST(4,5); P_CONST(5,0.5); P_CONST(6,1);
 V("greets",scrCLASS_fx, 11,0, 1,6); P_PIC(1);
 P_CONST(2,0);P_CONST(3,0);P_CONST(4,1);P_CONST(5,1); P_CONST(6,1);
 
-// 12: sinusparticle texture numparts numsin
+// 12/0: sinusparticle texture numparts numsin
 V("sinusparticle",scrCLASS_fx, 12,0, 1,3); P_PIC(1); P_CONST(2,300); P_CONST(3,20);
+// 12/1: sinusparticle2 texture numparts numsin
+V("sinusparticle2",scrCLASS_fx, 12,1, 1,3); P_PIC(1); P_CONST(2,300); P_CONST(3,20);
 
 // 13: fdtunnel txt1 txt2
 V("fdtunnel",scrCLASS_fx, 13,0, 2,2); P_PIC(1); P_PIC(2);
 
 // 14: picture pic
-// 14: sprite pic 0 480 640 0
-V("picture",scrCLASS_fx, 14,0, 1,5); P_PIC(1);P_CONST(2,0);P_CONST(3,480);P_CONST(4,640);P_CONST(5,0);
-V("sprite",scrCLASS_fx, 14,0, 1,5); P_PIC(1);P_CONST(2,0);P_CONST(3,480);P_CONST(4,640);P_CONST(5,0);
-V("addpicture",scrCLASS_fx, 14,1, 1,5); P_PIC(1);P_CONST(2,0);P_CONST(3,480);P_CONST(4,640);P_CONST(5,0);
-V("addsprite",scrCLASS_fx, 14,1, 1,5); P_PIC(1);P_CONST(2,0);P_CONST(3,480);P_CONST(4,640);P_CONST(5,0);
+// 14: sprite pic 0 480 640 0 [tx1 ty1 tx2 ty2]
+V("picture",scrCLASS_fx, 14,0, 1,9); P_PIC(1);P_CONST(2,0);P_CONST(3,480);P_CONST(4,640);P_CONST(5,0);P_CONST(6,0);P_CONST(7,0);P_CONST(8,1);P_CONST(9,1);
+V("sprite",scrCLASS_fx, 14,0, 1,9); P_PIC(1);P_CONST(2,0);P_CONST(3,480);P_CONST(4,640);P_CONST(5,0);P_CONST(6,0);P_CONST(7,0);P_CONST(8,1);P_CONST(9,1);
+V("addpicture",scrCLASS_fx, 14,1, 1,9); P_PIC(1);P_CONST(2,0);P_CONST(3,480);P_CONST(4,640);P_CONST(5,0);P_CONST(6,0);P_CONST(7,0);P_CONST(8,1);P_CONST(9,1);
+V("addsprite",scrCLASS_fx, 14,1, 1,9); P_PIC(1);P_CONST(2,0);P_CONST(3,480);P_CONST(4,640);P_CONST(5,0);P_CONST(6,0);P_CONST(7,0);P_CONST(8,1);P_CONST(9,1);
 
 // 15/0: colorbox x1 y1 x2 y2 r g b
 // 15/1: addcolorbox x1 y1 x2 y2 r g b
@@ -78,8 +81,10 @@ P_CONST(5,1);P_CONST(6,1);P_CONST(7,1);
 
 // 16/0:  loadpic pic_var "filename"
 // 16/1:  loadRGBA pic_var "filename" "filename2"
+// 16/2:  loadMASK pic_var "filename" "filename2"
 V("loadpic",scrCLASS_global,16,0, 2,3); P_NEW(1);
 V("loadRGBA",scrCLASS_global,16,1, 3,3); P_NEW(1);
+V("loadMASK",scrCLASS_global,16,2, 3,3); P_NEW(1);
 
 // 17/0:  fade float_var start end time
 V("fade",scrCLASS_global,17,0, 1,4); P_FLOAT(1); P_CONST(2,0); P_CONST(3,1); P_CONST(4,1);
@@ -126,6 +131,7 @@ V("hjbtunnel_init",scrCLASS_global, 28,0, 0,1); P_CONST(1,63897457);
 
 // 29: swirl txt [scale]
 V("swirl",scrCLASS_fx, 29,0, 1,2); P_PIC(1); P_CONST(2,15);
+V("addswirl",scrCLASS_fx, 29,1, 1,2); P_PIC(1); P_CONST(2,15);
 
 // 30: noise txt [color]
 // 30: addnoise txt [color]
@@ -151,13 +157,30 @@ V("projected_map_anim",scrCLASS_object,35,1, 1,2); P_PICANIM(1); P_CONST(2,0.01)
 // 36/0: fdwater txt heightmap1 heightmap2 [color]
 // 36/1: fdripple txt [color]
 V("fdwater",scrCLASS_fx, 36,0, 3,6); P_PIC(1); P_CONST(4,0.5);P_CONST(5,0.5);P_CONST(6,0.8);
+V("addfdwater",scrCLASS_fx, 36,2, 3,6); P_PIC(1); P_CONST(4,0.5);P_CONST(5,0.5);P_CONST(6,0.8);
 V("fdripples",scrCLASS_fx, 36,1, 1,4); P_PIC(1); P_CONST(2,0.5);P_CONST(3,0.5);P_CONST(4,0.8);
 
 // 37: clone_fx
 V("clone_fx",scrCLASS_fx, 37,0, 1,1); P_CONST(1,0);
 
+// 38: camera camname
+V("camera",scrCLASS_scene, 38,0, 1,1);
+
+// 39: sinzoom texture num xpos ypos r g b
+V("sinzoom",scrCLASS_fx, 39,0, 1,7); P_PIC(1);P_CONST(2,10);P_CONST(3,320);P_CONST(4,240);P_CONST(5,1);P_CONST(6,1);P_CONST(7,1);
+
+// 40:  maxscene maxscene_var texture
+V("maxscene",scrCLASS_fx, 40,0, 4,4); P_MAXSCENE(1); P_PIC(2); P_PIC(3); P_PIC(4);
+
+// 41:  load_maxscene maxscene_var "filename"
+V("load_maxscene",scrCLASS_global, 41,0, 2,2); P_NEW(1);
+
+// 42
+V("pointer_hack",scrCLASS_scene,42,0,0,0);
+
 //===========================================================================
 #undef V
+#undef P_MAXSCENE
 #undef P_INT
 #undef P_FLOAT
 #undef P_PIC

@@ -89,6 +89,7 @@ void NEWparticle_redraw(c_PARTICLE *obj,c_MATRIX objmat, float dt){
     if(dt>0) move_particle(&particles[i],dt);
   }
   glEnd();
+  glLineWidth(1.0f);
 
 // -------------------- LIGHTS ---------------------
   aglTexture(obj->texture_id);

@@ -22,6 +22,8 @@
 
 /* ************************************************************************** */
 
+extern float ast3d_blend;
+
 /* ************************************************************************** */
 
 static c_VECTOR circle_p[CIRCLE_U+1];
@@ -43,7 +45,7 @@ for(vi=0;vi<=CIRCLE_V;vi++){
 //  float Rt=0.5*pow(v,1+0.9*sin(pos));
 //  float Dt=sin(pos)*(5-sin(pos)*4*v);
 //  float Dt=sin(pos)*(1-v*sin(pos+0.3));
-  float Dt=fx->twist_inner*sin(pos)+fx->twist_outer*v*cos(pos);
+  float Dt=fx->twist_inner*cos(pos)+fx->twist_outer*v*sin(pos);
   u=0;
   if(vi) glBegin(GL_TRIANGLE_STRIP);
   for(ui=0;ui<=CIRCLE_U;ui++){
@@ -51,8 +53,8 @@ for(vi=0;vi<=CIRCLE_V;vi++){
       glTexCoord2fv(circle_t[ui]);
       glVertex3fv(&circle_p[ui].x);
     }
-    circle_p[ui].x=R*cos(u);
-    circle_p[ui].y=R*sin(u);
+    circle_p[ui].x=fx->x+R*cos(u);
+    circle_p[ui].y=fx->y+R*sin(u);
     circle_p[ui].z=-20;
     circle_t[ui][0]=0.5f+Rt*cos(u+Dt);
     circle_t[ui][1]=0.5f-Rt*sin(u+Dt);
@@ -104,9 +106,9 @@ float blur_alpha[BLUR_LEVEL];
 
   aglTexture(fx->texture);
   for(i=0;i<fx->blur_level;i++){
-    float a=blur_alpha[i]/as;
-    glColor3f(a,a,a);
-    aglBlend(i?AGL_BLEND_ADD:AGL_BLEND_ALPHA);
+    float a=ast3d_blend*blur_alpha[i]/as;
+    glColor4f(a,a,a,a);
+    aglBlend((i||fx->type)?AGL_BLEND_ADD:AGL_BLEND_ALPHA);
     DrawCircle(pos-fx->blur_pos*i,fx);
   }
 

@@ -14,7 +14,7 @@ static INLINE unsigned char clip_255_blend(float x,float b){
   return (int)(x*b*255.0);
 }
 
-int FindCameras(c_SCENE *scene){
+int FindCameras(c_SCENE *scene,char* camname){
   w_NODE *node;
   c_CAMERA *cam=NULL;
   int objno=0;
@@ -26,7 +26,7 @@ int FindCameras(c_SCENE *scene){
       printf("CAMERA #%d: %s\n",camno,c->name);
 #endif
       if(camno<MAX_CAMNO) cameras[camno++]=c;
-      if(strcmp(c->name,"Camera01")==0) cam=c;
+      if(camname) if(strcmp(c->name,camname)==0) cam=c;
     }
     if (node->type == ast3d_obj_light){
       c_LIGHT *c=(c_LIGHT *)node->object;
@@ -43,7 +43,7 @@ int FindCameras(c_SCENE *scene){
     }
   }
   if(!cam && camno) cam=cameras[0];
-  scene->cam=cam;
+  if(!scene->cam) scene->cam=cam;
   return camno;
 }
 

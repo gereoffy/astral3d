@@ -36,17 +36,11 @@ static INLINE float vrnd(void){ return(((float)rand())/RAND_MAX); }
 static void setnewpart(c_PART *p,c_OBJECT *obj){
   float a,v[3];
   a=vrnd()*3.14159265359*2.0;
-  vinit(v,sin(a)*obj->particle.eject_r*vrnd(),0.15,cos(a)*obj->particle.eject_r*vrnd());
-//  printf("setnewpart.  a=%f   xyz: %f %f %f\n",a,v[0],v[1],v[2]);
-  p->p.x=v[0]+vrnd()*obj->particle.ridtri;
-  p->p.y=v[1]+vrnd()*obj->particle.ridtri;
-  p->p.z=v[2]+vrnd()*obj->particle.ridtri;
-//  printf("setnewpart.  p.xyz: %f %f %f\n",p->p.x,p->p.y,p->p.z);
+  p->p.x=  p->p.y=  p->p.z=0;
+  p->v[0]=vrnd()*sin(a)*obj->particle.eject_r;
+  p->v[1]=(1+vrnd())*obj->particle.eject_vy;
+  p->v[2]=vrnd()*cos(a)*obj->particle.eject_r;
   vinit(p->color,vrnd(),vrnd(),vrnd());
-  vinit(p->v,v[0]*obj->particle.eject_vl/(obj->particle.eject_r/2),
-             vrnd()*obj->particle.eject_vy+obj->particle.eject_vy/2,
-             v[2]*obj->particle.eject_vl/(obj->particle.eject_r/2));
-//  printf("setnewpart.  v.xyz: %f %f %f\n",p->v[0],p->v[1],p->[2]);
   p->energy=1;
 }
 
@@ -58,7 +52,8 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
 //  glShadeModel(GL_FLAT);
 //  aglZbuffer(AGL_ZBUFFER_NONE);
   aglZbuffer(AGL_ZBUFFER_R);
-  aglTexture(lightmap);
+//  aglTexture(lightmap);
+  aglTexture(obj->particle.texture_id);
   aglBlend(AGL_BLEND_ADD);
 
     glBegin(GL_QUADS);
@@ -93,8 +88,9 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
       p[j].color[1]*=obj->particle.colordecrement;
       p[j].color[2]*=obj->particle.colordecrement;
 
-#if 0
-      if(p[j].p.y<0.1|| p[j].energy<=0.001) {  // 
+#if 1
+//      if(p[j].p.y<0.1|| p[j].energy<=0.001) {  // 
+      if(p[j].p.y>obj->particle.max_y) {  // 
 #else
       if(p[j].p.y<0.1) {  // 
 #endif
@@ -105,6 +101,7 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
         p[j].p.x+=dt*p[j].v[0];
         p[j].p.y+=dt*p[j].v[1];
         p[j].p.z+=dt*p[j].v[2];
+//        if(j==10) printf("PART  dt=%8.5f   %8.3f  %8.3f  %8.3f    V: %8.3f  %8.3f  %8.3f\n",dt,p[j].p.x,p[j].p.y,p[j].p.z,p[j].v[0],p[j].v[1],p[j].v[2]);
       }
       
     }
@@ -122,8 +119,9 @@ void particle_preplay(c_OBJECT *obj,float dt,int times){
       p[j].color[0]*=obj->particle.colordecrement;
       p[j].color[1]*=obj->particle.colordecrement;
       p[j].color[2]*=obj->particle.colordecrement;
-#if 0
-      if(p[j].p.y<0.1|| p[j].energy<=0.001){
+#if 1
+//      if(p[j].p.y<0.1|| p[j].energy<=0.001){
+      if(p[j].p.y>obj->particle.max_y) {  // 
 #else
       if(p[j].p.y<0.1){
 #endif

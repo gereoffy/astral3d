@@ -30,7 +30,7 @@ extern void resize(int w,int h);
 extern void ast3d_Perspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
 
 extern void draw3dsframe(float deltatime);
-extern int FindCameras(c_SCENE *scene);
+extern int FindCameras(c_SCENE *scene,char* camname);
 extern void LoadMaterials(c_SCENE *scene);
 
 extern float bump_du;

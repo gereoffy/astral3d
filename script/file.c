@@ -88,6 +88,7 @@ int i;
     case scrTYPE_pic: printf("texture_var"); break;
     case scrTYPE_picanim: printf("picanim_var"); break;
     case scrTYPE_scene: printf("scene_var"); break;
+    case scrTYPE_maxscene: printf("maxscene_var"); break;
     case scrTYPE_const: printf("<value>"); break;
     case scrTYPE_newvar: printf("new_var_name"); break;
     default: printf("???");
@@ -131,6 +132,13 @@ void *ptr=NULL;
            ptr=(void*)current_scene;
          } else ptr=(void*)(fx->scene);
          if(!ptr) scrSyntax("using scene-dependent variable, but no scene selected");
+         break;
+      case scrCLASS_maxscene:
+         if(fx->type!=FXTYPE_MAXSCENE){
+           printf("Warning: current FX is not MAXscene!\n");
+           ptr=(void*)current_maxscene;
+         } else ptr=(void*)(fx->maxscene);
+         if(!ptr) scrSyntax("using maxscene-dependent variable, but no scene selected");
          break;
       case scrCLASS_light:
          ptr=(void*)current_light;
@@ -182,7 +190,11 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       if(fxnum>=FX_DB) scrSyntax("Invalid FX number");
 //      printf("Setting current FX to #%d\n",fxnum);
       fx=&fxlist[fxnum];
-      if(fx->type==FXTYPE_SCENE && fx->scene) current_scene=fx->scene;
+      if(fx->type==FXTYPE_SCENE && fx->scene){
+        current_scene=fx->scene;
+//        printf("layer parser debug: fx->type=%d\n",fx->type);
+      }
+      if(fx->type==FXTYPE_MAXSCENE && fx->maxscene) current_maxscene=fx->maxscene;
       if(sor[i]==0){ current_fx=fx;return; }
     }
   }
@@ -214,6 +226,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       if(cmd->Type==scrTYPE_pic) scrSyntax("Picture/texture variables are NOT redefinable!");
       if(cmd->Type==scrTYPE_picanim) scrSyntax("Animated texture variables are NOT redefinable!");
       if(cmd->Type==scrTYPE_scene) scrSyntax("Scene variables are NOT redefinable!");
+      if(cmd->Type==scrTYPE_maxscene) scrSyntax("MAXScene variables are NOT redefinable!");
       // Check/setup environment:
       ptr=scrGetPtr(cmd, fx);
       // Assigning values:
@@ -254,6 +267,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         case scrTYPE_float:
         case scrTYPE_str:
         case scrTYPE_scene:
+        case scrTYPE_maxscene:
           if(i>pdb) scrSyntaxH("parameter required",cmd,i);
           pvar[i]=scrSearchVar(p[i]);
           if(!pvar[i]){
@@ -328,7 +342,8 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         i=ast3d_load_world(p[2],scene); if(i!=ast3d_err_ok)scrFatal(ast3d_geterror(i));
         i=ast3d_load_motion(p[2],scene);if(i!=ast3d_err_ok)scrFatal(ast3d_geterror(i));
         ast3d_setactive_scene(scene);
-        if((FindCameras(scene)==0) || (!scene->cam)) scrFatal("No camera found!!");
+        scene->cam=NULL;
+        if((FindCameras(scene,"Camera01")==0) || (!scene->cam)) scrFatal("No camera found!!");
         printf("Default camera: %s\n",scene->cam->name);
         ast3d_setactive_camera(scene->cam);
         LoadMaterials(scene);
@@ -344,9 +359,11 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
           FX_RESET(fx);
 //        fx->frame=0;
         }
-          fx->type=FXTYPE_SCENE;fx->scene=scene;
+        fx->type=FXTYPE_SCENE;fx->scene=scene;
         ast3d_setactive_scene(scene);
         ast3d_setactive_camera(scene->cam);
+        fx->cam=scene->cam;
+        current_scene=scene;
         return;
       }
 //===============================================================================
@@ -364,7 +381,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 // 5:  light lightno
       if(cmdp->code==5){
         int l;
-        FindCameras(scene);
+        FindCameras(scene,NULL);
         l=pval[1];
         if(l<0 || l>=lightno) scrSyntax("Invalid light number!");
         current_light=lights[l];
@@ -486,6 +503,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         FX_RESET(fx);
         fx->type=FXTYPE_SINPART;
         sinpart_init(&fx->sinpart,pval[1],pval[2],pval[3]);
+        fx->sinpart.type=cmdp->type;
         return;
       }
 //===============================================================================
@@ -515,6 +533,10 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         fx->pic.y1=pval[3];
         fx->pic.x2=pval[4];
         fx->pic.y2=pval[5];
+        fx->pic.tx1=pval[6];
+        fx->pic.ty1=pval[7];
+        fx->pic.tx2=pval[8];
+        fx->pic.ty2=pval[9];
 //        fx->pic.rgb[0]=fx->pic.rgb[1]=fx->pic.rgb[2]=1.0F;
 //        fx->pic.alphamode=0;fx->pic.zbuffer=0;fx->pic.z=10.0;
         return;
@@ -541,9 +563,12 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 // 16/1:  loadRGBA pic_var "filename" "filename2"
       if(cmdp->code==16){
         texture_st *t;
-        if(pdb==3)
-          t=load_texture( fix_mapname(p[2]),NULL,1.0, NULL,NULL,0, fix_mapname(p[3]),NULL,1.0, 0);
-        else
+        if(pdb==3){
+          if(cmdp->type==2)
+            t=load_texture( fix_mapname(p[2]),fix_mapname(p[3]),1.0, NULL,NULL,0, NULL,NULL,1.0, 0);
+          else
+            t=load_texture( fix_mapname(p[2]),NULL,1.0, NULL,NULL,0, fix_mapname(p[3]),NULL,1.0, 0);
+        } else
           t=load_texture( fix_mapname(p[2]), NULL, 1.0, NULL,NULL,0, NULL,NULL,0, 0);
         if(!t || !(t->flags&15)) scrSyntax("loadpic: File not found!");
         scrAddNewVar(strdup(p[1]),scrTYPE_pic,scrCLASS_global,0,(void*)t);
@@ -680,6 +705,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         FX_RESET(fx);
         fx->type=FXTYPE_SWIRL;
         fx->swirl.texture=pval[1];
+        fx->swirl.type=cmdp->type;
         fx->swirl.scale=pval[2];
         return;
       }
@@ -746,21 +772,23 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 // 35/1: projected_map_anim picanim [scale]
       if(cmdp->code==35){
         picanim_st* picanim=scrGetPtr(pvar[1],fx);
-        current_scene->projmap.maps=picanim;
+        scene->projmap.maps=picanim;
         if(cmdp->type==0){
-          current_scene->projmap.nummaps=1;
+          scene->projmap.nummaps=1;
         } else {
-          current_scene->projmap.nummaps=picanim->nummaps;
+          scene->projmap.nummaps=picanim->nummaps;
+          
           if(picanim->nummaps==1)
-            current_scene->projmap.maps=picanim->maps[0];
+            scene->projmap.maps=picanim->maps[0];
           else
-            current_scene->projmap.maps=picanim->maps;
+            scene->projmap.maps=picanim->maps;
         }
-        if(current_scene->projmap.nummaps<1) scrSyntax("projected_map: minimum 1 texture must exisist!!!");
-        printf("Enabling projected-mapping, animated textures: %d\n",current_scene->projmap.nummaps);
+        if(scene->projmap.nummaps<1) scrSyntax("projected_map: minimum 1 texture must exisist!!!");
+        printf("Enabling projected-mapping, animated textures: %d\n",scene->projmap.nummaps);
         current_material->flags|=ast3d_mat_reflect|ast3d_mat_projected_map;
-        current_scene->projmap.animphase=0;
-        current_scene->projmap.scale=pval[2];
+        scene->projmap.animphase=0;
+        scene->projmap.scale=pval[2];
+//        printf("projected_map_anim nummaps=%d\n",scene->projmap.nummaps);
         return;
       }
 //===============================================================================
@@ -771,7 +799,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         fx->type=FXTYPE_FDWATER;
         fx->fdwater.type=cmdp->type;
         fx->fdwater.texture=pval[1];
-        if(cmdp->type==0){
+        if(!(cmdp->type&1)){
           if(!LoadMAP(p[2],&fx->fdwater.map1)) scrSyntax("fdwater: heightmap 1 file not found!");
           if(!LoadMAP(p[3],&fx->fdwater.map2)) scrSyntax("fdwater: heightmap 2 file not found!");
           fx->fdwater.color[0]=pval[4];
@@ -794,6 +822,59 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         return;
       }
 //===============================================================================
+// 38: camera camname
+      if(cmdp->code==38){
+        scene=fx->scene;ast3d_setactive_scene(scene);
+        scene->cam=NULL;
+        FindCameras(scene,p[1]);
+        if(scene->cam==NULL) scrSyntax("Camera not found!!!");
+        ast3d_setactive_camera(scene->cam);
+        fx->cam=scene->cam;
+        return;
+      }
+//===============================================================================
+// 39: sinzoom texture xpos ypos r g b
+      if(cmdp->code==39){
+        FX_RESET(fx);
+        fx->type=FXTYPE_SINZOOM;
+        fx->sinzoom.texture=pval[1];
+        fx->sinzoom.partnum=pval[2];
+        fx->sinzoom.x=pval[3];
+        fx->sinzoom.y=pval[4];
+        fx->sinzoom.color[0]=pval[5];
+        fx->sinzoom.color[1]=pval[6];
+        fx->sinzoom.color[2]=pval[7];
+        return;
+      }
+//===============================================================================
+#ifdef MAX_SUPPORT
+// 40:  maxscene maxscene_var
+      if(cmdp->code==40){
+        Scene *scene=scrGetPtr(pvar[1],fx);
+        FX_RESET(fx);
+        fx->type=FXTYPE_MAXSCENE;
+        current_maxscene=fx->maxscene=scene;
+        scene->texture_id=pval[2];
+        scene->texture2_id=pval[3];
+        scene->texture3_id=pval[4];
+        return;
+      }
+//===============================================================================
+// 41:  load_maxscene maxscene_var "filename"
+      if(cmdp->code==41){
+        Scene *scene=LoadMAXScene(p[2]);
+        if(!scene) scrFatal("MAXscene file not found!");
+        scrAddNewVar(strdup(p[1]),scrTYPE_maxscene,scrCLASS_global,0,(void*)scene);
+        current_maxscene=scene;
+        return;
+      }
+#endif
+//===============================================================================
+//if(cmdp->code==42){
+//  scene_debug_ptr=current_scene;
+//  return;
+//}
+
       scrSyntax("Internal error: Unimplemented command (check command code!)");
     }
   }

@@ -21,13 +21,15 @@ static void calc_objnormals (c_OBJECT *obj)
     normal.y=-(p1->z-p2->z)*(p1->x-p3->x) + (p1->x-p2->x)*(p1->z-p3->z);
     normal.z=-(p1->x-p2->x)*(p1->y-p3->y) + (p1->y-p2->y)*(p1->x-p3->x);
 
+//    vec_normalize (&normal, &normal);
+
     /* vertexnormals: */
     j=obj->faces[i].a;vec_add (&normal, &obj->vertices[j].norm, &obj->vertices[j].norm);
     j=obj->faces[i].b;vec_add (&normal, &obj->vertices[j].norm, &obj->vertices[j].norm);
     j=obj->faces[i].c;vec_add (&normal, &obj->vertices[j].norm, &obj->vertices[j].norm);
 
     A+=(obj->faces[i].A=vec_length(&normal));
-    vec_normalize (&normal, &normal);
+//    vec_normalize (&normal, &normal);
     vec_copy (&normal, &obj->faces[i].norm);
     
     obj->faces[i].D=normal.x*p1->x+normal.y*p1->y+normal.z*p1->z;

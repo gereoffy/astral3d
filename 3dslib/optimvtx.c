@@ -2,6 +2,10 @@
 #define HASH_SIZE 256
 #define HASH_FV(a,b,c) (( ((int)(a))^((int)(b))^((int)(c)) )&(HASH_SIZE-1))
 
+float vtxoptim_threshold=0;
+//float vtxoptim_uvthreshold=0;
+int vtxoptim_uvcheck=0;
+
 static void optimize_vertex (c_OBJECT *obj){
   int32     i, j, k;
   int opt=0;
@@ -19,11 +23,11 @@ static void optimize_vertex (c_OBJECT *obj){
     hash=HASH_FV(obj->vertices[i].vert.x,obj->vertices[i].vert.y,obj->vertices[i].vert.z);
     j=hash_table[hash];
     while(j>=0){
-      if( obj->vertices[i].vert.x==obj->vertices[j].vert.x &&
-          obj->vertices[i].vert.y==obj->vertices[j].vert.y &&
-          obj->vertices[i].vert.z==obj->vertices[j].vert.z &&
-          obj->vertices[i].u==obj->vertices[j].u &&
-          obj->vertices[i].v==obj->vertices[j].v ) {
+      if( (fabs(obj->vertices[i].vert.x-obj->vertices[j].vert.x)<=vtxoptim_threshold) &&
+          (fabs(obj->vertices[i].vert.y-obj->vertices[j].vert.y)<=vtxoptim_threshold) &&
+          (fabs(obj->vertices[i].vert.z-obj->vertices[j].vert.z)<=vtxoptim_threshold) &&
+          ((vtxoptim_uvcheck==0)||(obj->vertices[i].u==obj->vertices[j].u && obj->vertices[i].v==obj->vertices[j].v))
+        ) {
         ++opt;
         obj->vertices[i].opt_tmp=j;
         goto oke; // break;
@@ -35,6 +39,8 @@ static void optimize_vertex (c_OBJECT *obj){
     obj->vertices[i].pvert.x=hash_table[hash]; hash_table[hash]=i;
     oke:;
   }
+  printf("OPTIMVTX: %d duplicated vertices\n",opt);
+  
 //  putchar('2');fflush(stdout);
 
 /* pass-2: renumber faces */

@@ -22,6 +22,7 @@
 #include "../agl/agl.h"
 
 #include "../afs/afs.h"
+#include "../afs/afsmangle.h"
 #include "../loadmap/loadmaps.h"
 
 #include "../3dslib/ast3d.h"
@@ -397,7 +398,7 @@ for(i=0;i<CTRLPOINTS_V_SUB;i++){
 
 /* ************************************************************************** */
 
-void update_ctrlpoints(float szog,int first,int last){
+void update_ctrlpoints(float szog,int first,int last,float amp){
 int i;
 
 for(i=first;i<last;i++){
@@ -418,7 +419,7 @@ for(i=first;i<last;i++){
       R+=sin(szog2)*ctrlpoints_sins[i][j][k];
       szog2+=szog;
     }
-    R=3+1*R;
+    R=3+amp*R;
     { float s=2*3.14169265*(float)j/CTRLPOINTS_V;
       float sin_s=sin(s);
       float cos_s=cos(s);
@@ -612,7 +613,7 @@ c_VECTOR v1,v2;
 
 //  u0=100; // hack
 
-  update_ctrlpoints(pos_,0,CTRLPOINTS_U);
+  update_ctrlpoints(1.37527362+param->morph_speed*pos_,0,CTRLPOINTS_U,param->morph_amp);
 
   for(i=LOGO_U_TILE-1;i>=0;i--){
     int j;

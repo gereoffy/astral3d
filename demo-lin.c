@@ -39,6 +39,7 @@ void ExitDemo(){
 }
 
 static float time_dt=0;
+static int MP3_frames_last=0;
 
 /* handle KEY events */
 static void key(unsigned char k, int x, int y){
@@ -46,8 +47,10 @@ static void key(unsigned char k, int x, int y){
   case 27:  /* Escape */
     ExitDemo();
   case 'p': 
-    printf("MARK:  p=%5d   t=%6.2f  dt=%5.2f  fps=%4.2f\n",MP3_frames,adk_time,adk_time-time_dt,(adk_time>2)?(total_frames/adk_time):0);
+    printf("MARK:  p=%5d  [dp=%4d]  t=%6.2f  [dt=%5.2f]  fps=%4.2f\n",MP3_frames,MP3_frames-MP3_frames_last,adk_time,adk_time-time_dt,(adk_time>2)?(total_frames/adk_time):0);
+    print_currentfx_params();
     time_dt=adk_time;
+    MP3_frames_last=MP3_frames;
     break;
   case 's': 
     pause^=1;MP3_eof=pause;
@@ -69,6 +72,7 @@ GLvoid DrawScene(){
   if(pause) return;
 //  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   draw_scene();
+  if(!scr_playing) return;
   glFinish();
   glutSwapBuffers();
   ++total_frames;

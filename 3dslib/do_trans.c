@@ -25,6 +25,8 @@ static void do_transform (){
     if (node->type == ast3d_obj_object) {
       obj = (c_OBJECT *)node->object;
 
+      obj->flags&=~(ast3d_obj_inside|ast3d_obj_visible|ast3d_obj_frustumcull);
+
       /* CHECK OBJECT HIDE TRACK      */
       if(!(obj->flags & (ast3d_obj_hidden|ast3d_obj_chidden))){
         static c_MATRIX objmat;
@@ -32,7 +34,6 @@ static void do_transform (){
         mat_mul (ast3d_camera->matrix, obj->matrix, objmat);
         mat_normalize (objmat, normat);
 
-        obj->flags&=~(ast3d_obj_inside|ast3d_obj_visible|ast3d_obj_frustumcull);
         obj->flags|=ast3d_obj_allvisible;
 
         if ((ast3d_flags & ast3d_domorph) && (obj->flags & ast3d_obj_morph)) {

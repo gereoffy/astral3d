@@ -1,7 +1,8 @@
 // ====================== EVENT handler ===============================
 
 float adk_mp3_frame=0.0;
-#define MP3_FRAMES (nosound?adk_mp3_frame:(MP3_frames))
+//float adk_mp3_frame_correction=0;
+#define MP3_FRAMES ((nosound?adk_mp3_frame:(MP3_frames))+adk_mp3_frame_correction)
 
 #define scrEVENTframe   1
 #define scrEVENTtime    2

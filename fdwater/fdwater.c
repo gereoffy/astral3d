@@ -76,16 +76,20 @@ int flag=0;
     v=(float)y/60.0f;
     //----------- pass 1 ----------------
     aglTexture(params->texture);
-    aglBlend(AGL_BLEND_NONE);
+    if(params->type&2)
+      aglBlend(AGL_BLEND_ADD);
+    else
+      aglBlend((ast3d_blend==1)?AGL_BLEND_NONE:AGL_BLEND_ALPHA);
 //    glColor3f(1,1,1);
 //    glColor3f(0,0,0);
-    glColor3fv(params->color);
+//    glColor3fv(params->color);
+    glColor4f(params->color[0],params->color[1],params->color[2],ast3d_blend);
     glBegin(GL_TRIANGLE_STRIP);
     for(x=0;x<=80;x++){
       float u1,v1,u2,v2;
       float h1,h2,h3;
       u=(float)x/80.0f;
-if(params->type==0){
+if(!(params->type&1)){
   // Heightmapped WATER
       if(y){
         glTexCoord2f(texcoord[x][0],texcoord[x][1]);
@@ -100,7 +104,7 @@ if(params->type==0){
       du=params->amp*h2;
       dv=params->amp*h3;
       texcoord[x][0]=u+du;
-      texcoord[x][1]=v+dv;
+      texcoord[x][1]=1-(v+dv);
       h1*=h1;
       h1*=h1*params->bright;
 //      h1=h2*=params->bright;
@@ -139,7 +143,7 @@ if(params->type==0){
       dv=params->amp*h3;
 
       texcoord[x][0]=0.5+0.95*(u+du-0.5);
-      texcoord[x][1]=0.5+0.95*(v+dv-0.5);
+      texcoord[x][1]=0.5-0.95*(v+dv-0.5);
 
 //      h1*=h1*params->bright;
 //      h1=sqrt(h2*h2+0.3*h3*h3)*params->bright+32;
@@ -157,7 +161,7 @@ if(params->type==0){
 }
     }
     glEnd();
-    if(params->type==0) if(y){
+    if(!(params->type&1)) if(params->bright) if(y){
       //----------- pass 2 ----------------
       glDisable(GL_TEXTURE_2D);
       aglBlend(AGL_BLEND_ADD);

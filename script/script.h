@@ -10,5 +10,7 @@ extern void scrInit();
 extern void scrLoad(char* filename);
 extern void fx_init();
 
+extern void print_currentfx_params();
+
 extern FILE* fx_debug;
 

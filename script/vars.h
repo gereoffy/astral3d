@@ -12,6 +12,10 @@ VAR_GLOB(scrTYPE_int  ,"default_mat_flags",default_mat_flags);
 VAR_GLOB(scrTYPE_int  ,"default_obj_flags",default_obj_flags);
 VAR_GLOB(scrTYPE_int  ,"default_track_flags",default_track_flags);
 VAR_GLOB(scrTYPE_float,"default_corona_scale",default_corona_scale);
+VAR_GLOB(scrTYPE_float,"pattern_correction",adk_mp3_frame_correction);
+
+VAR_GLOB(scrTYPE_float,"vtxoptim_threshold",vtxoptim_threshold);
+VAR_GLOB(scrTYPE_int,"vtxoptim_uvcheck",vtxoptim_uvcheck);
 
 #undef VAR_GLOB
 
@@ -49,6 +53,10 @@ VAR_FX(scrTYPE_float,"pic_x1",pic.x1,0.0);
 VAR_FX(scrTYPE_float,"pic_y1",pic.y1,480.0);
 VAR_FX(scrTYPE_float,"pic_x2",pic.x2,640.0);
 VAR_FX(scrTYPE_float,"pic_y2",pic.y2,0.0);
+VAR_FX(scrTYPE_float,"pic_tx1",pic.tx1,0.0);
+VAR_FX(scrTYPE_float,"pic_ty1",pic.ty1,0.0);
+VAR_FX(scrTYPE_float,"pic_tx2",pic.tx2,1.0);
+VAR_FX(scrTYPE_float,"pic_ty2",pic.ty2,1.0);
 VAR_FX(scrTYPE_int  ,"pic_alphamode",pic.alphamode,0);
 VAR_FX(scrTYPE_float,"pic_alphalevel",pic.alphalevel,0);
 VAR_FX(scrTYPE_int  ,"pic_zbuffer",pic.zbuffer,0);
@@ -64,6 +72,11 @@ VAR_FX(scrTYPE_float,"wire_blend",wire_blend,0.5);
 VAR_FX(scrTYPE_float,"spline_size",spline_size,100.0);
 VAR_FX(scrTYPE_float,"spline_n",spline_n,16);
 
+// SINzoom:
+VAR_FX(scrTYPE_float,"sinzoom_size",sinzoom.size,100);
+VAR_FX(scrTYPE_float,"sinzoom_scale",sinzoom.scale,1.2);
+VAR_FX(scrTYPE_float,"sinzoom_dphase",sinzoom.d_phase,0.1);
+
 // FDtunnel:
 VAR_FX(scrTYPE_float,"fdtunnel_speedx",fdtunnel.speed[0],0.008);
 VAR_FX(scrTYPE_float,"fdtunnel_speedy",fdtunnel.speed[1],0.009736);
@@ -78,6 +91,8 @@ VAR_FX(scrTYPE_float,"fdtunnel_rad_speed",fdtunnel.rad_speed[1],0.02354);
 VAR_FX(scrTYPE_float,"fdtunnel_rad_amp",fdtunnel.rad_amp[1],128);
 VAR_FX(scrTYPE_float,"fdtunnel_rad_szog",fdtunnel.rad_szog[1],5);
 
+VAR_FX(scrTYPE_float,"hjbtunnel_morph_amp",hjbtunnel.morph_amp,1);
+VAR_FX(scrTYPE_float,"hjbtunnel_morph_speed",hjbtunnel.morph_speed,1);
 
 // GREETS:
 VAR_FX(scrTYPE_float,"greets_blend_speed",greets.blend_speed,1.0);
@@ -92,6 +107,8 @@ VAR_FX(scrTYPE_int  ,"swirl_blurlevel",swirl.blur_level,1);
 VAR_FX(scrTYPE_float,"swirl_bluralpha",swirl.blur_alpha,0.8);
 VAR_FX(scrTYPE_float,"swirl_blurpos",swirl.blur_alpha,0.01);
 VAR_FX(scrTYPE_float,"swirl_scale",swirl.scale,15);
+VAR_FX(scrTYPE_float,"swirl_x",swirl.x,0);
+VAR_FX(scrTYPE_float,"swirl_y",swirl.y,0);
 VAR_FX(scrTYPE_float,"lens_power",swirl.lens,1.0f);
 VAR_FX(scrTYPE_float,"twist_inner",swirl.twist_inner,0);
 VAR_FX(scrTYPE_float,"twist_outer",swirl.twist_outer,0);
@@ -166,6 +183,7 @@ VAR_OBJ(scrTYPE_float,"part_dieratio",particle.dieratio);
 VAR_OBJ(scrTYPE_float,"part_agrav",particle.agrav);
 VAR_OBJ(scrTYPE_float,"part_colordecrement",particle.colordecrement);
 VAR_OBJ(scrTYPE_int  ,"part_sizelimit",particle.sizelimit);
+VAR_OBJ(scrTYPE_float,"part_maxy",particle.max_y);
 
 // hair
 VAR_OBJ(scrTYPE_float,"hair_length",hair_len);
@@ -176,6 +194,11 @@ VAR_OBJ(scrTYPE_float,"laser_reflection",laser_reflection);
 VAR_OBJ(scrTYPE_int,"receive_laser",receive_laser);
 
 #undef VAR_OBJ
+
+#define VAR_OBJF(vartype,varname,realname,flag) scrAddNewVar(varname,vartype,scrCLASS_object,flag,(void*)(&obj->realname))
+VAR_OBJF(scrTYPE_flag,"obj_hidden",flags,ast3d_obj_chidden);
+
+#undef VAR_OBJF
 
 //=============================
 // material-dependent:
@@ -192,6 +215,7 @@ VAR_MAT(scrTYPE_flag ,"env_spheremap",flags,ast3d_mat_env_sphere);
 //VAR_MAT(scrTYPE_flag ,"projected_map",flags,ast3d_mat_projected_map);
 
 #undef VAR_MAT
+
 
 //=============================
 // scene-dependent:
@@ -212,4 +236,11 @@ VAR_SCENE(scrTYPE_float,"projmap_scale",projmap.scale);
 VAR_SCENE(scrTYPE_float,"projmap_animphase",projmap.animphase);
 
 #undef VAR_SCENE
+
+// scene-dependent:
+#define VAR_MAXSCENE(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_maxscene,0,(void*)(&maxscene->realname))
+VAR_MAXSCENE(scrTYPE_float,"knot1_alpha",knot1_alpha);
+VAR_MAXSCENE(scrTYPE_float,"knot2_alpha",knot2_alpha);
+
+#undef VAR_MAXSCENE
 

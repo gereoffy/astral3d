@@ -67,6 +67,8 @@ void draw3dsframe(float deltatime){
     int particle_update=1;
     
     ast3d_update();        // keyframing & transformations
+    
+//    printf("DeltaTime=%8.3f\n",deltatime);
 
 PROF_START(prof_3d_matrixmode);
     glMatrixMode( GL_PROJECTION );
@@ -114,6 +116,7 @@ if(laserno){
               if((obj->particle.type&7)==1)
                 NEWparticle_redraw(&obj->particle,objmat,particle_update*0.5*deltatime); // !!!!!!!!!!!!! FIXME!
               else
+//                particle_redraw(obj,objmat,0.5*deltatime); // !!!!!!!!!!!!! FIXME!
                 particle_redraw(obj,objmat,particle_update*0.5*deltatime); // !!!!!!!!!!!!! FIXME!
               particle_update=0;
             }
@@ -159,7 +162,7 @@ PROF_END(prof_3d_calc);
 PROF_START(prof_3d_draw);
 
 if(scene->fog.type&ast3d_fog_fog) glEnable(GL_FOG);
-aglZbuffer((obj->enable_zbuffer)?AGL_ZBUFFER_RW:AGL_ZBUFFER_NONE);
+aglZbuffer((obj->enable_zbuffer)?((obj->enable_zbuffer==1)?AGL_ZBUFFER_RW:AGL_ZBUFFER_R):AGL_ZBUFFER_NONE);
 
 PROF_START(prof_3d_texture);
 #include "4_textur.c"

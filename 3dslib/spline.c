@@ -151,9 +151,7 @@ static void CompDerivTwo (t_KEY *key){
 
 
 float spline_ease (float t, float a, float b){
-/*
-  spline_ease: remap parameter between two keys to apply eases.
-*/
+/* spline_ease: remap parameter between two keys to apply eases. */
   float k;
   float s = a+b;
 

@@ -12,6 +12,8 @@ float rel_time=GetRelativeTime();
 int f;
 int zbuf_flag=0;       // ha =1 akkor torolni kell a zbuffert az effekt elott!!
 int active_faders=0;
+
+
   adk_time+=rel_time;
   fx_debug_time+=rel_time;
   adk_mp3_frame+=rel_time*(44100.0F/1152.0F);
@@ -89,6 +91,7 @@ int active_faders=0;
       scene=fx->scene; ast3d_setactive_scene(scene);
 //      scene->cam->aspectratio=(float)window_w/(float)window_h;
       scene->cam->aspectratio=640.0F/480.0F;
+      if(fx->cam) scene->cam=fx->cam;
       ast3d_setactive_camera(scene->cam);
       ast3d_setframe(fx->frame);
 //      ast3d_update();
@@ -101,6 +104,20 @@ int active_faders=0;
       }
       continue;
     }
+
+#ifdef MAX_SUPPORT
+    if(fx->type==FXTYPE_MAXSCENE && fx->maxscene){
+      CLEAR_ZB
+      MAX_draw_scene(fx->maxscene,fx->frame);
+//      if(fx->loop_scene)
+//      { float frame,frames;
+//        ast3d_getframes(&frame,&frames);
+//        if(fx->frame>=frames) fx->frame=fx->frame-frames+frame;
+//        if(fx->frame<0) fx->frame=0; // HACK?
+//      }
+      continue;
+    }
+#endif
 
     fx->frame+=rel_time*fx->fps;
 
@@ -157,7 +174,15 @@ int active_faders=0;
     if(fx->type==FXTYPE_SINPART){
 //      printf("Playing SMOKE for fx #%d\n",f);
 //      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
-      draw_sinpart(fx->frame,&fx->sinpart);
+      if(fx->sinpart.type==0)
+        draw_sinpart(fx->frame,&fx->sinpart);
+      else
+        draw_sinpart2(fx->frame,&fx->sinpart);
+    }
+
+
+    if(fx->type==FXTYPE_SINZOOM){
+      draw_sinzoom(fx->frame,&fx->sinzoom);
     }
 
     if(fx->type==FXTYPE_FDWATER){
@@ -224,14 +249,10 @@ int active_faders=0;
         glVertex3f(fx->pic.x1,fx->pic.y2,fx->pic.z);
       } else {
         // PICTURE
-        glTexCoord2f(0.0f,0.0f);
-        glVertex3f(fx->pic.x1,fx->pic.y1,fx->pic.z);
-        glTexCoord2f(1.0f,0.0f);
-        glVertex3f(fx->pic.x2,fx->pic.y1,fx->pic.z);
-        glTexCoord2f(1.0f,1.0f);
-        glVertex3f(fx->pic.x2,fx->pic.y2,fx->pic.z);
-        glTexCoord2f(0.0f,1.0f);
-        glVertex3f(fx->pic.x1,fx->pic.y2,fx->pic.z);
+        glTexCoord2f(fx->pic.tx1,fx->pic.ty1); glVertex3f(fx->pic.x1,fx->pic.y1,fx->pic.z);
+        glTexCoord2f(fx->pic.tx2,fx->pic.ty1); glVertex3f(fx->pic.x2,fx->pic.y1,fx->pic.z);
+        glTexCoord2f(fx->pic.tx2,fx->pic.ty2); glVertex3f(fx->pic.x2,fx->pic.y2,fx->pic.z);
+        glTexCoord2f(fx->pic.tx1,fx->pic.ty2); glVertex3f(fx->pic.x1,fx->pic.y2,fx->pic.z);
       }
       glEnd();
 

@@ -124,6 +124,19 @@ INLINE void ast3d_DrawGLTriangle_projectedmap_alpha(c_FACE *f,int a){
 #endif
 }
 
+INLINE void ast3d_DrawGLTriangle_projectedmap_color(c_FACE *f){
+  c_VERTEX *p;
+#ifdef NO_LIGHTING
+        p=f->pa; TRI_REFL_EUV(p); TRI_COLOR(p); TRI_VERTEX(p);
+        p=f->pb; TRI_REFL_EUV(p); TRI_COLOR(p); TRI_VERTEX(p);
+        p=f->pc; TRI_REFL_EUV(p); TRI_COLOR(p); TRI_VERTEX(p);
+#else
+        p=f->pa; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+        p=f->pb; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+        p=f->pc; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+#endif
+}
+
 INLINE void ast3d_DrawGLTriangle_spheremap(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING

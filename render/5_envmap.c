@@ -6,6 +6,9 @@ if(matflags&ast3d_mat_reflect){
     texture_st *t2;
     int phasei=scene->projmap.animphase;
     float phasef=scene->projmap.animphase-phasei;
+    
+//    printf("AT: nummaps=%d\n",scene->projmap.nummaps);
+    
     if(scene->projmap.nummaps<=1){
       t1=scene->projmap.maps;
       t2=NULL;
@@ -19,7 +22,16 @@ if(matflags&ast3d_mat_reflect){
 //    printf("Renderint projmap, txt=%d  alpha=%5.3f\n",phasei,phasef);
 //    printf("tetxure id = %d\n",t1->id);
 
+#if 1
+    if(scene->fog.type&ast3d_fog_fog){
+      static float z[4]={0,0,0,0};
+      glEnable(GL_FOG);
+      glFogfv(GL_FOG_COLOR,z);
+    }
+#endif
+
     aglBlend(AGL_BLEND_ADD);
+//    aglBlend(AGL_BLEND_MUL);
     if(t1)
     if(!t2){
       aglTexture(t1->id);
@@ -37,6 +49,7 @@ if(matflags&ast3d_mat_reflect){
           if(obj->flags&ast3d_obj_allvisible || obj->face_visible[i])
 //            ast3d_DrawGLTriangle_projectedmap(&obj->faces[i]);   /* %%%%%%%%%%% */
             ast3d_DrawGLTriangle_projectedmap_alpha(&obj->faces[i],phi);   /* %%%%%%%%%%% */
+//            ast3d_DrawGLTriangle_projectedmap_color(&obj->faces[i]);   /* %%%%%%%%%%% */
       glEnd();
      }
      if(t2){
@@ -47,9 +60,17 @@ if(matflags&ast3d_mat_reflect){
           if(obj->flags&ast3d_obj_allvisible || obj->face_visible[i])
 //            ast3d_DrawGLTriangle_projectedmap(&obj->faces[i]);   /* %%%%%%%%%%% */
             ast3d_DrawGLTriangle_projectedmap_alpha(&obj->faces[i],phi);   /* %%%%%%%%%%% */
+//            ast3d_DrawGLTriangle_projectedmap_color(&obj->faces[i]);   /* %%%%%%%%%%% */
       glEnd();
      }
     }
+
+#if 0
+    if(scene->fog.type&ast3d_fog_fog){
+      glFogfv(GL_FOG_COLOR,scene->fog.color.rgb);
+      glDisable(GL_FOG);
+    }
+#endif
 
   } else {
 

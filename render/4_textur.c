@@ -6,7 +6,7 @@
     aglBlend(AGL_BLEND_NONE);
   aglTexture((matflags&ast3d_mat_texture)?(mat->texture_id):0);
 
-  if( (matflags&(ast3d_mat_transparent|ast3d_mat_transadd)) && (obj->enable_zbuffer)){
+  if( (matflags&(ast3d_mat_transparent|ast3d_mat_transadd)) && (obj->enable_zbuffer==1)){
 
     /*  TRANSPARENT OBJECT -> Z-Sorting with 16-bit ByteSort method */
 

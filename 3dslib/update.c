@@ -62,6 +62,17 @@ int32 ast3d_update (){
         ast3d_getkey_vect (tobj->scale, frame, &obj->scale);
         ast3d_getkey_quat (tobj->rotate, frame, &obj->rotate);
         qt_make_objmat(obj);
+        
+#if 0
+        { c_MATRIX tmp;
+          mat_identity(tmp);
+          tmp[X][W]=-obj->pivot.x;
+          tmp[Y][W]=-obj->pivot.y;
+          tmp[Z][W]=-obj->pivot.z;
+          mat_mul(tmp,obj->matrix,obj->matrix);
+        }
+#endif
+
         ast3d_getkey_hide (tobj->hide, frame, &hidden);
         if (ast3d_getkey_morph (tobj->morph, frame, &obj->morph) == ast3d_err_ok)
           obj->flags |= ast3d_obj_morph;

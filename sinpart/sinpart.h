@@ -4,6 +4,7 @@ typedef struct {
   int texture;
   int partnum;
   int sinnum;
+  int type;
 
   float speed;
   float sinspeed;
@@ -25,5 +26,6 @@ typedef struct {
 } fx_sinpart_struct;
 
 extern void draw_sinpart(float frame,fx_sinpart_struct *params);
+extern void draw_sinpart2(float frame,fx_sinpart_struct *params);
 extern void sinpart_init(fx_sinpart_struct *params,int texture,int partnum,int sinnum);
 

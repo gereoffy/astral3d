@@ -1,6 +1,7 @@
 
 typedef struct {
   int texture;
+  int type;  // 0=alpha  1=additiv
   float texturescale;
   // motion blur:
   int blur_level;
@@ -14,7 +15,7 @@ typedef struct {
   float wave_phase;
   float wave_amp;
   float wave_freq;
-
+  float x,y;
 } fx_swirl_struct;
 
 void SWIRL_Render(float pos,fx_swirl_struct *fx);
