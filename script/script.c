@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <math.h>
 #ifdef __GNUC__
 #include <sys/time.h>
 #include <sys/types.h>

@@ -123,7 +123,7 @@ afs_FILE* afs_fopen(char *filename,char *mode){
     }
   }
  }
- fprintf(stderr,"AFS: File not found: %s\n",filename);
+// fprintf(stderr,"AFS: File not found: %s\n",filename);
  return NULL;
 }
 
@@ -146,7 +146,7 @@ FILE* afs_fopen2(char *filename,char *mode){
     f=fopen(name,mode); if(f) return f;
   }
  }
- fprintf(stderr,"AFS: File not found: %s\n",filename);
+// fprintf(stderr,"AFS: File not found: %s\n",filename);
  return NULL;
 }
 

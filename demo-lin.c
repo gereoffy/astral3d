@@ -26,8 +26,8 @@ void ExitDemo(){
     MP3_Stop();
     MP3_CloseDevice();
   }
-  printf("\nTexture memory used:  32bpp: %d k    16bpp: %d k\n",
-    map_memory_used/1024,map_memory_used_16bpp/1024);
+//  printf("\nTexture memory used:  32bpp: %d k    16bpp: %d k\n",
+//    map_memory_used/1024,map_memory_used_16bpp/1024);
   exit(0);
 }
 

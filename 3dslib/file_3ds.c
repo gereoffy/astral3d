@@ -535,6 +535,8 @@ static int read_TRIMESH (afs_FILE *f)
   obj->flags = 0;
   obj->bumpdepth=0.005;
   obj->enable_zbuffer=1;
+  obj->vertexlights=0.0;
+  obj->explode_speed=obj->explode_frame=0.0;
   if(strncmp(obj->name,"PARTICLE",8)==0) obj->flags|=ast3d_obj_particle;
   obj->particle.np=obj->particle.maxnp=0;
   vec_zero (&obj->pivot);

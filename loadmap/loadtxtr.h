@@ -28,4 +28,5 @@ texture_st* load_texture(char *txt1,char *txt1m,float txt1a,
                          char *txt2,char *txt2m,float txt2a,
                          char *alp,char *alpm,float alpa,int negflags);
                          
+extern void PrintMAPinfo();
                          

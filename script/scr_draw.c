@@ -9,14 +9,17 @@
 #define FXTYPE_PICTURE 4
 
 typedef struct {
+  int type;        /* 0=linear  1=sinus */
   float *ptr;
   float blend;          /* 0..1 megy */
   float speed;          /* blend+=speed*relative_time */
   float start,end;
+  float offs,amp;  /* sinus-hoz */
 } fade_struct;
 
-#define MAX_FADER 16
+#define MAX_FADER 32
 fade_struct fader[MAX_FADER];
+
 
 typedef struct {
   int type;
@@ -72,11 +75,11 @@ int zbuf_flag=0;
   for(f=0;f<MAX_FADER;f++) if(fader[f].ptr){
     fade_struct *fade=&fader[f];
     fade->blend+=fade->speed*rel_time;
-    if(fade->blend>=1.0){
-      *(fade->ptr)=fade->end;
-      fade->ptr=NULL;
-    } else {
-      *(fade->ptr)=fade->start+(fade->end-fade->start)*fade->blend;
+    { float val=fade->start+(fade->end-fade->start)*fade->blend;
+      if(fade->blend>=1.0) val=fade->end;
+      if(fade->type==1) val=fade->offs+fade->amp*sin(val*M_PI/180.0F);
+      *(fade->ptr)=val;
+      if(fade->blend>=1.0) fade->ptr=NULL;
     }
   }
 

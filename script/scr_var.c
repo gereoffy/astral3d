@@ -29,12 +29,6 @@ int scrVarDB_float=0;
 int scrVarDB_image=0;
 int scrVarDB_imgptr=0;
 
-void scrFatal(byte *s1){
-  if(s1) printf("FATAL: %s\n",s1);
-  printf("Scriptsystem terminated.\n");
-  exit(1);
-}
-
 void scrError(byte *s1,byte *s2){
   printf("ERR: ");printf(s1,s2);
 }

@@ -16,6 +16,14 @@
 static texture_st textures[MAX_TEXTURES];
 static int texture_db=0;
 
+static int map_memory_used=0;
+static int map_memory_used_16bpp=0;
+
+void PrintMAPinfo(){
+  printf("Total texture memory used: %d kB  (16bpp: %d kB)\n",
+  map_memory_used/1024,map_memory_used_16bpp/1024);
+}
+
 /* Downcase path/filename and cut extension. Duplicates string. */
 char* fix_mapname(char *name){
 char temp[256];
@@ -49,7 +57,7 @@ texture_st* load_texture(char *txt1,char *txt1m,float txt1a,
                          char *alp,char *alpm,float alpa,int negflags){
 int i;
 
-printf("load_texture called negflags=%d\n",negflags);
+// printf("load_texture called negflags=%d\n",negflags);
 
   /* Compare to already loaded textures */
 #define CMP_NAMES(a,b) ( ((!(a)) && (!(b))) || ((a) && (b) && strcmp(a,b)==0) )
@@ -105,7 +113,7 @@ printf("load_texture called negflags=%d\n",negflags);
   if(t->xsize> 32 || t->ysize> 32) t->xsize=t->ysize=64;  else
                                    t->xsize=t->ysize=32;
   /* Print debug message */
-  printf("Loading %s texture (flags=%x), size: %d x %d\n",(t->pixelsize==4)?"RGBA":"RGB",t->flags,t->xsize,t->ysize);
+//  printf("Loading %s texture (flags=%x), size: %d x %d\n",(t->pixelsize==4)?"RGBA":"RGB",t->flags,t->xsize,t->ysize);
 
   remix=remix_base=malloc(t->pixelsize*t->xsize*t->ysize);
   if(!remix) { printf("Out of memory!!!!!!\n");exit(11);}

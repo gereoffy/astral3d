@@ -178,6 +178,9 @@ fx_struct *fx=current_fx;
         *object_ptr_bumpdepth = &current_object->bumpdepth;
         *object_ptr_additivetexture = &current_object->additivetexture;
         *object_ptr_zbuffer = &current_object->enable_zbuffer;
+        *object_ptr_vertexlights = &current_object->vertexlights;
+        *object_ptr_explode_frame = &current_object->explode_frame;
+        *object_ptr_explode_speed = &current_object->explode_speed;
         return;
       }
 
@@ -330,12 +333,35 @@ fx_struct *fx=current_fx;
         for(f=0;f<MAX_FADER;f++){ if(!fader[f].ptr) break; }
         if(f>=MAX_FADER) scrFatal("fade: No free fader!!!");
         { fade_struct *fade=&fader[f];
+          fade->type=0;
           fade->ptr=n->ptr;
           fade->start=atof(p[2]);
           fade->end=atof(p[3]);
           fade->speed=1.0/atof(p[4]);
           fade->blend=0.0;
           *(fade->ptr)=fade->start;
+//          printf("FADE: %f .. %f, speed=%f\n",fade->start,fade->end,fade->speed);
+        }
+        return;
+      }
+
+      if(strcmp(p[0],"sinfade")==0){                                   //sinfade
+        int f;
+        if(pdb<5) scrFatal("sinfade: Missing or too many operands!");
+        n=scrSearchVarT(p[1],scrTYPE_float);
+        if(!n) scrFatal("sinfade: Not found variable!");
+        for(f=0;f<MAX_FADER;f++){ if(!fader[f].ptr) break; }
+        if(f>=MAX_FADER) scrFatal("sinfade: No free fader!!!");
+        { fade_struct *fade=&fader[f];
+          fade->type=1;
+          fade->ptr=n->ptr;
+          fade->start=atof(p[2]);
+          fade->end=atof(p[3]);
+          fade->speed=1.0/atof(p[4]);
+          fade->blend=0.0;
+          if(pdb>=6) fade->amp=atof(p[6]); else fade->amp=1.0F;
+          if(pdb>=7) fade->offs=atof(p[7]); else fade->offs=0.0F;
+//          *(fade->ptr)=fade->start;
 //          printf("FADE: %f .. %f, speed=%f\n",fade->start,fade->end,fade->speed);
         }
         return;

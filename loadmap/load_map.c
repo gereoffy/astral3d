@@ -8,9 +8,6 @@
 #include "load_raw.c"
 #include "load_jpg.c"
 
-int map_memory_used=0;
-int map_memory_used_16bpp=0;
-
 int LoadMAP(char *n,map_st *map){
   char fname[256];
   int i=0,j;

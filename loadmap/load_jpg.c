@@ -5,7 +5,6 @@
 
 struct jpeg_decompress_struct cinfo;
 struct jpeg_error_mgr jerr;
-static unsigned char greypal[256][3];
 
 int LoadJPG(FILE *input_file,map_st *map){
   unsigned char *buffer=NULL;
@@ -47,12 +46,13 @@ int LoadJPG(FILE *input_file,map_st *map){
   map->colors=0;
   if(cinfo.num_components==1){    /* grayscaled */
     int i;
-    for(i=0;i<256;i++) greypal[i][0]=greypal[i][1]=greypal[i][2]=i;
+    unsigned char *greypal=malloc(256*3);
+    if(!greypal) return 0;
+    for(i=0;i<256;i++) greypal[i*3]=greypal[i*3+1]=greypal[i*3+2]=i;
     map->colors=256;
-    map->pal=&greypal[0][0];
+    map->pal=greypal;
   }
   
 return 1;
 }
-
 

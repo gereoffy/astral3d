@@ -1,13 +1,14 @@
-Astral Script System 2.0  - belsô használatra!   (C) 1999.10.3. by A'rpi/Astral
+Astral Script System 3.0  - belsô használatra!   (C) 1999.12.20. by A'rpi/Astral
 ========================
 Alapvetôen 3 féle parancstípus létezik:
 1. globális parancsok, változók
    az aktuális effekttôl, scene-tôl függetlenül használható
-2. effekt/scene parancsok, változók
+2. effekt parancsok, változók
    a kiválasztott effekt (scene) típusát, paramétereit befolyásolják
-3. light változók
-   a kiválasztott fényforrás paramétereit befolyásolják
+3. light és object specifikus változók
+   a kiválasztott fényforrás vagy object paramétereit befolyásolják
 ----------------
+
 1. Globális parancsok:
 ======================
 Ide tartoznak a betöltô, engine vezérlô parancsok:
@@ -27,14 +28,14 @@ Ide tartoznak a betöltô, engine vezérlô parancsok:
   Kép betöltése. A kép egyenlôre csak truecolor lehet, RAW vagy JPG formátumú.
   Pl.:  loadpic logo1 astral18.jpg
   A kép méretei 2 hatványa kell legyen, tehát 64x64, 128x128, 256x256
-  vagy 512x512 méretû lehet!!!  (Ez késôbb sem fog változni, legfeljebb az
-  engine képes lesz betöltéskor átkonvertálni)
+  vagy 512x512 méretû lehet!!!  Betölthetô más méretû kép is, de át
+  lesz konvertálva a fenti felbontások közül a legkisebb de nagyobbra.
   A képre a késôbbiekben (az effektekben) a <változó> névvel hivatkozhatunk.
 
 - loadRGBA <változó> <név> <név2>
   Hasonló a loadpic-hez, de ez nem RGB, hanem RGBA képet tölt be, azaz
   alphamap-et (átlátszósági maszk) is tölt be. A <név> a kép, a <név2>
-  az alphamap neve. A 2 kép mérete meg kell egyezzen!
+  az alphamap neve.
   Pl.:  loadpic logo1 astral18.jpg a18maszk.raw
   Az alphamap 256 szürkeskálás vagy truecolor lehet, utóbbi esetben csak
   a zöld komponenst veszi figyelembe. fekete=opaque (nem átlátszó),

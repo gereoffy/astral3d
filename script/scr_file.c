@@ -5,6 +5,14 @@ char script_file[scrMAXSIZE];
 int script_file_size;
 int script_file_ptr=0;
 char sor[8192];
+int script_lineno=0;
+
+void scrFatal(byte *s1){
+  if(s1) printf("FATAL: %s\n",s1);
+  printf("Error in line %d, byte position: %d\n",script_lineno,script_file_ptr);
+  printf("Scriptsystem terminated.\n");
+  exit(1);
+}
 
 void scrLoad(char* filename){
 FILE* h;
@@ -14,6 +22,7 @@ FILE* h;
   fclose(h);
   printf("Loading script file: %d bytes.\n",script_file_size);
   script_file_ptr=0;
+  script_lineno=0;
 }
 
 int scrReadln(char* sor){
@@ -22,6 +31,7 @@ int c;
   xxx1:
     if(script_file_ptr>=script_file_size) return -1;
     c=script_file[script_file_ptr];
+    if(c==10) ++script_lineno;
   if(c==13 || c==10 || c==32 || c==9){++script_file_ptr;goto xxx1;}
   if(c==';'){  // csak komment van a sorban!
     xxx3:
@@ -32,9 +42,9 @@ int c;
   }
   xxx2:
     if(script_file_ptr>=script_file_size) goto vege; //return -1;
-    c=script_file[script_file_ptr];
+    c=script_file[script_file_ptr++];
+    if(c==10) ++script_lineno;
     if(c==9)c=32;
-    ++script_file_ptr;
   if(c!=10 && c!=13){sor[i]=c;i++;goto xxx2;}
 vege:
   sor[i]=0;

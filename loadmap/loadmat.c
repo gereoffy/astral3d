@@ -26,9 +26,9 @@ void LoadMaterials(c_SCENE *scene){
         texture_st *t;
 
         if(1 && mat->bump.file){
-          /* Texture1 + texture2 + Bump map */
-	  printf("BUMP.amountof=%f\n",mat->bump.amountof);
-	  mat->bump.amountof=1.0;
+        /* Texture1 + texture2 + Bump map */
+//          printf("BUMP.amountof=%f\n",mat->bump.amountof);
+//          mat->bump.amountof=1.0;
           mat->flags|=ast3d_mat_bump;
           t=load_texture( fix_mapname(mat->texture.file),
                           fix_mapname(mat->bump.file),

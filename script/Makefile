@@ -40,9 +40,12 @@ script.o: /usr/include/sys/select.h /usr/include/bits/select.h
 script.o: /usr/include/bits/sigset.h /usr/include/sys/sysmacros.h
 script.o: /usr/include/alloca.h /usr/include/unistd.h
 script.o: /usr/include/bits/posix_opt.h /usr/include/bits/confname.h
-script.o: /usr/include/getopt.h /usr/include/string.h /usr/include/sys/time.h
-script.o: /usr/include/bits/time.h ../mp3lib/mp3.h /usr/include/GL/gl.h
-script.o: /usr/include/GL/glu.h ../3dslib/ast3d.h ../timer/timer.h
-script.o: ../blob/blob.h ../fdtunnel/fdtunnel.h ../render/render.h
-script.o: ../loadmap/loadmaps.h scr_var.c scr_event.c scr_file.c scr_init.c
-script.o: vars.h scr_draw.c scr_exec.c
+script.o: /usr/include/getopt.h /usr/include/string.h /usr/include/math.h
+script.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+script.o: /usr/include/bits/mathcalls.h
+script.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
+script.o: /usr/include/sys/time.h /usr/include/bits/time.h ../mp3lib/mp3.h
+script.o: /usr/include/GL/gl.h /usr/include/GL/glu.h ../3dslib/ast3d.h
+script.o: ../timer/timer.h ../blob/blob.h ../fdtunnel/fdtunnel.h
+script.o: ../render/render.h ../loadmap/loadmaps.h scr_var.c scr_event.c
+script.o: scr_file.c scr_init.c vars.h scr_draw.c scr_exec.c

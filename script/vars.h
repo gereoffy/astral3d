@@ -24,6 +24,9 @@ SCR_INT_PTR(light_ptr_zbuffer,"light_zbuffer");
 SCR_FLOAT_PTR(object_ptr_bumpdepth,"bumpdepth");
 SCR_INT_PTR(object_ptr_additivetexture,"additivetexture");
 SCR_INT_PTR(object_ptr_zbuffer,"zbuffer");
+SCR_FLOAT_PTR(object_ptr_vertexlights,"vertexlights");
+SCR_FLOAT_PTR(object_ptr_explode_frame,"explode_frame");
+SCR_FLOAT_PTR(object_ptr_explode_speed,"explode_speed");
 
 // particle system
 SCR_INT_PTR(particle_ptr_np,"part_num");

@@ -264,15 +264,16 @@ typedef struct _c_MATERIAL { /* material struct */
 } c_MATERIAL;
 
 typedef struct _c_VERTEX { /* vertex struct */
-  c_VECTOR vert, pvert;                  /* vertex              */
-  c_VECTOR norm, pnorm;                  /* vertex normal       */
-  c_VECTOR specular;                     /* envmap/lightmap u,v */
-  float    u, v;                         /* texture coordinates */
-  float    bump_du, bump_dv;             /* bump texture coordinate offsets */
-  c_VECTOR u_grad,v_grad;                /* u,v gradient vectors */
   int      visible;
   unsigned char rgb[4];
   unsigned char refl_rgb[4];
+  c_VECTOR vert, pvert;                  /* vertex              */
+  c_VECTOR norm, pnorm;                  /* vertex normal       */
+  c_VECTOR specular;                     /* envmap/lightmap u,v */
+  float    bump_du, bump_dv;             /* bump texture coordinate offsets */
+  c_VECTOR u_grad,v_grad;                /* u,v gradient vectors */
+  float    u, v;                         /* texture coordinates */
+  float    weight;
 } c_VERTEX;
 
 typedef struct _c_FACE { /* face struct */
@@ -488,6 +489,9 @@ typedef struct _c_OBJECT { /* object struct */
   c_PARTICLE particle;
   int        additivetexture;
   int        enable_zbuffer;         /* 1=use zbuffer */
+  float      vertexlights;           /* 0=disable   other=vertex light scale */
+  float      explode_speed;
+  float      explode_frame;
 } c_OBJECT;
 
 
