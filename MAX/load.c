@@ -179,20 +179,15 @@ if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 #include "update.c"
 
 
-int load_scene(){
-FILE *f;
+int load_scene(FILE *classdirfile,FILE *f){
 
-f=fopen("classdirectory3","rb"); if(!f) f=fopen("classdirectory2","rb");
-if(!f) return 1;
-while(!feof(f)) class_dir_reader(f,0);
-fclose(f);
+while(!feof(classdirfile)) class_dir_reader(classdirfile,0);
 
 init_classreaders();
 
 read_classdef();
 
 nodeno=0;
-f=fopen("scene","rb");if(!f) return 1;
 { unsigned short int chunk_id=0;
   unsigned int chunk_size=0;
   fread(&chunk_id,2,1,f);fread(&chunk_size,4,1,f);
@@ -201,7 +196,6 @@ f=fopen("scene","rb");if(!f) return 1;
   }
   chunk_size&=0x7fffffff;
   while(ftell(f)<chunk_size) node_reader(f,nodeno++);
-  fclose(f);
 }
 printf("\n%d nodes readed\n",nodeno);
 

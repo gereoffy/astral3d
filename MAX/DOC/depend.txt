@@ -1,4 +1,5 @@
-terv.
+node dependency    by A'rpi
+===============
 
 Minden node-nak be lesznek flag-ezve a ref-jei, hogy melyikektol fugg.
 (Tehat ha pl. a ref legfelso bitje 1, akkor ha a a ref valtozik akkor

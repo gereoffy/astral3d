@@ -1,4 +1,4 @@
-#define FPS 1
+#define FPS 10
 #define INLINE inline
 
 #include <stdio.h>
@@ -9,11 +9,13 @@
 #include "agl/agl.h"
 #include <GL/glut.h>
 
+#include "afs/afs.h"
+#include "afs/afsmangle.h"
 #include "load.c"
 
 int play_frame = 2;
 int play_back_frame = 0;
-int frame;
+float frame;
 node_st *max3d_camera;
 int window_w,window_h;
 
@@ -46,7 +48,7 @@ void draw_scene(){
   glLoadIdentity();
 
   // render objects
-  printf("Rendering objs from camera %s:\n",camnode->name);
+  printf("Rendering objs from %s   frame=%f\n",camnode->name,frame);
 //  mat_print(cammat); mat_test(cammat);
   
   node=scene.Nodes; while(node){
@@ -57,7 +59,7 @@ void draw_scene(){
 //    mat_mul(trmat,n->mat,cammat);
     mat_mul(trmat,cammat,n->mat);
     mat_mulvec(&pos,&pos0,trmat);
-    printf("Node '%s':  %8.3f  %8.3f  %8.3f\n",n->name,pos.x,pos.y,pos.z);
+//    printf("Node '%s':  %8.3f  %8.3f  %8.3f\n",n->name,pos.x,pos.y,pos.z);
     glColor3ubv(n->wirecolor);
     if(n->mesh){
       Class_EditableMesh *mesh=n->mesh;
@@ -97,7 +99,7 @@ void draw_scene(){
 static void key(unsigned char k, int x, int y){
   switch (k) {
     case 27: exit(0);  /* Escape */
-    case 'p':  printf("frame=%d\n",frame);
+    case 'p':  printf("frame=%f\n",frame);
   }
 }
 
@@ -119,8 +121,25 @@ GLvoid resize_window(int w, int h){
 }
 
 int main(int argc,char* argv[]){
-    if(load_scene()) {printf("Error reading scene.\n"); return 1;} // error
+  OLE2_File *of;
+  afs_FILE *f1;
+  afs_FILE *f2;
+
+    // Load Scene:
+    afs_init("",AFS_TYPE_FILES);
+    of=OLE2_Open(fopen((argc>1)?argv[1]:"knotmesh-anim.max","rb"));
+    if(!of){ printf("File not found!\n");exit(1);}
+    f1=afs_open_OLE2(of,"ClassDirectory3");
+    if(!f1) f1=afs_open_OLE2(of,"ClassDirectory2");
+    if(!f1){ printf("Invalid MAX file (missing ClassDirectory2/3)!\n");exit(1);}
+    f2=afs_open_OLE2(of,"Scene");
+    if(!f2){ printf("Invalid MAX file (missing Scene)!\n");exit(1);}
+    if(load_scene(f1,f2)) {printf("Error reading scene.\n"); return 1;} // error
+    afs_fclose(f1); afs_fclose(f2);
+    OLE2_Close(of);
+
     max3d_camera=node_by_name(scene.Nodes,"Camera01");
+    if(!max3d_camera) max3d_camera=node_by_name(scene.Nodes,"rolli");
     if(!max3d_camera) {printf("No camera found!!!\n"); return 1;} // error
 
     glutInit(&argc, argv);

@@ -1,0 +1,78 @@
+Hat mar ideje elkezdeni irni, 3 het utan :-)
+
+Amit eddig tud:
+  - beolvassa a classdirectory es scene fileokat (.MAX/OLE2)
+    berakja a node-kat egy nodes[] tombbe. Aminek ismerjuk
+    a tartalmat azt beolvassa egy megfelelo strukturaba amire
+    a node->data mutat. (ez van a readers/ alkonyvtarban)
+  - olvashatoan dumpolja a kepernyore az egeszet
+    (kommentek, formatum megadhato a classdef.txt-ben)
+  - keyframer: kiszamolja a Node-k (Node!=node !!!) matrixat,
+    figyelembe veve a tm-et (pivot) es a hierarchyt is.
+    Tudja a PRS es a LookAt transformationt kezelni.
+    (a LookAt csak akkor korrekt ha az axis=Z es flipaxis=OFF)
+  - Tracks: beolvassa a linear/bezier/tcb floatot, vectort, colort,
+    scale-t, es a TCB/Euler rotation key-eket.
+  - a render.c az megjeleniti OpenGL-el a drotvazat, a 3dsmax
+    altal letarolt wirecolor szinnel, edge flagek figyelembevetelevel.
+    De csak akkor teszi ha Editable Mesh az object!
+
+Ami kene surgosen:
+  - getKey implementalasa (keyframing)
+  - LookAt teljes tamogatasa
+  - ScaleAxis tamogatasa
+  - normalvektorok szamolasa
+  - texturazas (coins.bmp rulez)
+  - fenyszamolas
+  - nehany object primitiv implementalasa teszteleshez (box,sphere,teapot...)
+
+Na szoval valahol itt tartunk most.
+
+MAX3D v0.5   2000.04.06.  by A'rpi
+========================
+- getKey, ezeket tudja mar:
+  Linear float
+  TCB float
+  TCB position
+  Bezier position - ez nem igazan jol muxik
+  
+MAX3D v0.6   2000.04.07.  by A'rpi
+========================
+- OLE2 lib, ez tud olyat hogy open/close OLE2 file, es
+  az OLE2 darabjait nev szerint be tudja tolteni memoriaba (OLE2_Load)
+- AFS v4.0 elkeszult. ami uj benne:
+  - kisebb bugfixek
+  - afsmangle.h (nem kell az afs_ a fuggvenynevek ele ha ezt includeolod)
+  - OLE2 beepitve, uj:  afs_FILE* afs_open_OLE2(OLE2_File *of,char* olename);
+  - feof() es fgets() implementacioja
+- load_scene() atirva hogy 2 file-t kapjon parameterkent (classdir es scene,
+  nekunk kell megnyitnunk es lezarnunk.)
+- Render.c atirva hogy hasznalja az AFS4-et, es a .MAX filebol olvassa be
+  a remek uj OLE2 fuggvenyek segitsegevel...
+
+MAX3D v0.7   2000.04.08.  by A'rpi
+========================
+- Bezier POS mukodik!
+  A bezier-hez kell 4 pont, a 2 vegpont es 2 controlpont
+     A=key.value
+     B=A+(dt/3)*key.out_tan
+     D=keyn.value
+     C=D+(dt/3)*keyn.in_tan
+  (key es keyn kozott vagyunk, dt=keyn.frame-key.frame)
+  ez nem 100% hogy jo, de latszolag mukodik...
+- Quaternion rotation (TCB)
+  Elegge nagy szivas volt. ismet. :(
+  - loader szarul toltotte a quat-ot, nem wxyz hanem xyzw van tarolva!
+  - a matrix_from_prs() inverz rot. matrixot csinalt, javitva
+    (kerdes, hogy ezutan is mukodik-e majd a kamera...)
+  - quat_slerpl() nem vette figyelembe a negativ elojelet -> a nagy
+    (angle>180fok) forgatasok neha forditva mentek...
+  => birdshow.max-et meg nem nyomja le jol :((((((
+     bugzik a hierarchy?
+     -> hierarchy mat_mul()-janal a 2 parameter csereje nagyjabol javitotta
+     mar csak a laba van kicsit odebb, talan PIVOT gond???
+     lehet, hogy a parent TM-jet nem kene beleszamolni?
+
+
+
+

@@ -1,4 +1,5 @@
 
 rm -f a.out
-gcc -Wall -g main.c -lm
+gcc -Wall -g main.c -lm -Lafs -lafs
+
 

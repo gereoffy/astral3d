@@ -1,13 +1,7 @@
 
 int force_changed=1;
 
-void update_track(node_st *node,int frame){
-  Track *track=node->data;
-  node->state=STATE_UPDATED;
-  if(track->numkeys==0 && force_changed==0) return; // nincs keyframe
-// ide jon a keyframer hivasa
-  node->state=STATE_CHANGED;
-}
+#include "keyframe.c"
 
 int update_node(node_st *node){
   int i;
@@ -35,18 +29,18 @@ int update_node(node_st *node){
   return 1;
 }
 
-void update(int frame){
+void update(float frame){
 int i;
 node_st *node;
   //
   for(i=0;i<nodeno;i++) nodes[i].state=STATE_UNKNOWN;
   //
-  printf("Updating Tracks\n");
+//  printf("Updating Tracks\n");
   node=scene.Tracks; while(node){ 
     if(node->state==STATE_UNKNOWN) update_track(node,frame);
     node=node->next;}
   //
-  printf("Updating Nodes\n");
+//  printf("Updating Nodes\n");
   node=scene.Nodes; while(node){ 
     if(node->state==STATE_UNKNOWN) update_node(node);
     node=node->next;}

@@ -51,7 +51,7 @@ typedef struct {
 
 typedef struct { float x,y,z; } Point3;
 
-typedef struct { float w,x,y,z;} Quat;
+typedef struct { float x,y,z,w;} Quat;
 
 typedef struct { 
   Point3 amount;
@@ -144,6 +144,8 @@ typedef struct {
   int numkeys; // number of keys
   int frame_from,frame_to; // frame of first&last keys
   int keytype; // chunk id
+  int* frames;
+  int* keyflags;
   void* keys;  // key data
 // Calced:
   int current_key;
@@ -153,23 +155,19 @@ typedef struct {
 //====================== Float Key ====================
 
 typedef struct {
-  int frame,flags;
   float value;
 } Float_Key;
 
 typedef struct {
-  int frame,flags;
   float value;
 } Linear_Float_Key;
 
 typedef struct {
-  int frame,flags;
   float value;
   float in_tan,out_tan;
 } Bezier_Float_Key;
 
 typedef struct {
-  int frame,flags;
   float value;
   TCBparams tcb;
   float deriv1,deriv2;
@@ -178,19 +176,16 @@ typedef struct {
 //====================== Pos Key ====================
 
 typedef struct {
-  int frame,flags;
   Point3 value;
 } Pos_Key;
 
 typedef struct {
-  int frame,flags;
   Point3 value;
   TCBparams tcb;
   Point3 deriv1,deriv2;
 } TCB_Pos_Key;
 
 typedef struct {
-  int frame,flags;
   Point3 value;
   Point3 in_tan,out_tan;
   int tmp1,tmp2,tmp3;      // 0     ????????
@@ -199,33 +194,31 @@ typedef struct {
 //====================== Rot Key ====================
 
 typedef struct {
-  int frame,flags;
-  Quat quatvalue; //int y1,y2,y3,y4; // ? quaternion
+  Quat value; //int y1,y2,y3,y4; // ? quaternion
   TCBparams tcb;
-  Quat value;
+  Point3 axis;
+  float angle;
   Quat deriv1,deriv2;
 } TCB_Rot_Key;
 
 //====================== Scale Key ====================
 
 typedef struct {
-  int frame,flags;
   Scale value;
 } Scale_Key;
 
 typedef struct {
-  int frame,flags;
   Scale value;
   TCBparams tcb;
   Scale deriv1,deriv2;
 } TCB_Scale_Key;
 
 typedef struct {
-  int frame,flags;
   Scale value;
   Scale in_tan,out_tan;
 } Bezier_Scale_Key;
 
+//================================== Node ===================================
 
 typedef struct {
   char *name;

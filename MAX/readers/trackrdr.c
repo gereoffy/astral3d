@@ -57,7 +57,24 @@ void track_init(node_st *node){
   tr->keytype=0;
   tr->keys=NULL;
   tr->flags=0;
+  tr->current_key=0; tr->current_alpha=-1;
   node->data=tr;
+}
+
+void recalc_quaternions(Track *track){
+  TCB_Rot_Key* keys=track->keys;
+  int i;
+  Quat temp;
+  
+  return;
+  
+  if(track->keytype!=0x2522) return; // not TCB Rot track
+  if(track->numkeys<2) return;
+  for(i=1;i<track->numkeys;i++){
+    keys[i].angle+=keys[i-1].angle;
+    quat_mul(&temp,&keys[i].value,&keys[i-1].value);
+    quat_copy(&keys[i].value,&temp);
+  }
 }
 
 void track_uninit(node_st *node){
@@ -81,10 +98,10 @@ void track_uninit(node_st *node){
   for(i=0;i<track->numkeys;i++){
 //    Key* key=&track->keys[i];
     switch(track->keytype){
-#define PRINT_KEY(tipus) tipus *key=track->keys;tipus *k=&key[i];printf("    Key %5.1f [%04X] ",(float)k->frame/160.0f,k->flags);
+#define PRINT_KEY(tipus) tipus *key=track->keys;tipus *k=&key[i];printf("    Key %5.1f [%04X] ",(float)track->frames[i]/160.0f,track->keyflags[i]);
 #define PRINT_FLOAT(value) printf("%f",k->value);
 #define PRINT_POINT3(value) printf("%f,%f,%f",k->value.x,k->value.y,k->value.z);
-#define PRINT_QUAT(value) printf("%f,%f,%f,%f",k->value.w,k->value.x,k->value.y,k->value.z);
+#define PRINT_QUAT(value) printf("w:%f xyz:%f,%f,%f",k->value.w,k->value.x,k->value.y,k->value.z);
 #define PRINT_TCB printf(" T:%4.1f",k->tcb.tens*25+25); printf(" C:%4.1f",k->tcb.cont*25+25); printf(" B:%4.1f",k->tcb.bias*25+25); printf(" Ef:%4.1f",k->tcb.easefrom*50); printf(" Et:%4.1f",k->tcb.easeto*50);
       case 0x2511: {
         PRINT_KEY(Linear_Float_Key) PRINT_FLOAT(value)
@@ -108,6 +125,7 @@ void track_uninit(node_st *node){
       case 0x2522: {
         PRINT_KEY(TCB_Rot_Key) PRINT_QUAT(value)
         PRINT_TCB
+        printf("\n    angle: %f  axis: ",k->angle);PRINT_POINT3(axis);
         printf("\n      D1: ");PRINT_QUAT(deriv1) printf(" D2: ");PRINT_QUAT(deriv2)
         break; }
       case 0x2523: {
@@ -122,6 +140,23 @@ void track_uninit(node_st *node){
     printf("\n");
   }
 
+}
+
+//#define READKEYS(tipus) track->numkeys=chunk_size/sizeof(tipus);track->keys=malloc(track->numkeys*sizeof(tipus));fread(track->keys,sizeof(tipus),track->numkeys,f);track->keytype=chunk_id;
+
+INLINE void read_keys(Track *track,FILE *f,int *chunk_size,int key_size){
+  int n=(*chunk_size)/(8+key_size);
+  int i;
+  char *k;
+  track->numkeys=n;
+  track->frames=malloc(n*sizeof(int));
+  track->keyflags=malloc(n*sizeof(int));
+  k=track->keys=malloc(n*key_size);
+  for(i=0;i<n;i++){
+    track->frames[i]=int_reader(f,chunk_size);
+    track->keyflags[i]=int_reader(f,chunk_size);
+    fread(k+i*key_size,key_size,1,f); *chunk_size -= key_size;
+  }
 }
 
 int track_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
@@ -190,13 +225,15 @@ switch(chunk_id){
 //  case 0x2505: printf("  Scale key (%d)\n",chunk_size); break;
 
   // ----------- keys
-#define READKEYS(tipus) track->numkeys=chunk_size/sizeof(tipus);track->keys=malloc(track->numkeys*sizeof(tipus));fread(track->keys,sizeof(tipus),track->numkeys,f);track->keytype=chunk_id;
+//#define READKEYS(tipus) track->numkeys=chunk_size/sizeof(tipus);track->keys=malloc(track->numkeys*sizeof(tipus));fread(track->keys,sizeof(tipus),track->numkeys,f);track->keytype=chunk_id;
+#define READKEYS(tipus) read_keys(track,f,&chunk_size,sizeof(tipus));track->keytype=chunk_id;
+
   case 0x2511: READKEYS(Linear_Float_Key);break;
   case 0x2516: READKEYS(Bezier_Float_Key);break;
   case 0x2519: READKEYS(Bezier_Scale_Key);break;
   case 0x2520: READKEYS(TCB_Float_Key);break;
   case 0x2521: READKEYS(TCB_Pos_Key);break;
-  case 0x2522: READKEYS(TCB_Rot_Key);break;
+  case 0x2522: READKEYS(TCB_Rot_Key);recalc_quaternions(track); break;
   case 0x2523: READKEYS(TCB_Scale_Key);break;
   case 0x2524: READKEYS(Bezier_Pos_Key);break;
 

@@ -17,7 +17,9 @@ void init_ParamBlock(node_st *node){  // beallitja a keyframe pointereket
 char* update_PRS(node_st *node){
   Class_PRS *prs=node->data;
   mat_from_prs(prs->mat,prs->pos,prs->rot,prs->scale,prs->scaleaxis);
-  printf("updating PRS\n");
+//  printf("updating PRS\n");
+//  printf("  Quat: w: %8.5f  x: %8.5f y: %8.5f z: %8.5f\n",prs->rot->w,prs->rot->x,prs->rot->y,prs->rot->z);
+//  mat_print(prs->mat);
   return NULL;
 }
 
@@ -44,11 +46,11 @@ char* update_LookAt(node_st *node){
   to.z=(*tomat)[Z][W];
   // create mat from lat->from, to, lat->roll, lat->scale
   mat_from_lookat(lat->mat,lat->from,&to,*lat->roll,lat->scale,lat->scaleaxis,lat->axis);
-  printf("updating LookAt\n");
-  printf("  from: %8.5f  %8.5f  %8.5f\n",lat->from->x,lat->from->y,lat->from->z);
-  printf("  to:   %8.5f  %8.5f  %8.5f\n",to.x,to.y,to.z);
-  printf("  roll: %8.5f\n",*lat->roll);
-  mat_print(lat->mat);
+//  printf("updating LookAt\n");
+//  printf("  from: %8.5f  %8.5f  %8.5f\n",lat->from->x,lat->from->y,lat->from->z);
+//  printf("  to:   %8.5f  %8.5f  %8.5f\n",to.x,to.y,to.z);
+//  printf("  roll: %8.5f\n",*lat->roll);
+//  mat_print(lat->mat);
   return NULL;
 }
 
@@ -75,16 +77,20 @@ char* init_LookAt(node_st *node){
 char* update_Node(node_st *node){
   Class_Node *n=node->data;
   printf("updating Node '%s'\n",n->name);
-  printf("tm_mat:\n");mat_print(n->tm_mat);
+//  printf("tm_mat:\n");mat_print(n->tm_mat);
   if(n->orient_mat){
-    printf("orient:\n");mat_print(*n->orient_mat);
+//    printf("orient:\n");mat_print(*n->orient_mat);
     mat_mul(n->mat,n->tm_mat,*n->orient_mat);
-    printf("tm*orient:\n");mat_print(n->mat);
+//    mat_mul(n->mat,*n->orient_mat,n->tm_mat);
+//    printf("tm*orient:\n");mat_print(n->mat);
   } else mat_copy(n->mat,n->tm_mat);
   if(n->parent_mat){
-    printf("parent_mat:\n");mat_print(*n->parent_mat);
-    mat_mul2(n->mat,*n->parent_mat);
-    printf("mat:\n");mat_print(n->mat);
+//    printf("parent_mat:\n");mat_print(*n->parent_mat);
+    Matrix temp;
+    mat_mul(temp,*n->parent_mat,n->mat);
+    mat_copy(n->mat,temp);
+//    mat_mul2(n->mat,*n->parent_mat);
+//    printf("mat:\n");mat_print(n->mat);
   }
   return NULL;
 }
@@ -92,9 +98,17 @@ char* update_Node(node_st *node){
 char* init_Node(node_st *node){
   Matrix tempmat;
   Class_Node *n=node->data;
-  node_st *orient=dep_node_by_ref(node,2);
-  node_st *object=dep_node_by_ref(node,4);
+  node_st *orient;
+  node_st *object;
   node_st *parent=node_by_id(n->parent);
+  printf("Node %s refdb=%d\n",n->name,node->refdb);
+  if(node->refdb==8){
+    orient=dep_node_by_ref(node,0);
+    object=dep_node_by_ref(node,1);
+  } else {
+    orient=dep_node_by_ref(node,2);
+    object=dep_node_by_ref(node,4);
+  }
   if(classtype_by_node(parent)==CLASSTYPE_NODE){
     Class_Node *pn=parent->data;
     n->parent_mat=&pn->mat;

@@ -5,6 +5,8 @@
 #include <math.h>
 #include <string.h>
 
+#include "afs/afs.h"
+#include "afs/afsmangle.h"
 #include "load.c"
 
 void draw_scene(node_st* nodelist,char* camname){
@@ -42,7 +44,22 @@ void draw_scene(node_st* nodelist,char* camname){
 
 
 int main(int argc,char* argv[]){
-  if(load_scene()) return 1; // error
+  OLE2_File *of;
+  afs_FILE *f1;
+  afs_FILE *f2;
+
+    // Load Scene:
+    afs_init("",AFS_TYPE_FILES);
+    of=OLE2_Open(fopen((argc>1)?argv[1]:"knotmesh-anim.max","rb"));
+    if(!of){ printf("File not found!\n");exit(1);}
+    f1=afs_open_OLE2(of,"ClassDirectory3");
+    if(!f1) f1=afs_open_OLE2(of,"ClassDirectory2");
+    if(!f1){ printf("Invalid MAX file (missing ClassDirectory2/3)!\n");exit(1);}
+    f2=afs_open_OLE2(of,"Scene");
+    if(!f2){ printf("Invalid MAX file (missing Scene)!\n");exit(1);}
+    if(load_scene(f1,f2)) {printf("Error reading scene.\n"); return 1;} // error
+    afs_fclose(f1); afs_fclose(f2);
+    OLE2_Close(of);
 
   update(100);
   draw_scene(scene.Nodes,"Camera01");

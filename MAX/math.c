@@ -1,3 +1,47 @@
+// from CLAX, mod by A'rpi
+void mat_from_prs(Matrix out,Point3 *pos,Quat *rot,Point3 *scale,Quat *scaleaxis){
+/*
+  qt_invmatrix: convert a unit quaternion to inversed rotation matrix.
+      ( 1-yy-zz , xy-wz   , xz+wy   )
+  T = ( xy+wz   , 1-xx-zz , yz-wx   )
+      ( xz-wy   , yz+wx   , 1-xx-yy )
+*/
+  float x2, y2, z2, wx, wy, wz, xx, xy, xz, yy, yz, zz;
+
+    x2 = rot->x + rot->x; y2 = rot->y + rot->y; z2 = rot->z + rot->z;
+    wx = rot->w * x2;   wy = rot->w * y2;   wz = rot->w * z2;
+    xx = rot->x * x2;   xy = rot->x * y2;   xz = rot->x * z2;
+    yy = rot->y * y2;   yz = rot->y * z2;   zz = rot->z * z2;
+
+#if 1
+    out[X][X] = scale->x*(1.0 - (yy + zz));
+    out[X][Y] = scale->y*(xy + wz);
+    out[X][Z] = scale->z*(xz - wy);
+    out[X][W] = pos->x;
+    out[Y][X] = scale->x*(xy - wz);
+    out[Y][Y] = scale->y*(1.0 - (xx + zz));
+    out[Y][Z] = scale->z*(yz + wx);
+    out[Y][W] = pos->y;
+    out[Z][X] = scale->x*(xz + wy);
+    out[Z][Y] = scale->y*(yz - wx);
+    out[Z][Z] = scale->z*(1.0 - (xx + yy));
+    out[Z][W] = pos->z;
+#else
+// inverse
+    out[X][X] = scale->x*(1.0 - (yy + zz));
+    out[X][Y] = scale->y*(xy - wz);
+    out[X][Z] = scale->z*(xz + wy);
+    out[X][W] = pos->x;
+    out[Y][X] = scale->x*(xy + wz);
+    out[Y][Y] = scale->y*(1.0 - (xx + zz));
+    out[Y][Z] = scale->z*(yz - wx);
+    out[Y][W] = pos->y;
+    out[Z][X] = scale->x*(xz - wy);
+    out[Z][Y] = scale->y*(yz + wx);
+    out[Z][Z] = scale->z*(1.0 - (xx + yy));
+    out[Z][W] = pos->z;
+#endif
+}
 
 void mat_test(Matrix mat){  // by A'rpi
 /* Megnezzuk, hogy jo trmatrix-e */
@@ -147,34 +191,6 @@ void quat_from_euler(Quat *quat,float yaw,float pitch,float roll){
 
 }
 
-// from CLAX, mod by A'rpi
-void mat_from_prs(Matrix out,Point3 *pos,Quat *rot,Point3 *scale,Quat *scaleaxis){
-/*
-  qt_invmatrix: convert a unit quaternion to inversed rotation matrix.
-      ( 1-yy-zz , xy-wz   , xz+wy   )
-  T = ( xy+wz   , 1-xx-zz , yz-wx   )
-      ( xz-wy   , yz+wx   , 1-xx-yy )
-*/
-  float x2, y2, z2, wx, wy, wz, xx, xy, xz, yy, yz, zz;
-
-    x2 = rot->x + rot->x; y2 = rot->y + rot->y; z2 = rot->z + rot->z;
-    wx = rot->w * x2;   wy = rot->w * y2;   wz = rot->w * z2;
-    xx = rot->x * x2;   xy = rot->x * y2;   xz = rot->x * z2;
-    yy = rot->y * y2;   yz = rot->y * z2;   zz = rot->z * z2;
-
-    out[X][X] = scale->x*(1.0 - (yy + zz));
-    out[X][Y] = scale->y*(xy - wz);
-    out[X][Z] = scale->z*(xz + wy);
-    out[X][W] = pos->x;
-    out[Y][X] = scale->x*(xy + wz);
-    out[Y][Y] = scale->y*(1.0 - (xx + zz));
-    out[Y][Z] = scale->z*(yz - wx);
-    out[Y][W] = pos->y;
-    out[Z][X] = scale->x*(xz - wy);
-    out[Z][Y] = scale->y*(yz + wx);
-    out[Z][Z] = scale->z*(1.0 - (xx + yy));
-    out[Z][W] = pos->z;
-}
 
 INLINE void mat_from_tm(Matrix out,TMatrix *tm){  // by A'rpi
   mat_from_prs(out,&tm->pos,&tm->rot,&tm->scale.amount,&tm->scale.axis);
@@ -309,5 +325,87 @@ void mat_from_lookat(Matrix out,Point3 *pos,Point3 *target,float roll,Point3 *sc
    out[Y][W]=pos->y;
    out[Z][W]=pos->z;
 
+}
+
+
+float spline_ease (float t, float a, float b){
+/* spline_ease: remap parameter between two keys to apply eases. */
+  float k;
+  float s = a+b;
+
+  if (s == 0.0) return t;
+  if (s > 1.0) {
+    a = a/s;
+    b = b/s;
+  }
+  k = 1.0/(2.0-a-b);
+  if (t < a) return ((k/a)*t*t);
+    else {
+      if (t < 1.0-b) return (k*(2*t-a));
+        else {
+          t = 1.0-t;
+          return (1.0-(k/b)*t*t);
+        }
+    }
+}
+
+INLINE void quat_copy(Quat *out,Quat *a){
+  out->w=a->w;
+  out->x=a->x;
+  out->y=a->y;
+  out->z=a->z;
+}
+
+INLINE float quat_length (Quat *a){
+/*  qt_length: computes quaternion magnitude.*/
+  return sqrt (a->w*a->w + a->x*a->x + a->y*a->y + a->z*a->z);
+}
+
+INLINE float quat_dot(Quat *a,Quat *b){
+/*  qt_dot: computes dot product of a*b.*/
+  float len;
+  len = 1.0 / (quat_length(a) * quat_length(b));
+  return (a->w*b->w + a->x*b->x + a->y*b->y + a->z*b->z) * len;
+}
+
+INLINE float quat_dotunit(Quat *a,Quat *b){
+/*  qt_dot: computes dot product of a*b.*/
+  return (a->w*b->w + a->x*b->x + a->y*b->y + a->z*b->z);
+}
+
+INLINE void quat_mul(Quat *out,Quat *a,Quat *b){
+/*  qt_multiply: quaternion multiplication (out = a*b).*/
+  Quat temp;
+  temp.w = a->w*b->w - a->x*b->x - a->y*b->y - a->z*b->z;
+  temp.x = a->w*b->x + a->x*b->w + a->y*b->z - a->z*b->y;
+  temp.y = a->w*b->y + a->y*b->w + a->z*b->x - a->x*b->z;
+  temp.z = a->w*b->z + a->z*b->w + a->x*b->y - a->y*b->x;
+  quat_copy (out,&temp);
+}
+
+void quat_slerpl(Quat *out,Quat *a,Quat *b,float spin,float alpha){
+/*  qt_slerp: spherical interpolation of quaternions.*/
+  float  k1, k2;
+  float  angle, anglespin;
+  float  sina, cosa;
+  float flip=1.0;
+
+  cosa = quat_dotunit(a,b);
+  if (cosa < 0.0){ cosa = -cosa, flip = -1;}
+  if (1.0 - fabs(cosa) < (1.0e-6)) {
+    k1 = 1.0 - alpha;
+    k2 = alpha;
+  } else {
+    angle = acos (cosa);
+    sina = sin (angle);
+    anglespin = angle + spin*M_PI;
+    k1 = sin (angle - alpha*anglespin) / sina;
+    k2 = sin (alpha*anglespin) / sina;
+  }
+  k2 *= flip;
+  out->x = k1*a->x + k2*b->x;
+  out->y = k1*a->y + k2*b->y;
+  out->z = k1*a->z + k2*b->z;
+  out->w = k1*a->w + k2*b->w;
 }
 
