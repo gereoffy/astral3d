@@ -4,6 +4,9 @@
 ;==================== LOADERS ==========================
 writeln "[*]-----> Loading world..."
 
+default_obj_flags=4096
+default_mat_flags=16384
+
 ;loadRGBA buborek 1co.jpg 1op.jpg
 ;loadRGBA buborek 1co256.jpg 1op256.jpg
 ;load_scene walk walk2.3ds
@@ -23,7 +26,7 @@ load_scene ripp ripp3.3ds
 scene ripp
 fixUV
 
-load_scene volumetric ven8.3ds
+load_scene volumetric ven6.3ds
 
 load_scene terem terem2.3ds
 
@@ -61,6 +64,8 @@ play 1s
 scene 2fog
 fps=63
 ;blend=0.5
+;fog_znear=500
+;fog_zfar=1000
 fog_znear=0
 fog_zfar=2000
 
@@ -79,6 +84,7 @@ play -1010p
 
 2:
 fdtunnel fdtunnel1 fdtunnel2
+fdtunnel_rad_amp=384
 fps=10
 fade blend 0 1 2
 play 2s
@@ -229,11 +235,15 @@ play 5s
 5: fade blend 1 0 2
 
 play -7981p
+
+0: blend=0
+5: blend=0
 1:
 sprite join 0 480 640 0
 blend=1
 
 play 10s
-fade blend 1 0 2s
+fade blend 1 0 1s
+play 1s
 end
 

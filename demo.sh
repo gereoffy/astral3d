@@ -21,6 +21,6 @@ setenv LIBS "-L3dslib -last3d -Lloadmap -llmap -Lafs -lafs -Lmp3lib -lMP3"
 setenv LIBS2 "-lm -lGL -L../libs -ljpeg -lglut -lGLU"
 setenv OBJS "script/script2.o blob/blob.o fdtunnel/fdtunnel.o spline/spline.o smoke/smoke.o greets/greets.o sinpart/sinpart.o render/render.o render/particle.o agl/agl.o timer/timer-lx.o"
 
-gcc -g -O2 demo-lin.c -o demo $OBJS $LIBS $LIBS2 $XLIBS >& errors
+gcc -O2 demo-lin.c -o demo $OBJS $LIBS $LIBS2 $XLIBS >& errors
 cat errors
 strip demo

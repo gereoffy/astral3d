@@ -11,7 +11,7 @@ static void CompDeriv (t_KEY *keyp, t_KEY *key, t_KEY *keyn, float lfp,float lfn
 /*
   CompDeriv: compute derivative for key "key".
 */
-  float tm, cm, cp, bm, bp, tmcm, tmcp;
+  float tm, cm, cp, bm, bp;
   float ksm, ksp, kdm, kdp;
   float dt, fp, fn, c;
 
@@ -20,14 +20,14 @@ static void CompDeriv (t_KEY *keyp, t_KEY *key, t_KEY *keyn, float lfp,float lfn
   fp = (key->frame - keyp->frame + lfp) * dt + c;
   fn = (keyn->frame - key->frame + lfn) * dt + c;
   cm = 1.0 - key->cont;
-  tm = 0.5 * (1.0 - key->tens);
-  cp = 2.0 - cm;
+  cp = 1.0 + key->cont;
   bm = 1.0 - key->bias;
-  bp = 2.0 - bm;
-  tmcm = tm * cm;
-  tmcp = tm * cp;
-  ksm = tmcm * bp * fp; ksp = tmcp * bm * fp;
-  kdm = tmcp * bp * fn; kdp = tmcm * bm * fn;
+  bp = 1.0 + key->bias;
+  tm = 0.5 * (1.0 - key->tens);
+  ksm = tm * cm * bp * fp;
+  ksp = tm * cp * bm * fp;
+  kdm = tm * cp * bp * fn;
+  kdp = tm * cm * bm * fn;
   /* required for real-time derivate computing:
        - prev, current, next key values
        - ksm, ksp, kdm, kdp  values

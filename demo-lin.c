@@ -23,6 +23,9 @@
 
 // #include "glide.h"
 
+static int pause=0;
+static int total_frames=0;
+
 void ExitDemo(){
   if(!nosound){
     MP3_Stop();
@@ -31,6 +34,7 @@ void ExitDemo(){
   if(fx_debug) fclose(fx_debug);
 //  printf("\nTexture memory used:  32bpp: %d k    16bpp: %d k\n",
 //    map_memory_used/1024,map_memory_used_16bpp/1024);
+  printf("\nTotal frames: %d\n",total_frames);
   exit(0);
 }
 
@@ -44,6 +48,11 @@ static void key(unsigned char k, int x, int y){
   case 'p': 
     printf("MARK:  p=%5d   t=%6.2f  dt=%5.2f\n",MP3_frames,adk_time,adk_time-time_dt);
     time_dt=adk_time;
+    break;
+  case 's': 
+    pause^=1;MP3_eof=pause;
+    GetRelativeTime();
+    break;
   default:
     return;
   }
@@ -57,10 +66,12 @@ GLvoid resize_window(int w, int h){
 
 GLvoid DrawScene(){
   if(!scr_playing) return;
+  if(pause) return;
 //  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   draw_scene();
   glFinish();
   glutSwapBuffers();
+  ++total_frames;
 }
 
 GLvoid IdleFunc(){
@@ -72,11 +83,17 @@ GLvoid IdleFunc(){
 int main(int argc,char* argv[]){
 int fullscreen=1;
 char* scriptname="astral.scr";
+int xs=640;
+int ys=480;
 
     { int i;
       for(i=1;i<argc;i++){
         if(strcmp(argv[i],"-window")==0) fullscreen=0; else
         if(strcmp(argv[i],"-nosound")==0) nosound=1; else
+        if(strcmp(argv[i],"-640")==0){ xs=640;ys=480;} else
+        if(strcmp(argv[i],"-800")==0){ xs=800;ys=600;} else
+        if(strcmp(argv[i],"-1024")==0){ xs=1024;ys=768;} else
+        if(strcmp(argv[i],"-1280")==0){ xs=1280;ys=1024;} else
         scriptname=argv[i];
       }
     }
@@ -86,9 +103,9 @@ char* scriptname="astral.scr";
 
     glutInit(&argc, argv);
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize (640, 480);
+    glutInitWindowSize(xs,ys);
+//    glutInitWindowSize (1280,1024);
 //    glutInitWindowSize (800, 600);
-//    glutInitWindowSize (1024, 768);
 //    glutInitWindowSize (1280, 1024);
     glutInitWindowPosition (0, 0);
     glutCreateWindow (argv[0]);
@@ -103,7 +120,7 @@ char* scriptname="astral.scr";
      printf("GLUT_API_VERSION: %d\n", GLUT_API_VERSION);
 #endif
 
-
+//    resize_window(640,480);
     if(fullscreen) glutFullScreen();
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
@@ -154,6 +171,7 @@ char* scriptname="astral.scr";
 //    grDitherMode(GR_DITHER_4x4);
 
 //    resize_window(640,480);
+
     glutDisplayFunc(DrawScene);
 //    glutMouseFunc(mouse);
     glutKeyboardFunc(key);

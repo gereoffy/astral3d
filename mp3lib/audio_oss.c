@@ -102,6 +102,7 @@ static int audio_open(struct audio_info_struct *ai){
   if(audio_set_format(ai)<0) ERR("Can't set format\n");
   if(audio_set_channels(ai)<0) ERR("Can't set channels\n");
   if(audio_set_rate(ai)<0) ERR("Can't set rate\n");
+  printf("audio_open OK.\n");
   return 1;
 }
 
@@ -116,6 +117,7 @@ while(1){
   if(!select(ai->fn+1, NULL, &rfds, NULL, &tv)) return;
   if(buffer_len<outburst){
     len=MP3_DecodeFrame(&buffer[buffer_len],-1);
+//    printf("mp3_decode len=%d\n",len);
     if(!len){ MP3_eof=1; return;}
     buffer_len+=len; ++MP3_frames;  
   }
@@ -135,13 +137,18 @@ static int audio_close(struct audio_info_struct *ai)
 
 static struct audio_info_struct ai;
 
-static void sig_handler(int signum){ if(!MP3_eof)audio_play_MP3(&ai);}
+static void sig_handler(int signum){
+  if(!MP3_eof)audio_play_MP3(&ai);
+//  else printf("warning! signal but mp3_eof\n");
+}
 
 int MP3_Play(char *filename,int pos){
   MP3_eof=0;
   MP3_frames=pos;
   MP3_file=fopen(filename,"rb");
-  if(!MP3_file) return 0;
+  printf("MP3_Play: file='%s'",filename);
+  if(!MP3_file){ printf(" not found!\n"); return 0;}
+  printf("Ok!\n");
 //  if(pos>0) fseek(MP3_file,pos,SEEK_SET);
   
   MP3_Init(MP3_file,pos);
@@ -168,7 +175,8 @@ void MP3_Stop(){
      it.it_value.tv_sec=0;
      it.it_value.tv_usec=0;
      setitimer(ITIMER_REAL,&it,NULL);
-  if(MP3_file){ fclose(MP3_file);MP3_file=NULL;}
+  printf("MP3_Stop() called!\n");
+  if(MP3_file){ fclose(MP3_file);MP3_file=NULL;printf("MP3_Stop() file closed!\n");}
 }
 
 int MP3_OpenDevice(char *devname){
@@ -176,6 +184,7 @@ int MP3_OpenDevice(char *devname){
   ai.format=AUDIO_FORMAT_SIGNED_16;
   ai.channels=2;
   ai.rate=44100;
+  printf("MP3_OpenDevice  dev=%s\n",ai.device);
   return audio_open(&ai);
 }
 

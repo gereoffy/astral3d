@@ -14,7 +14,6 @@
 *****************************************************************************/
 
   char    ast3d_version[]   = "Astral 3DS Loader v4.0";
-  char    ast3d_copyright[] = "copyright (c) 1998-2000 Astral";
 
 c_SCENE  *ast3d_scene=NULL;  /* current active scene  */
 c_CAMERA *ast3d_camera=NULL; /* current active camera */

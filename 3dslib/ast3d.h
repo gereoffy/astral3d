@@ -3,15 +3,19 @@
 
 /* ---------------- Configuration ------------------ */
 
-/* If enabled, uses frustum culling for faces */
+/* Enable frustum culling for faces */
 #define FRUSTUM_CULL
 
+/* Enable spline object (mesh) morph */
 #define SPLINE_MORPH
 
+/* Enable removing duplicated vertices */
 #define OTIMIZE_VERTEX
 
+/* Sort faces for triangle strip. Not works yet... :( */
 // #define TRIANGLE_STRIP
 
+/* Support for generating lightmap coordinates */
 #define LIGHTMAP_UV
 
 /* Minimum face number for pre-trans backface culling */
@@ -25,7 +29,7 @@
 #define INLINE _inline
 #endif
 
-#define ast3d_VERSION 0.10
+
 #ifndef M_PI
 #define M_PI 3.14159265359
 #endif
@@ -551,15 +555,12 @@ typedef struct _c_SCENE { /* scene (world, keyframer) */
 extern "C" {
 #endif
 
-  extern char ast3d_version[];
-  extern char ast3d_copyright[];
-  extern c_MATERIAL *Default_MATERIAL;
+extern c_MATERIAL *Default_MATERIAL;
 
 extern int default_mat_flags;
 extern int default_obj_flags;
 extern int default_track_flags;
 extern float default_corona_scale;
-
 
 /*****************************************************************************
   library functions (astral 3d api)

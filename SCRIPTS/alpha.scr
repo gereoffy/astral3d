@@ -4,6 +4,16 @@
 writeln "Loading world..."
 
 loadpic alpha_logo 002.jpg
+
+;********** alpha logo, befadel a tunnel
+time=0
+8: sprite alpha_logo 0 480 640 0
+8: fade blend 0 1 0.5
+play 0.5s
+
+default_obj_flags=4096    ; smooth all (no smoothinggroups)
+default_mat_flags=16384   ; lightning on reflectionmaps
+
 loadpic alphastral 003.jpg
 loadpic credit1 cr01.jpg
 loadpic credit2 cr02.jpg
@@ -20,7 +30,6 @@ load_scene unreal newproj.3ds
 load_scene torusknot part2.3ds
 load_scene default 2.3ds
 load_scene 4alpha 4inone.3ds
-
 
 ;================== START MUSIC ========================
 start_music mindgoa.mp3
@@ -305,9 +314,12 @@ loadpic end5 end005.jpg
 
 start_music pl_disc.mp3
 
-1: scene astrans
-1: fps=15
-1: fade blend 0 1 1
+1:
+scene astrans
+light 1
+light_enabled=0
+fps=15
+fade blend 0 1 1
 play 3s
 
 2: addsprite end1 0 480 640 0

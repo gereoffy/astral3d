@@ -7,6 +7,9 @@
 
 // Astral File System v3.0
 
+//#define BYTEORDER_SWAP(c) c= ((c>>24)&0xFF) | (((c>>16)&0xFF)<<8) | (((c>>8)&0xFF)<<16) | ((c&0xFF)<<24)
+#define BYTEORDER_SWAP(c)
+
 typedef struct {
   char name[80-8];
   int pos;
@@ -64,10 +67,17 @@ int afs_init(char *filename,int type){
   if(type==AFS_TYPE_PAK){
     fseek(afs->file,-4,SEEK_END);
     if(1!=fread(&afs->file_db,sizeof(int),1,afs->file)) return 0;
+    BYTEORDER_SWAP(afs->file_db);
     if(afs->file_db<1 || afs->file_db>AFS_MAXFILES) return 0;
     fseek(afs->file,-4-sizeof(fake_entry)*afs->file_db,SEEK_END);
     afs->dir=(fake_entry*)malloc(sizeof(fake_entry)*afs->file_db);
     if(1!=fread(afs->dir,sizeof(fake_entry)*afs->file_db,1,afs->file)) return 0;
+{ int i;
+  for(i=0;i<afs->file_db;i++){
+    BYTEORDER_SWAP(afs->dir[i].pos);
+    BYTEORDER_SWAP(afs->dir[i].size);
+  }
+}
     afs->base=0;
     printf("AFS Init: PAK contains %d files.\n",afs->file_db);
     afs->type=AFS_TYPE_PAK;

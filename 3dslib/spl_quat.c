@@ -9,7 +9,7 @@ static void CompAB (t_KEY *prev, t_KEY *cur, t_KEY *next){
 */
   c_QUAT qp, qm, qa, qb, qae, qbe;
   c_QUAT *QB;                 /* current quaternion key */
-  float  tm, cm, cp, bm, bp, tmcm, tmcp, ksm, ksp, kdm, kdp;
+  float  tm, cm, cp, bm, bp, ksm, ksp, kdm, kdp;
   float  fp, fn;
 
   QB = &cur->qa;
@@ -19,27 +19,25 @@ static void CompAB (t_KEY *prev, t_KEY *cur, t_KEY *next){
   if (!next) qt_copy (&qm, &qp);
 
   fp = fn = 1.0;
-  cm = 1.0 - cur->cont;
   if (prev && next) {
     float c = fabs( cur->cont );
     float dt = (1-c) * 2.0F / (next->frame - prev->frame);
     fp = (cur->frame - prev->frame) * dt + c;
     fn = (next->frame - cur->frame) * dt + c;
   }
-  tm = 0.5 * (1.0 - cur->tens);
-  cp = 2.0 - cm;
+  cm = 1.0 - cur->cont;
+  cp = 1.0 + cur->cont;
   bm = 1.0 - cur->bias;
-  bp = 2.0 - bm;
-  tmcm = tm * cm;
-  tmcp = tm * cp;
-  ksm  = 1.0 - tmcm * bp * fp;
-  ksp  = -tmcp * bm * fp;
-  kdm  = tmcp * bp * fn;
-  kdp  = tmcm * bm * fn - 1.0;
-  qa.x = 0.5 * (kdm * qm.x + kdp * qp.x); qb.x = 0.5 * (ksm * qm.x + ksp * qp.x);
-  qa.y = 0.5 * (kdm * qm.y + kdp * qp.y); qb.y = 0.5 * (ksm * qm.y + ksp * qp.y);
-  qa.z = 0.5 * (kdm * qm.z + kdp * qp.z); qb.z = 0.5 * (ksm * qm.z + ksp * qp.z);
-  qa.w = 0.5 * (kdm * qm.w + kdp * qp.w); qb.w = 0.5 * (ksm * qm.w + ksp * qp.w);
+  bp = 1.0 + cur->bias;
+  tm = 0.5 * 0.5 * (1.0 - cur->tens);
+  ksm  = 0.5 - tm * cm * bp * fp;
+  ksp  =     - tm * cp * bm * fp;
+  kdm  =       tm * cp * bp * fn;
+  kdp  =-0.5 + tm * cm * bm * fn;
+  qa.x = (kdm * qm.x + kdp * qp.x); qb.x = (ksm * qm.x + ksp * qp.x);
+  qa.y = (kdm * qm.y + kdp * qp.y); qb.y = (ksm * qm.y + ksp * qp.y);
+  qa.z = (kdm * qm.z + kdp * qp.z); qb.z = (ksm * qm.z + ksp * qp.z);
+  qa.w = (kdm * qm.w + kdp * qp.w); qb.w = (ksm * qm.w + ksp * qp.w);
   qt_exp (&qa, &qae);
   qt_exp (&qb, &qbe);
   qt_mul (QB, &qae, &cur->ds);

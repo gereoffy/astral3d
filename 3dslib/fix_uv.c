@@ -4,7 +4,8 @@ void calc_uv_grads(c_OBJECT *obj);
 // uvflag:
 //    1  = fixU
 //    2  = fixV
-//    4  = force calc_uv_grads
+//    4  = force calc_uv_grads()
+//    8  = force smoothing_group()
 void ast3d_fixUV(char *objname,int uvflag){
     int      i;
     w_NODE *node=NULL;

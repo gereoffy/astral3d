@@ -4,6 +4,9 @@
 ;| Astral Script System and 3D engine  (C) 1999. Astral |;
 ;========================================================;
 
+default_obj_flags=4096
+default_mat_flags=16384
+
 load_scene vlogo vlogo3.3ds
 loadpic loading loading2.jpg
 ;--------- VLOGO ---------------------

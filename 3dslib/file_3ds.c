@@ -1,3 +1,5 @@
+//#define REVERSE_BYTEORDER
+
 // #define SHOW_UNKNOWN_CHUNKS
 //#define SHOW_CHUNK_TREE
 //#define SHOW_CHUNK_NAMES
@@ -22,8 +24,6 @@ int default_track_flags=0;
 float default_corona_scale=1.0;
 
 /****************************************************************************/
-
-#define REVERSE_BYTEORDER
 
 INLINE static int afs_fread_word(word *ptr,int s1,int s2,afs_FILE *f){
   word c;

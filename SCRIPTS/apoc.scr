@@ -1,0 +1,1000 @@
+; system apoc [astral demo] script
+
+;======================================================
+mount pak astral2.pak
+
+loadpic loading loading1.jpg
+time=0
+
+2:
+sprite loading 0 480 640 0
+fade blend 0 1 1
+play 1s
+
+;=================== LOADING ==========================
+1:
+loadpic light1 light.jpg
+loadpic light2 light2.jpg
+
+loadpic apoclogo apoc1.jpg
+loadpic title title.jpg
+
+; credits:
+loadpic cred0 astral.jpg
+loadpic cred1 credits1.jpg
+loadpic cred2 credits2.jpg
+loadpic cred3 credits3.jpg
+loadpic credbg credits.jpg
+
+; city alatt:
+loadpic death1 death01.jpg
+loadpic death2 death02.jpg
+loadpic death3 death03.jpg
+loadpic death4 death04.jpg
+loadpic death5 death05.jpg
+
+; scifi4 alatt:
+loadpic 01 01.jpg
+loadpic 02 02.jpg
+loadpic 03 03.jpg
+loadpic 04 04.jpg
+loadpic 05 05.jpg
+loadpic 06 07.jpg
+loadpic 07 06.jpg
+;loadpic 08 08.jpg
+;loadpic 09 09.jpg
+;loadpic 010 10.jpg
+;loadpic 011 11.jpg
+;loadpic 012 12.jpg
+
+;---- 15sec part --------
+loadpic tunnel1 alien01.jpg
+loadpic tunnel2 red.raw
+loadpic tunnel3 concr2x.raw
+loadpic speech01 speech01.jpg
+loadpic speech02 speech02.jpg
+loadpic speech03 speech03.jpg
+loadpic speech04 speech04.jpg
+loadpic speech05 speech05.jpg
+loadpic speech06 speech06.jpg
+loadpic speech07 speech07.jpg
+loadpic speech08 speech08.jpg
+loadpic speech09 speech09.jpg
+loadpic speech10 speech10.jpg
+
+load_scene scifi4 mesh/scifi4.3ds  ; scifi, ajtok
+load_scene anim2 mesh/anim2.3ds    ; scifi brutal
+load_scene apoc01 mesh/apoc01.3ds  ; labirintus
+
+;================== Loading CITY 1 ========================
+
+load_scene city1 mesh/city1b.3ds
+1:
+scene city1
+
+; falak:
+object Object16
+lightmap 256
+object Object09
+lightmap 256
+object Object37
+lightmap 256
+object Object06
+lightmap 128
+object Object13
+lightmap 128
+object Object66
+lightmap 64
+object Object72
+lightmap 64
+
+; kukak:
+object Object67
+lightmap 64
+object Object62
+lightmap 64
+
+render_lightmaps
+
+; Omni lights:
+light 9
+corona_scale=0
+light 10
+corona_scale=0
+light 11
+corona_scale=0
+light 12
+corona_scale=0
+light 13
+corona_scale=0
+light 14
+corona_scale=0
+light 15
+corona_scale=0
+
+light 0  ; Graffity elotti lampa
+corona_scale=0
+
+; Spot-ok:
+light 1
+corona_scale=0
+light_enabled=0
+light 2
+corona_scale=0
+light_enabled=0
+light 3
+corona_scale=0
+light_enabled=0
+light 4
+corona_scale=0
+light_enabled=0
+light 5
+corona_scale=0
+light_enabled=0
+light 6
+corona_scale=0
+light_enabled=0
+light 7
+corona_scale=0
+light_enabled=0
+light 8
+corona_scale=0
+light_enabled=0
+
+fog_znear=200
+fog_zfar=1000
+
+;================== Loading CITY 2 ========================
+load_scene city2 mesh/city2b.3ds
+
+0:
+scene city2
+
+object Object161
+lightmap 256
+object Object170
+lightmap 256
+object Object165
+lightmap 256
+
+render_lightmaps
+
+light 3 ; vonatnal
+attenuation0=0
+;attenuation1=0.01
+;attenuation2=0.00002
+attenuation2=0.0002
+
+light 2
+attenuation0=0
+attenuation1=0.01
+corona_scale=0
+light 4
+attenuation0=0
+attenuation1=0.01
+corona_scale=0
+light 5
+attenuation0=0
+attenuation1=0.01
+corona_scale=0
+light 6
+attenuation0=0
+attenuation1=0.01
+corona_scale=0
+light 8 ; lila sux
+attenuation0=0
+attenuation1=0.01
+corona_scale=0
+
+light 7 ; szoba
+attenuation0=0
+attenuation1=0.01
+;attenuation2=0.000005
+corona_scale=0
+
+znear=5
+zfar=1000
+
+light 0
+corona_scale 30
+light_zbuffer=0
+attenuation0=0
+attenuation1=0.02
+
+light 1
+corona_scale 30
+light_zbuffer=0
+attenuation0=0
+attenuation1=0.02
+
+object Object149
+self_illumination=0.5
+
+
+;================== Loading ZOLD IZE ======================
+load_scene zoldize mesh/scifi5.3ds
+1:
+scene zoldize
+object Object26
+lightmap 256
+object Object16
+lightmap 256
+object Object04
+lightmap 256
+object Object14
+lightmap 256
+object Object07
+lightmap 256
+object "DEFAULT03"
+lightmap 256
+render_lightmaps
+
+
+;===================== Loading PARTICLE part ========
+load_scene hernyo mesh/hernyo6.3ds
+
+load_scene apoc02 mesh/apoc02.3ds
+1:
+scene apoc02
+
+particle PARTICLE01 light1 500
+part_sizelimit=800
+
+part_eject_r=2
+part_eject_vy=50
+;part_eject_vl=15
+;part_energy=1
+;part_colordecrement=0.999
+
+particle_preplay PARTICLE01 0.015 600
+
+particle PARTICLE02 light1 500
+part_sizelimit=800
+
+part_eject_r=-2
+part_eject_vy=-50
+;part_eject_vl=15
+;part_energy=1
+;part_colordecrement=0.999
+
+particle_preplay PARTICLE02 0.015 600
+
+object Object01
+lightmap 64
+object Object03
+lightmap 64
+object Object04
+lightmap 64
+object Object05
+lightmap 64
+
+render_lightmaps
+
+object FENYEK
+vertexlights 0.0005
+
+light 0
+corona_scale 20 ; bejarati piros
+light 1
+corona_scale 20 ; bejarati kek
+light 2
+corona_scale 0  ; terem kozepen
+light 3
+corona_scale 0  ; piros genyaban
+
+;==================== Loading TEMPLOM ====================
+
+load_scene templom mesh/templom5.3ds
+1:
+scene templom
+
+light 0
+;light_enabled=0
+attenuation1=0.005
+corona_scale=0
+light 1
+;light_enabled=0
+attenuation1=0.005
+corona_scale=0
+
+object fal
+lightmap 64
+object fal01
+lightmap 64
+object fal02
+lightmap 64
+object fal03
+lightmap 64
+object fal04
+lightmap 64
+object fal05
+lightmap 64
+object fal06
+lightmap 64
+object fal07
+lightmap 64
+object fal08
+lightmap 64
+object fal09
+lightmap 64
+
+object "DEFAULT   "
+lightmap 256
+object "DEFAULT 01"
+lightmap 256
+object "DEFAULT 02"
+lightmap 256
+object "DEFAULT 03"
+lightmap 256
+
+render_lightmaps
+
+light 2
+corona_scale=0
+attenuation0=0
+attenuation2=0.0002
+;light_enabled=0
+light 3
+corona_scale=0
+attenuation0=0
+attenuation2=0.0002
+;light_enabled=0
+light 4
+corona_scale=0
+attenuation0=0
+attenuation2=0.0004
+;light_enabled=0
+light 5
+corona_scale=0
+attenuation0=0
+attenuation2=0.0004
+;light_enabled=0
+
+
+
+;==================== Loading MATRIX & HOTEL =============
+
+load_scene matrix mesh/apoc03c.3ds
+0:
+scene matrix
+
+; hide lights
+light 0
+corona_scale=0
+light 1
+corona_scale=0
+light 2
+corona_scale=0
+light 3
+corona_scale=0
+light 4
+corona_scale=0
+light 5
+corona_scale=0
+light 6
+corona_scale=0
+light 7
+corona_scale=0
+light 8
+corona_scale=0
+light 9
+corona_scale=0
+light 10
+corona_scale=0
+light 11
+corona_scale=0
+light 12
+corona_scale=0
+light 13
+corona_scale=0
+light 14
+corona_scale=0
+light 15
+corona_scale=0
+light 16
+corona_scale=0
+
+
+load_scene hotel mesh/hotels.3ds
+
+0:
+scene hotel
+fps=25
+znear=10
+
+object OilTank01
+hair_length=-10
+
+light 0
+;light_enabled=0
+attenuation1=0.002
+corona_scale=0
+light 2
+;light_enabled=0
+attenuation1=0.002
+corona_scale=0
+
+light 1 ; lent
+;light_enabled=0
+attenuation1=0.002
+
+light 3 ; lepcso 1
+attenuation1=1
+light 4 ; lepcso 2
+attenuation1=1
+
+object Object16
+lightmap 64
+object Object17
+lightmap 256
+object Object18
+lightmap 64
+object Object19
+lightmap 64
+object Object20
+lightmap 64
+object Object29
+
+; lepcso falak:
+object PLAFON
+lightmap 128
+object LEPCSOK
+lightmap 128
+object FAL1B
+lightmap 64
+object FAL1K
+lightmap 64
+object FAL2B
+lightmap 64
+object FAL2K
+lightmap 64
+
+render_lightmaps
+
+;=========================;
+
+;==================== STARTING MUSIC ======================
+;------ Fade off "Loading" pic:
+time=0
+0: blend=0
+1: blend=0
+2: fade blend 1 0 1
+3: blend=0
+
+start_music alpha2.mp3 ; really apoc.mp3 but windoze mp3 player requires this name
+time=0
+
+;===========================================================
+
+;===============================================
+;     STARTING CITY SCENE
+;===============================================
+
+0:
+scene city1
+fps=23
+loop_scene=0
+fade blend 0 1 2
+;play 4s
+
+;====== Credits... ======
+1:
+addsprite cred0 0 480 640 0
+fade blend 0 1 1
+play 4s
+fade blend 1 0 1
+
+2:
+addsprite credbg 0 480 640 0
+fade blend 0 1 1
+
+play 2s
+
+1:
+addsprite cred1 0 480 640 0
+fade blend 0 0.7 1
+play 4s
+fade blend 0.7 0 1
+play 2s
+
+1:
+addsprite cred2 0 480 640 0
+fade blend 0 0.7 1
+play 4s
+fade blend 0.7 0 1
+play 2s
+
+1:
+addsprite cred3 0 480 640 0
+fade blend 0 0.7 1
+play 4s
+fade blend 0.7 0 1
+play 1s
+
+
+;play 2s
+
+;------- city1 -> city2
+0:
+play -530f
+fade blend 1 0.1 2
+2: fade blend 1 0 2
+play -578f
+scene_cont city2
+znear=5
+zfar=1000
+fade blend 0.1 1 0.5
+
+; metro is coming...
+play -700f
+light 0
+fade corona_scale 30 0 0.3
+light 1
+fade corona_scale 30 0 0.3
+object Object149
+fade self_illumination 0.5 0 3
+
+play 3s
+
+4:
+addsprite death1 0 480 640 0
+fade blend 0 1 3
+play 8s
+fade blend 1 0 3
+5:
+addsprite death2 0 480 640 0
+fade blend 0 1 3
+play 8s
+fade blend 1 0 3
+4:
+addsprite death3 0 480 640 0
+fade blend 0 1 3
+play 8s
+fade blend 1 0 3
+
+5:
+addsprite death4 0 480 640 0
+fade blend 0 1 6
+;play 6.5s
+;fade blend 1 0 3
+
+
+play -2578p
+0: fade blend 1 0 6
+
+1:
+addsprite death5 0 480 640 0
+fade blend 0 1 3
+
+5: fade blend 1 0 3
+
+;play -2910p
+play -2905p
+fade blend 1 0 1
+
+;-scifi4es scenemammexkc : :vafda l kgal satöbbi
+0:
+scene scifi4
+fps=0 ;24
+loop_scene=0;1
+znear=5
+zfar=1000
+light 2
+light_enabled=0
+
+fade blend 0 1 1
+
+;play -2944p
+play -2940p
+fade fps 0 24 0.5
+
+;***************************************************************************;
+;                START FLASHING PICS
+;***************************************************************************;
+
+;play 2s
+
+2:
+addsprite 07 0 480 640 0
+fade blend 0 0.7 2
+play 2.8s
+fade blend 0.7 0 1
+
+3:
+addsprite 02 0 480 640 0
+fade blend 0 0.7 1
+play 1s
+fade blend 0.7 0 1
+
+2:
+addsprite 03 0 480 640 0
+fade blend 0 0.7 1
+play 1s
+fade blend 0.7 0 1
+
+3:
+addsprite 04 0 480 640 0
+fade blend 0 0.7 2
+play 2.8s
+fade blend 0.7 0 1
+
+2:
+addsprite 05 0 480 640 0
+fade blend 0 0.7 1
+play 1s
+fade blend 0.7 0 1
+
+3:
+addsprite 07 0 480 640 0
+fade blend 0 0.7 1
+play 1s
+fade blend 0.7 0 1
+
+2:
+addsprite 02 0 480 640 0
+fade blend 0 0.7 2
+play 2.8s
+fade blend 0.7 0 1
+
+3:
+addsprite 06 0 480 640 0
+fade blend 0 0.7 1
+play 1s
+fade blend 0.7 0 1
+
+2:
+addsprite 03 0 480 640 0
+fade blend 0 0.7 1
+play 1s
+fade blend 0.7 0 1
+
+3:
+addsprite 04 0 480 640 0
+fade blend 0 0.7 1
+play 2.8s
+fade blend 0.7 0 1
+
+2:
+addsprite 07 0 480 640 0
+fade blend 0 0.7 1
+play 1s
+fade blend 0.7 0 1
+
+3:
+addsprite 06 0 480 640 0
+fade blend 0 0.7 1
+play 1s
+fade blend 0.7 0 1
+
+2:
+addsprite 05 0 480 640 0
+fade blend 0 1 3
+;play 2.1s
+;fade blend 0.7 0 1
+
+play -3670p
+
+4:
+addcolorbox 0 480 640 0 1 1 1
+fade blend 0 1 0.5
+play 0.5s
+;fade blend 1 0 2.3
+fade blend 1 0 1.3
+
+;========
+0: blend=0 ; STOP scifi
+
+2:
+addsprite 01 0 480 640 0
+;blend=0.6
+sinfade blend 0 1400 9 0.4 0.6
+
+
+;==============================
+;zoldgenya
+;===================================
+
+1:
+scene zoldize
+fps=38
+loop_scene=0
+;fade blend 0 1 2
+
+;------------ Zold ize --------------
+corona_sprite=light2
+
+light 0
+corona_scale 0
+light 1
+corona_scale 0
+light 2
+corona_scale 0
+
+light 3
+light_zbuffer=0
+sinfade corona_scale 0 10000 100 15 20
+light 4
+light_zbuffer=0
+sinfade corona_scale 120 10000 100 15 20
+light 5
+light_zbuffer=0
+sinfade corona_scale 240 10000 100 15 20
+
+light 6
+light_zbuffer=0
+sinfade corona_scale 0 10000 100 15 20
+light 7
+light_zbuffer=0
+sinfade corona_scale 120 10000 100 15 20
+light 8
+light_zbuffer=0
+sinfade corona_scale 240 10000 100 15 20
+;--------------------------;
+;========
+
+play -4030p
+
+3:
+addcolorbox 0 480 640 0 1 1 1
+fade blend 0 1 0.5
+play 0.5s
+fade blend 1 0 2.3
+
+1: blend=0 ; disable zoldize
+
+0:
+blend=1 ; CONTINUE scifi
+light 2
+corona_scale 3
+light_zbuffer=0
+
+2:
+addsprite 03 0 480 640 0
+blend=0.6
+play 6s
+fade blend 0.6 0 1
+
+;-----------------;
+play -4420p
+0: fade blend 1 0 2
+
+1:
+scene anim2  ; scifi brutal
+fps=30
+fade blend 0 1 2
+
+play 13.4s
+fade blend 1 0 1
+
+;===================================
+; particle
+;===================================
+
+0:
+scene apoc02
+fps=30
+fade blend 0 1 1
+
+play -560f
+
+1:
+scene hernyo
+object OilTank01
+hair_length=-10
+fps=200
+
+fade blend 0 0.5 2
+play 5s
+fade blend 0.5 0 1
+
+;play -5887p
+play -5880p
+
+2:
+addcolorbox 0 480 640 0 1 1 1
+fade blend 0 1 0.5
+play 0.5s
+fade blend 1 0 1
+
+0:
+scene scifi4
+frame=150
+fps=20
+play -250f
+fade blend 1 0 1
+
+1:
+scene apoc01
+znear=1
+fps=50
+fade blend 0 1 1
+
+play -6798p
+fade blend 1 0 2 ;0.5
+
+;========
+
+0: blend=0
+1: blend=0
+
+; flashback
+
+5:
+fdtunnel tunnel1 tunnel2
+fdtunnel_rad_amp=500
+fade blend 0 1 2 ;0.2
+
+7:
+addsprite speech01
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+8:
+addsprite speech02
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+7:
+addsprite speech03
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+8:
+addsprite speech04
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+9:
+;;addsprite speech10
+sprite title
+fade blend 0 1 0.5
+
+
+6:
+fdtunnel 0 tunnel3
+fdtunnel_fovx=10
+;fdtunnel_fovy=10
+blend=0.2 ;fade blend 0 0.2 1 ;blend=0.1
+
+9:
+play 1.2s
+fade blend 1 0 0.5
+
+
+7:
+addsprite speech05
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+8:
+addsprite speech06
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+7:
+addsprite speech07
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+8:
+addsprite speech08
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+7:
+addsprite speech09
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+8:
+addsprite speech10
+fade blend 0 1 0.5
+play 1.2s
+fade blend 1 0 0.5
+
+play 1.2s
+
+7:
+addsprite speech10
+fade blend 0 1 0.5
+
+8:
+addsprite speech10
+fade blend 0 1 0.5
+play 1.2s
+
+8: fade blend 1 0 4
+7: fade blend 1 0 4
+
+5: fade blend 1 0 2
+6: fade blend 0.2 0 2
+
+
+0: blend=0
+1: blend=0
+2: blend=0
+3: blend=0
+4: blend=0
+;5: blend=0
+;6: blend=0
+;7: blend=0
+;8: blend=0
+9: blend=0
+
+;======================== TEMPLOM ====================
+
+play -7360p
+
+4: colorbox 0 480 640 0 0 0 0
+4: blend=0.3
+
+0:
+scene templom
+fps=28
+fade blend 0 1 3
+
+;play -8060p
+
+;========
+;play -8060p
+play -8000p
+
+;************************ MATRIX -> HOTEL *************************
+
+;;;;;;start_music apoc.mp3 8060
+;;;;;;time=0
+
+
+1:
+scene matrix
+fade fps 0 14 2
+fade blend 0 1 2
+;fps=14
+;frame=470
+
+play 3s
+0: blend=0
+
+play -490f
+
+0:
+scene hotel
+loop_scene=0
+fps=0
+fade fps 0 22 4
+
+1: play -522f
+1: blend=0
+
+;play -1250f
+;fade fps 22 0 3
+
+;;play -1150f
+;play -11560p
+play -11500p
+fade fps 22 80 2
+
+play -11570p
+fps=0
+
+2:
+addsprite apoclogo
+fade blend 0 1 3
+play 6s
+
+0: fade blend 1 0 2
+2: fade blend 1 0 2
+play 3s
+end
+
+
+
