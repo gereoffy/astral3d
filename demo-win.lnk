@@ -1,0 +1,46 @@
+
+system begin nt386
+    option osname='Windows NT character-mode'
+    libpath %WATCOM%\lib386
+    libpath %WATCOM%\lib386\nt
+    format windows nt
+    runtime console
+end
+
+system nt386
+
+name demosysw
+file demo-win.obj
+file win-code.obj
+file timer/timer-w.obj
+file agl/agl.obj
+file script/script2.obj
+file blob/blob.obj
+file fdtunnel/fdtunnel.obj
+file hjbtunel/tunnel2.obj
+file bsptunel/tunnel.obj
+file swirl/swirl.obj
+file spline/spline.obj
+file sinpart/sinpart.obj
+file smoke/smoke.obj
+file greets/greets.obj
+file render/particle.obj
+file render/partic2.obj
+file render/render.obj
+file loadmap/load_map.obj
+file loadmap/loadmat.obj
+file loadmap/loadmaps.obj
+file loadmap/loadtxtr.obj
+file max/render.obj
+file sinzoom/sinzoom.obj
+file fdwater/fdwater.obj
+file gears/gears.obj
+library opengl32.lib
+library glu32.lib
+library 3dslib/ast3d.lib
+library ../libs/jpeg.lib
+library mp3lib/mp3.lib
+library afs/afs.lib
+
+
+

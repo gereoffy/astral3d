@@ -174,12 +174,14 @@ typedef struct {
 
 //============================= Modifiers ===================================
 
+/*
 typedef struct {
   int doBias; // flag
   float bias;
 
 
 } Class_TwistDeformer;
+*/
 
 //================================== Node ===================================
 

@@ -319,18 +319,28 @@ int i;
 	glBindTexture(GL_TEXTURE_2D, t->id); //agl_textureid=t->id;
   if(negflags&256){
   	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP);
-	  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP);
   } else {
   	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
-	  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, 
-    (negflags&512) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-  gluBuild2DMipmaps(GL_TEXTURE_2D, t->pixelsize, t->xsize, t->ysize,
-      (t->pixelsize==4)?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, remix_base);
-  map_memory_used+=t->pixelsize*t->xsize*t->ysize;
-  map_memory_used_16bpp+=2*t->xsize*t->ysize;
+  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  if(negflags&512){
+    // MipMap
+    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, 
+    (negflags&1024)?GL_LINEAR_MIPMAP_NEAREST:GL_LINEAR_MIPMAP_LINEAR);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, t->pixelsize, t->xsize, t->ysize,
+       (t->pixelsize==4)?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, remix_base);
+    map_memory_used+=3*t->pixelsize*t->xsize*t->ysize/2;
+    map_memory_used_16bpp+=3*2*t->xsize*t->ysize/2;
+  } else {
+    // Single
+    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, t->pixelsize, t->xsize, t->ysize, 0,
+       (t->pixelsize==4)?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, remix_base);
+    map_memory_used+=t->pixelsize*t->xsize*t->ysize;
+    map_memory_used_16bpp+=2*t->xsize*t->ysize;
+  }
 //  printf("Texture uploaded succesfully!\n");
 #endif
 

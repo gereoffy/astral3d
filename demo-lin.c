@@ -109,12 +109,16 @@ int ys=480;
 
     glutInit(&argc, argv);
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+//    if(!xs && !fullscreen){ xs=640;ys=480;}
     glutInitWindowSize(xs,ys);
 //    glutInitWindowSize (1280,1024);
 //    glutInitWindowSize (800, 600);
 //    glutInitWindowSize (1280, 1024);
     glutInitWindowPosition (0, 0);
     glutCreateWindow (argv[0]);
+
+    if(fullscreen) glutFullScreen();
+
 
 #if 1
      printf("GL_VERSION: %s\n", (char *) glGetString(GL_VERSION));
@@ -127,7 +131,6 @@ int ys=480;
 #endif
 
 //    resize_window(640,480);
-    if(fullscreen) glutFullScreen();
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
     glClearDepth( 1.0 );
@@ -168,7 +171,7 @@ int ys=480;
 //    fx_debug=fopen("effects.log","wt");
 
     printf("lightmap loading\n");
-    lightmap=LoadSimpleMap("light.bmp");
+    lightmap=LoadSimpleMap("light.bmp",512+1024);
     printf("lightmap OK\n");
     blobmap=load_blob_map("2.jpg");
 //    fdtunnel_texture=load_blob_map("coins.jpg");

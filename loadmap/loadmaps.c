@@ -11,12 +11,12 @@
 #include "../loadmap/loadtxtr.h"
 #include "../loadmap/loadmaps.h"
 
-int LoadSimpleMap(char *mapname){
+int LoadSimpleMap(char *mapname,int flags){
   texture_st *t;
         t=load_texture( fix_mapname(mapname), NULL, 1.0,
                         NULL,NULL,0,
                         NULL,NULL,0,
-                        0
+                        flags
                       );
         if(t->flags&15) return t->id;
         return 0;

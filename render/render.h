@@ -42,6 +42,10 @@ extern void particle_init(c_OBJECT *obj,int texture,int np);
 extern void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt);
 extern void particle_preplay(c_OBJECT *obj,float dt,int times);
 
+extern void particle3_init(c_OBJECT *obj,int texture,int np);
+extern void particle3_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt);
+extern void particle3_preplay(c_OBJECT *obj,float dt,int times);
+
 extern void NEWparticle_init(c_PARTICLE *obj,int texture,int np,int npl);
 extern void NEWparticle_redraw(c_PARTICLE *obj,c_MATRIX objmat, float dt);
 extern void NEWparticle_preplay(c_PARTICLE *obj,float dt,int times);

@@ -106,11 +106,18 @@ if(laserno){
 
           if(obj->flags&ast3d_obj_particle){
             if(obj->particle.np>0){
-              if((obj->particle.type&7)==1)
-                NEWparticle_redraw(&obj->particle,objmat,particle_update*0.5*deltatime); // !!!!!!!!!!!!! FIXME!
-              else
+              switch(obj->particle.type&7){
+              case 0:
 //                particle_redraw(obj,objmat,0.5*deltatime); // !!!!!!!!!!!!! FIXME!
                 particle_redraw(obj,objmat,particle_update*0.5*deltatime); // !!!!!!!!!!!!! FIXME!
+                break;
+              case 1:
+                NEWparticle_redraw(&obj->particle,objmat,particle_update*0.5*deltatime); // !!!!!!!!!!!!! FIXME!
+                break;
+              case 2:
+                particle3_redraw(obj,objmat,particle_update*0.5*deltatime); // !!!!!!!!!!!!! FIXME!
+                break;
+              }
               particle_update=0;
             }
             continue;

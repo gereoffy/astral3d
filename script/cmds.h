@@ -36,6 +36,7 @@ V("object",scrCLASS_scene, 6,0, 1,1);
 
 // 7/0:  particle "objname" texture_id num [linenum]
 V("particle",scrCLASS_scene, 7,0, 2,4); P_PIC(2); P_CONST(3,800); P_CONST(4,-1);
+V("particle3",scrCLASS_scene, 7,0, 2,4); P_PIC(2); P_CONST(3,800); P_CONST(4,-3);
 // 7/1:  particle_preplay "objname" dt times
 V("particle_preplay",scrCLASS_scene, 7,1, 1,3); P_CONST(2,0.015); P_CONST(3,600);
 // 7/2:  particle_clone "dstobjname" "srcobjname"
@@ -83,6 +84,8 @@ P_CONST(5,1);P_CONST(6,1);P_CONST(7,1);
 // 16/1:  loadRGBA pic_var "filename" "filename2"
 // 16/2:  loadMASK pic_var "filename" "filename2"
 V("loadpic",scrCLASS_global,16,0, 2,3); P_NEW(1);
+V("loadpicMIP",scrCLASS_global,16,0+512, 2,3); P_NEW(1);
+V("loadpicMIPfast",scrCLASS_global,16,0+512+1024, 2,3); P_NEW(1);
 V("loadRGBA",scrCLASS_global,16,1, 3,3); P_NEW(1);
 V("loadMASK",scrCLASS_global,16,2, 3,3); P_NEW(1);
 

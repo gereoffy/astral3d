@@ -1,7 +1,7 @@
 # LINUX Makefile made by A'rpi / Astral
 
-SRCS = render.c particle.c partic2.c
-OBJS = render.o particle.o partic2.o
+SRCS = render.c particle.c partic2.c partic3.c
+OBJS = render.o particle.o partic2.o partic3.o
 # CC   = wgcc
 # CFLAGS = -g -Wall
 # CFLAGS = -O3 -mpentiumpro -pipe
@@ -29,4 +29,3 @@ depend:
 	makedepend -- $(CFLAGS) -- $(SRCS)
 
 # DO NOT DELETE
-

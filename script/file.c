@@ -426,14 +426,18 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         }
         if(cmdp->type==0){
           if(pval[4]<0)
-            particle_init(current_object,pval[2],pval[3]);
+            if(pval[4]==-3)
+              particle3_init(current_object,pval[2],pval[3]);
+            else
+              particle_init(current_object,pval[2],pval[3]);
           else
             NEWparticle_init(&current_object->particle,pval[2],pval[3],pval[4]);
         } else {
-          if(current_object->particle.type==0)
-            particle_preplay(current_object,pval[2],pval[3]);
-          else
-            NEWparticle_preplay(&current_object->particle,pval[2],pval[3]);
+          switch(current_object->particle.type&7){
+            case 0: particle_preplay(current_object,pval[2],pval[3]);break;
+            case 1: NEWparticle_preplay(&current_object->particle,pval[2],pval[3]);break;
+            case 2: particle3_preplay(current_object,pval[2],pval[3]);break;
+          }
         }
         return;
       }
@@ -564,12 +568,12 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       if(cmdp->code==16){
         texture_st *t;
         if(pdb==3){
-          if(cmdp->type==2)
-            t=load_texture( fix_mapname(p[2]),fix_mapname(p[3]),1.0, NULL,NULL,0, NULL,NULL,1.0, 0);
+          if((cmdp->type&255)==2)
+            t=load_texture( fix_mapname(p[2]),fix_mapname(p[3]),1.0, NULL,NULL,0, NULL,NULL,1.0, cmdp->type&(512+1024));
           else
-            t=load_texture( fix_mapname(p[2]),NULL,1.0, NULL,NULL,0, fix_mapname(p[3]),NULL,1.0, 0);
+            t=load_texture( fix_mapname(p[2]),NULL,1.0, NULL,NULL,0, fix_mapname(p[3]),NULL,1.0, cmdp->type&(512+1024));
         } else
-          t=load_texture( fix_mapname(p[2]), NULL, 1.0, NULL,NULL,0, NULL,NULL,0, 0);
+          t=load_texture( fix_mapname(p[2]), NULL, 1.0, NULL,NULL,0, NULL,NULL,0, cmdp->type&(512+1024));
         if(!t || !(t->flags&15)) scrSyntax("loadpic: File not found!");
         scrAddNewVar(strdup(p[1]),scrTYPE_pic,scrCLASS_global,0,(void*)t);
         return;
@@ -654,6 +658,12 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       if(cmdp->code==23){
 //        printf("lmapmake for %s\n",current_object->name);
         current_object->flags|=ast3d_obj_lmapmake;
+        { int max_txtsize=512;
+          glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_txtsize);
+          if(max_txtsize>=1024) max_txtsize=1024; else max_txtsize=256;
+          if(pval[1]>max_txtsize) pval[1]=max_txtsize;
+          if(pval[2]>max_txtsize) pval[2]=max_txtsize;
+        } // Voodoo3 support
         make_lightmap_uv(current_object,pval[1],(pval[2]>0)?pval[2]:pval[1]);
         return;
       }
