@@ -3,7 +3,7 @@
 SRCS = render.c
 OBJS = render.o
 CC   = gcc
-CFLAGS = -g -O2 -mpentiumpro -pipe
+CFLAGS = -O2 -mpentiumpro -pipe
 
 .SUFFIXES: .c .o
 

@@ -15,10 +15,10 @@ void ast3d_fixUV(void){
           float lUo=0.5,lVo=0.5;
           c_MATERIAL *mat=obj->faces[0].pmat;
           if(mat){
-            if(mat->texture.U_scale) tUs=mat->texture.U_scale;
-            if(mat->texture.V_scale) tVs=mat->texture.V_scale;
-            if(mat->selfillmap.U_scale) lUs=mat->selfillmap.U_scale;
-            if(mat->selfillmap.V_scale) lVs=mat->selfillmap.V_scale;
+            if(mat->texture.U_scale){tUs=mat->texture.U_scale;tUo=0.5-tUs*mat->texture.U_offset;}
+            if(mat->texture.V_scale){tVs=mat->texture.V_scale;tVo=0.5-tVs*mat->texture.V_offset;}
+            if(mat->selfillmap.U_scale){lUs=mat->selfillmap.U_scale;lUo=0.5-lUs*mat->selfillmap.U_offset;}
+            if(mat->selfillmap.V_scale){lVs=mat->selfillmap.V_scale;lVo=0.5-lVs*mat->selfillmap.V_offset;}
           }
         
 /*---------------------- RENDER TRIANGLES -----------------------*/
@@ -28,32 +28,40 @@ void ast3d_fixUV(void){
       c_VERTEX *pc=obj->faces[i].pc;
       float u1,u2,u3,v1,v2,v3,min;
 
-//      u1=pa->u;v1=pa->v; u2=pb->u;v2=pb->v; u3=pc->u;v3=pc->v;
-      u1=(pa->u-0.5)*tUs+tUo; v1=(pa->v-0.5)*tVs+tVo;
-      u2=(pb->u-0.5)*tUs+tUo; v2=(pb->v-0.5)*tVs+tVo;
-      u3=(pc->u-0.5)*tUs+tUo; v3=(pc->v-0.5)*tVs+tVo;
+#if 0
+      u1=tUo+tUs*(pa->u-0.5); v1=tVo-tVs*(pa->v-0.5);
+      u2=tUo+tUs*(pb->u-0.5); v2=tVo-tVs*(pb->v-0.5);
+      u3=tUo+tUs*(pc->u-0.5); v3=tVo-tVs*(pc->v-0.5);
+#else
+      u1=pa->u;v1=pa->v; u2=pb->u;v2=pb->v; u3=pc->u;v3=pc->v;
+#endif
 
-// Allitsd ezt 1-re hogy ne bugozzon a texturazas!!! (csak ugy lassu... :( )
-#if 1
-//        if(u1<-1 || u2<-1 || u3<-1) printf("U: %2.5f %2.5f %2.5f\n",u1,u2,u3);
+// The fixUV main stuff:
 #define PREUV(u1,u2,u3) while(u1>=1.0 && u2>=1.0 && u3>=1.0){ u1-=1.0;u2-=1.0;u3-=1.0;}
         PREUV(u1,u2,u3);PREUV(v1,v2,v3);
 #define MINMAX(u1,u2,u3) min=u1;if(u2<min) min=u2;if(u3<min) min=u3;
-// #define FIXUV(u) if(u>2.0){++x; while(u>=0.0) u-=1.0;}
 #define FIXUV(u) while(u>(min+0.6)){++x; u-=1.0;}
         MINMAX(u1,u2,u3); FIXUV(u1); FIXUV(u2); FIXUV(u3);
         MINMAX(v1,v2,v3); FIXUV(v1); FIXUV(v2); FIXUV(v3);
 #undef FIXUV
 #undef MINMAX
 #undef PREUV
-#endif
 
-        obj->faces[i].u1=u1;obj->faces[i].v1=v1;
-        obj->faces[i].u2=u2;obj->faces[i].v2=v2;
-        obj->faces[i].u3=u3;obj->faces[i].v3=v3;
-        obj->faces[i].lu1=u1;obj->faces[i].lv1=v1;
-        obj->faces[i].lu2=u2;obj->faces[i].lv2=v2;
-        obj->faces[i].lu3=u3;obj->faces[i].lv3=v3;
+#if 0
+      obj->faces[i].u1=u1;obj->faces[i].v1=v1;
+      obj->faces[i].u2=u2;obj->faces[i].v2=v2;
+      obj->faces[i].u3=u3;obj->faces[i].v3=v3;
+      obj->faces[i].lu1=u1;obj->faces[i].lv1=v1;
+      obj->faces[i].lu2=u2;obj->faces[i].lv2=v2;
+      obj->faces[i].lu3=u3;obj->faces[i].lv3=v3;
+#else
+      obj->faces[i].u1=tUo+tUs*(u1-0.5); obj->faces[i].v1=tVo-tVs*(v1-0.5);
+      obj->faces[i].lu1=lUo+lUs*(u1-0.5); obj->faces[i].lv1=lVo-lVs*(v1-0.5);
+      obj->faces[i].u2=tUo+tUs*(u2-0.5); obj->faces[i].v2=tVo-tVs*(v2-0.5);
+      obj->faces[i].lu2=lUo+lUs*(u2-0.5); obj->faces[i].lv2=lVo-lVs*(v2-0.5);
+      obj->faces[i].u3=tUo+tUs*(u3-0.5); obj->faces[i].v3=tVo-tVs*(v3-0.5);
+      obj->faces[i].lu3=lUo+lUs*(u3-0.5); obj->faces[i].lv3=lVo-lVs*(v3-0.5);
+#endif
 
     } // for
 
@@ -79,16 +87,14 @@ void ast3d_NOfixUV(void){
           float lUo=0.5,lVo=0.5;
           c_MATERIAL *mat=obj->faces[0].pmat;
           if(mat){
-            if(mat->texture.U_scale) tUs=mat->texture.U_scale;
-            if(mat->texture.V_scale) tVs=mat->texture.V_scale;
-	    tUo=0.5-tUs*mat->texture.U_offset;
-	    tVo=0.5-tVs*mat->texture.V_offset;
-            if(mat->selfillmap.U_scale) lUs=mat->selfillmap.U_scale;
-            if(mat->selfillmap.V_scale) lVs=mat->selfillmap.V_scale;
+            if(mat->texture.U_scale){tUs=mat->texture.U_scale;tUo=0.5-tUs*mat->texture.U_offset;}
+            if(mat->texture.V_scale){tVs=mat->texture.V_scale;tVo=0.5-tVs*mat->texture.V_offset;}
+            if(mat->selfillmap.U_scale){lUs=mat->selfillmap.U_scale;lUo=0.5-lUs*mat->selfillmap.U_offset;}
+            if(mat->selfillmap.V_scale){lVs=mat->selfillmap.V_scale;lVo=0.5-lVs*mat->selfillmap.V_offset;}
           }
 
-    printf("texture scale:  U=%f  V=%f\n",tUs,tVs);
-    printf("texture offset: U=%f  V=%f\n",tUo,tVo);
+//    printf("texture scale:  U=%f  V=%f\n",tUs,tVs);
+//    printf("texture offset: U=%f  V=%f\n",tUo,tVo);
 //    printf("lightmap scale: U=%f  V=%f\n",lUs,lVs);
 
     for (i=0;i<obj->numfaces;i++){

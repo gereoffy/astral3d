@@ -57,7 +57,8 @@ loadmaps.o: /usr/include/math.h /usr/include/bits/huge_val.h
 loadmaps.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
 loadmaps.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
 loadmaps.o: /usr/include/GL/gl.h /usr/include/GL/glu.h ../3dslib/ast3d.h
-loadmaps.o: ../render/render.h ../loadmap/load_map.h ../loadmap/loadmaps.h
+loadmaps.o: ../render/render.h ../loadmap/load_map.h ../loadmap/loadtxtr.h
+loadmaps.o: ../loadmap/loadmaps.h
 loadmat.o: /usr/include/stdio.h /usr/include/features.h
 loadmat.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
 loadmat.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/stddef.h

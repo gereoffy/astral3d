@@ -53,22 +53,12 @@
                 }
                 /* lightmap u,v */
                 if(matflags&ast3d_mat_specularmap && li==0)
-                { float len2,two_nu;
-                  c_VECTOR v,t;
-                  float d=len*(x*n->x+y*n->y+z*n->z);
-                  v.x=n->x*d;
-                  v.y=n->y*d;
-                  v.z=n->z*d;
-                  t.x=2*v.x-len*x;
-                  t.y=2*v.y-len*y;
-                  t.z=2*v.z-len*z;
-#if 0
-                  printf("N: %f  %f  %f\n",n->x,n->y,n->z);
-                  printf("L: %f  %f  %f\n",len*x,len*y,len*z);
-                  printf("V: %f  %f  %f\n",v.x,v.y,v.z);
-                  printf("T: %f  %f  %f\n\n",t.x,t.y,t.z);
-                  printf("T: %f  %f  %f  len=%f\n\n",t.x,t.y,t.z,t.x*t.x+t.y*t.y+t.z*t.z);
-#endif
+                { float len2;
+                  c_VECTOR t;
+                  float d=2*(x*n->x+y*n->y+z*n->z);
+                  t.x=len*(n->x*d-x);
+                  t.y=len*(n->y*d-y);
+                  t.z=len*(n->z*d-z);
                   len2=t.x*t.x+t.y*t.y+(1.0+t.z)*(1.0+t.z);
                   if(len2>0) len2=1.0/sqrt(len2); else len2=1.0;
                   obj->vertices[i].specular.x=0.5+t.x*len2;

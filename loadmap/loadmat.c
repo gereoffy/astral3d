@@ -40,7 +40,7 @@ void LoadMaterials(c_SCENE *scene){
                         (mat->texture2.flags&8)?2:0 +
                         (mat->texture2_mask.flags&8)?32:0 +
                         (mat->opacitymap.flags&8)?4:0 +
-                        (mat->opacitymap_mask.flags&8)?64:0
+                        (mat->opacitymap_mask.flags&8)?64:0 + 512
                       );
         mat->texture_id=t->id;
         if(t->flags&15) mat->flags|=ast3d_mat_texture;
@@ -57,7 +57,7 @@ void LoadMaterials(c_SCENE *scene){
                         NULL,NULL,0,
                         fix_mapname(mat->reflection_mask.file), NULL, 1.0,
                         (mat->reflection.flags&8)?1:0 +
-                        (mat->reflection_mask.flags&8)?4:0
+                        (mat->reflection_mask.flags&8)?4:0 + 512
                       );
         mat->reflection_id=t->id;
         if(t->flags&15) mat->flags|=ast3d_mat_reflect;
@@ -68,7 +68,7 @@ void LoadMaterials(c_SCENE *scene){
                           mat->selfillmap.amountof,
                         NULL,NULL,0,
                         NULL,NULL,0,
-                        (mat->selfillmap.flags&8)?1:0
+                        (mat->selfillmap.flags&8)?1:0 + 512
                       );
         mat->lightmap_id=t->id;
         if(t->flags&15) mat->flags|=ast3d_mat_lightmap;
@@ -85,7 +85,7 @@ void LoadMaterials(c_SCENE *scene){
                           mat->specularmap.amountof,
                         NULL,NULL,0,
                         NULL,NULL,0,
-                        (mat->specularmap.flags&8)?1:0 + 256
+                        (mat->specularmap.flags&8)?1:0 + 256 + 512
                       );
 #endif
         mat->specularmap_id=t->id;
@@ -98,7 +98,7 @@ void LoadMaterials(c_SCENE *scene){
       }
     }
 
-   	glEnable(GL_TEXTURE_2D);
+//   	glEnable(GL_TEXTURE_2D);
 }
 
 

@@ -61,7 +61,9 @@ int i;
         t->texture2_amount==txt2a &&
         CMP_NAMES(t->alpha,alp) &&
         CMP_NAMES(t->alpha_mask,alpm) &&
-        t->alpha_amount==alpa){
+        t->alpha_amount==alpa &&
+        t->negflags==negflags){
+      printf("Texture already loaded!\n");
       return t;  /* Megvan!!!! */
     }
   }
@@ -77,6 +79,7 @@ int i;
   t->texture1=txt1; t->texture1_mask=txt1m; t->texture1_amount=txt1a;
   t->texture2=txt2; t->texture2_mask=txt2m; t->texture2_amount=txt2a;
   t->alpha=alp; t->alpha_mask=alpm; t->alpha_amount=alpa;
+  t->negflags=negflags;
   t->flags=0; t->id=0;   t->xsize=t->ysize=0;
 
 /* Define some useful macro... */
@@ -94,7 +97,7 @@ int i;
   t->pixelsize= (t->flags&4)? 4 : 3;
 
   /* Find optimal size */
-//  if(t->xsize>256 || t->t->ysize>256) t->xsize=t->ysize=512; else
+  if(t->xsize>256 || t->ysize>256) t->xsize=t->ysize=512; else
   if(t->xsize>128 || t->ysize>128) t->xsize=t->ysize=256; else
   if(t->xsize> 64 || t->ysize> 64) t->xsize=t->ysize=128; else
   if(t->xsize> 32 || t->ysize> 32) t->xsize=t->ysize=64;  else
@@ -110,10 +113,9 @@ int i;
   
         for(y=0;y<t->ysize;y++) for(x=0;x<t->xsize;x++){
           int xx,yy;
-          float r,g,b;
-          float r2,g2,b2;
           unsigned char *c;
-          r=g=b=r2=b2=g2=0.0;
+          float r,g,b;
+          r=g=b=0.0;
 
           /* texture1 */
           if(t->flags&1){
@@ -129,18 +131,20 @@ int i;
           /* texture2 */
           if(t->flags&2){
             float rm,gm,bm;
+            float r2,g2,b2;
             GET_C(map_txt2,c); GET_RGB(negflags&2,c,r2,g2,b2);
             if(t->flags&32){
               GET_C(map_txt2m,c); GET_RGB(negflags&32,c,rm,gm,bm);
               rm*=txt2a; gm*=txt2a; bm*=txt2a;
             } else rm=gm=bm=txt2a;
-            r2*=rm;g2*=gm;b2*=bm;
-            r*=(1.0-rm); g*=(1.0-gm); b*=(1.0-bm);
+            r=r2*rm+r*(1.0-rm);
+            g=g2*gm+g*(1.0-gm);
+            b=b2*bm+b*(1.0-bm);
           }
 
-          remix[0]=clip_255(r+r2);
-          remix[1]=clip_255(g+g2);
-          remix[2]=clip_255(b+b2);
+          remix[0]=clip_255(r);
+          remix[1]=clip_255(g);
+          remix[2]=clip_255(b);
 
           /* opacity map */
           if(t->flags&4){
@@ -159,7 +163,7 @@ int i;
  
 
 #if 1
-  printf("Texture is ready to upload!\n");
+//  printf("Texture is ready to upload!\n");
 	glGenTextures(1, &t->id);
 //  printf("Putting texture %dx%d, id=%d\n",xsize,ysize,mat->texture_id);
 	glBindTexture(GL_TEXTURE_2D, t->id);
@@ -170,19 +174,14 @@ int i;
   	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
 	  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
-#if 1
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-#else
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-#endif
-           
+  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, 
+    (negflags&512) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
   gluBuild2DMipmaps(GL_TEXTURE_2D, t->pixelsize, t->xsize, t->ysize,
       (t->pixelsize==4)?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, remix_base);
   map_memory_used+=t->pixelsize*t->xsize*t->ysize;
   map_memory_used_16bpp+=2*t->xsize*t->ysize;
-  printf("Texture uploaded succesfully!\n");
+//  printf("Texture uploaded succesfully!\n");
 #endif
 
   /* free memory */

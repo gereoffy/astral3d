@@ -246,15 +246,19 @@ v2.2 99/11/9
 - by A'rpi: Specular phongmap tamogatas (3ds-ben specularmap)
 Code mixed!!!!!
 
+v2.3 99/11/??  by A'rpi
+- texture manager:  loadtxtr.c
+  load_mat.c a texturemanagert hasznalja!
 
-BUGZ:
-- texturak fejjel lefele
-- winfos alatt ha tul sok a textura akkor nem tolti be mindet
-  (fclose() hianyzik???)
+v2.4 99/11/20  by Strepto & A'rpi
+- UV scale es offset tamogatasa jol  (noFixUV es fixUV is)
+  sajnos par regi scene nem megy jol, mert azokban forditva volt a textura...
+- afs3.c fclose bug kijavitva (JPG betoltesnel sose zarta le a filet)
+- loadmaps.c is texturemanagert hasznal + kis optim loadtxtr.c-ben
+- 3_light.c optim. specularmap-nal
 
 KELL MEG:
 - optimalt directional lighting attenuation nelkul, normal forgatas nelkul
-- Texture manager!!!!!!
 - nosound-al is menjen a demo!!!!!!
 - tobb fenyforras parametereinek 1ideju allitasa!  (bitmaszk kell light-nal)
 - gyorstekeres scriptrendszerbe

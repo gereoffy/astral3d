@@ -42,8 +42,10 @@ int FindCameras(c_SCENE *scene){
 static void SetupLightMode(void){
    w_NODE *node;
    c_LIGHT *lit;
+#ifndef NO_LIGHTING
    GLfloat position[4];
    GLfloat spot_default[] = { 0.0, 0.0, -1.0 };
+#endif
    int i;
 
    glDisable(GL_LIGHTING);

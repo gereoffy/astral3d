@@ -14,9 +14,33 @@
 #include "../render/render.h"
 
 #include "../loadmap/load_map.h"
+#include "../loadmap/loadtxtr.h"
 #include "../loadmap/loadmaps.h"
 
 int LoadSimpleMap(char *mapname){
+  texture_st *t;
+        t=load_texture( fix_mapname(mapname), NULL, 1.0,
+                        NULL,NULL,0,
+                        NULL,NULL,0,
+                        0
+                      );
+        if(t->flags&15) return t->id;
+        return 0;
+}
+        
+int Load_RGBAmap(char *mapname,char *alphamap){
+  texture_st *t;
+        t=load_texture( fix_mapname(mapname), NULL, 1.0,
+                        NULL,NULL,0,
+                        fix_mapname(alphamap), NULL, 1.0,
+                        0
+                      );
+        if(t->flags&15) return t->id;
+        return 0;
+}
+
+
+int OLD_LoadSimpleMap(char *mapname){
   int map_id=0;
   map_st map_light;
       if(LoadMAP(mapname,&map_light)){
@@ -49,7 +73,7 @@ int LoadSimpleMap(char *mapname){
 return map_id;
 }
 
-int Load_RGBAmap(char *mapname,char *alphamap){
+int OLD_Load_RGBAmap(char *mapname,char *alphamap){
   int map_id=0;
   int x,y;
   map_st map_light;

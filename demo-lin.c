@@ -74,7 +74,19 @@ int main(int argc,char* argv[]){
     glutInitWindowPosition (0, 0);
     glutCreateWindow (argv[0]);
 
-//    glutFullScreen();
+#if 1
+     printf("GL_VERSION: %s\n", (char *) glGetString(GL_VERSION));
+     printf("GL_EXTENSIONS: %s\n", (char *) glGetString(GL_EXTENSIONS));
+     printf("GL_RENDERER: %s\n", (char *) glGetString(GL_RENDERER));
+     printf("GL_VENDOR: %s\n", (char *) glGetString(GL_VENDOR));
+     printf("GLU_VERSION: %s\n", (char *) gluGetString(GLU_VERSION));
+     printf("GLU_EXTENSIONS: %s\n", (char *) gluGetString(GLU_EXTENSIONS));
+     printf("GLUT_API_VERSION: %d\n", GLUT_API_VERSION);
+			 
+#endif
+
+
+    glutFullScreen();
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
     glClearDepth( 1.0 );

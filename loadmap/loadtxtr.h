@@ -12,6 +12,7 @@ typedef struct {
   char *alpha;
   char *alpha_mask;
   float alpha_amount;
+  int negflags;
 /* Output: */
   int flags;
   int pixelsize;
