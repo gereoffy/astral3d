@@ -1,6 +1,19 @@
 #ifndef _AST3D_H_
 #define _AST3D_H_
 
+//#define INLINE inline
+
+#ifdef __GNUC__
+#define INLINE __inline__
+#else
+#define INLINE _inline
+#endif
+
+/* If enabled, uses frustum culling for faces */
+//#define FRUSTUM_CULL
+
+// #define TRIANGLE_STRIP
+
 #define ast3d_VERSION 0.10
 #ifndef M_PI
 #define M_PI 3.14159265359
@@ -56,7 +69,8 @@ enum ast3d_object_ { /* object types */
   ast3d_obj_light     = 2,                /* light (c_LIGHT)       */
   ast3d_obj_object    = 4,                /* object (c_OBJECT)     */
   ast3d_obj_material  = 8,                /* material (c_MATERIAL) */
-  ast3d_obj_ambient   = 16                /* ambient (c_AMBIENT)   */
+  ast3d_obj_ambient   = 16,               /* ambient (c_AMBIENT)   */
+  ast3d_obj_fog       = 32                /* fog     (c_AMBIENT)   */
 };
 
 enum ast3d_track_ { /* track types */
@@ -77,7 +91,7 @@ enum ast3d_key_ { /* key types */
   ast3d_key_roll     = 5,                 /* roll track     */
   ast3d_key_color    = 6,                 /* color track    */
   ast3d_key_morph    = 7,                 /* morph track    */
-  ast3d_key_hide     = 8,                 /* hide track     */
+  ast3d_key_hide     = 8                  /* hide track     */
 };
 
 /*****************************************************************************
@@ -94,11 +108,32 @@ enum ast3d_flags_ { /* astral 3d flags */
   ast3d_normcalc   = 64                   /* morph: recalculate normals   */
 };
 
+enum ast3d_fog_type_ {
+  ast3d_fog_none    = 0,
+  ast3d_fog_fog     = 1,
+  ast3d_fog_distcue = 2,
+  ast3d_fog_layered = 4
+};
+
+enum ast3d_background_type_ {
+  ast3d_backgr_none = 0,
+  ast3d_backgr_solidcolor = 1,
+  ast3d_backgr_gradient = 2,
+  ast3d_backgr_bitmap = 4
+};
+
 enum ast3d_mat_flags_ { /* astral 3d material flags */
   ast3d_mat_twosided = 1,                 /* two sided           */
   ast3d_mat_soften   = 2,                 /* soften              */
   ast3d_mat_wire     = 4,                 /* wireframe rendering */
-  ast3d_mat_transadd = 8                  /* transparency add    */
+  ast3d_mat_transadd = 8,                 /* transparency add    */
+  ast3d_mat_texture  = 16,                /* obj has texture     */
+  ast3d_mat_texturealpha = 32,            /* texture has alpha   */
+  ast3d_mat_reflect  = 64,                /* obj has reflect.map */
+  ast3d_mat_reflectalpha = 128,           /* reflect has alpha   */
+  ast3d_mat_transparent  = 256,           /* transparent object  */
+  ast3d_mat_specularmap  = 512,           /* specular phongmap   */
+  ast3d_mat_lightmap  = 1024              /* object has lightmap */
 };
 
 enum ast3d_map_flags_ { /* astral 3d map flags */
@@ -116,14 +151,21 @@ enum ast3d_shade_flags_ { /* astral 3d material shading */
 enum ast3d_face_flags_ { /* astral 3d face flags */
   ast3d_face_wrapU   = 1,                 /* face has texture wrapping (u) */
   ast3d_face_wrapV   = 2,                 /* face has texture wrapping (v) */
-  ast3d_face_visible = 4                  /* visible flag (backface cull)  */
+  ast3d_face_visible = 4,                 /* visible flag (backface cull)  */
+  ast3d_face_trianglestrip = 8            /* triangle-strip                */
 };
 
 enum ast3d_obj_flags_ { /* astral 3d object flags */
   ast3d_obj_hidden  = 1,                   /* object is hidden        */
   ast3d_obj_chidden = 2,                   /* object is always hidden */
   ast3d_obj_dummy   = 4,                   /* object is dummy         */
-  ast3d_obj_morph   = 8                    /* object is morphing      */
+  ast3d_obj_morph   = 8,                   /* object is morphing      */
+  ast3d_obj_displaylist = 16,              /* object has display list */
+  ast3d_obj_inside  = 32,                  /* we are in the object    */
+  ast3d_obj_visible = 64,                  /* object is in frustum    */
+  ast3d_obj_allvisible = 128,              /* all faces&vertices visible */
+  ast3d_obj_trianglestrip = 256,           /* triangle-stip capable   */
+  ast3d_obj_frustumcull = 512              /* frustum cull faces      */
 };
 
 enum ast3d_light_flags_ { /* astral 3d light flags */
@@ -143,7 +185,8 @@ enum ast3d_track_flags_ { /* astral 3d track flags */
 typedef float c_MATRIX[3][4];
 
 typedef struct _c_RGB { /* color struct */
-  float rgb[4];                         /* red, green, blue (0 -> 1.0) */
+/*  float r, g, b;  */                    /* red, green, blue (0 -> 1.0) */
+  float rgb[4];
 } c_RGB;
 
 typedef struct _c_VECTOR { /* vector */
@@ -157,6 +200,7 @@ typedef struct _c_QUAT { /* quaternion */
 typedef struct _c_BOUNDBOX { /* bounding box */
   c_VECTOR min;                          /* bounding box */
   c_VECTOR max;                          /* bounding box */
+  c_VECTOR p[8];
 } c_BOUNDBOX;
 
 typedef struct _c_MORPH { /* morph struct */
@@ -170,6 +214,7 @@ typedef struct _c_MAP { /* map struct */
   float U_scale, V_scale;                /* 1/U, 1/V scale */
   float U_offset, V_offset;              /* U, V offset    */
   float rot_angle;                       /* rotation angle */
+  float amountof;
 } c_MAP;
 
 typedef struct _c_MATERIAL { /* material struct */
@@ -185,16 +230,39 @@ typedef struct _c_MATERIAL { /* material struct */
   float trans_falloff;                   /* transparency falloff */
   float refblur;                         /* reflection blur      */
   float self_illum;                      /* self illuminance     */
+
   c_MAP texture;                         /* texture map          */
+  c_MAP texture2;                        /* texture map          */
   c_MAP bump;                            /* bump map             */
+  c_MAP opacitymap;                      /* opacity map          */
+  c_MAP specularmap;                     /* specular map         */
+  c_MAP shinenessmap;                    /* shininess map        */
+  c_MAP selfillmap;                      /* selfillmap map       */
   c_MAP reflection;                      /* reflection map       */
+
+  c_MAP texture_mask;                    /* texture mask         */
+  c_MAP texture2_mask;                   /* texture mask         */
+  c_MAP bump_mask;                       /* bump mask            */
+  c_MAP opacitymap_mask;                 /* opacity mask         */
+  c_MAP specularmap_mask;                /* specular mask        */
+  c_MAP shinenessmap_mask;               /* shininess mask       */
+  c_MAP selfillmap_mask;                 /* selfill mask         */
+  c_MAP reflection_mask;                 /* reflection mask      */
+
+  unsigned int texture_id;
+  unsigned int reflection_id;
+  unsigned int specularmap_id;
+  unsigned int lightmap_id;
 } c_MATERIAL;
 
 typedef struct _c_VERTEX { /* vertex struct */
   c_VECTOR vert, pvert;                  /* vertex              */
   c_VECTOR norm, pnorm;                  /* vertex normal       */
+  c_VECTOR specular;                     /* envmap/lightmap u,v */
   float    u, v;                         /* texture coordinates */
-  int     visible;			 /* visibility		*/		
+  int      visible;
+  unsigned char rgb[4];
+  unsigned char refl_rgb[4];
 } c_VERTEX;
 
 typedef struct _c_FACE { /* face struct */
@@ -204,7 +272,14 @@ typedef struct _c_FACE { /* face struct */
   c_VERTEX   *pa, *pb, *pc;                /* pointers to vertices    */
   c_MATERIAL *pmat;                        /* pointer to material     */
   c_VECTOR   norm, pnorm;                  /* face normal             */
-  int	     visible;			   /* face visibility	      */	
+  float      D;                            /* distance from 0;0;0     */
+  int        visible;                      /* visibility flag         */
+  float u1,v1,u2,v2,u3,v3;                 /* texture coords          */
+  float lu1,lv1,lu2,lv2,lu3,lv3;           /* lightmap coords         */ 
+#ifdef TRIANGLE_STRIP
+  struct _c_FACE *prev;
+  struct _c_FACE *next;
+#endif
 } c_FACE;
 
 typedef struct _c_LIGHT { /* light struct */
@@ -212,10 +287,33 @@ typedef struct _c_LIGHT { /* light struct */
   int32    id, parent1, parent2;         /* object id, parents    */
   int32    flags;                        /* light flags           */
   c_VECTOR pos, target;                  /* light position        */
+  c_VECTOR ppos, pdir;                   /* transformed light position */
   float    roll;                         /* roll (spotlight)      */
   float    hotspot, falloff;             /* hotspot, falloff      */
   c_RGB    color;                        /* light color           */
+  float    corona_scale;
+  float    attenuation[3];
+  int use_zbuffer;
+  int enabled;
+  float MatAmb[3],MatDiff[3],MatSpec[3];
+  float CosFalloff,CosHotspot,SpotExp;
+  int ambient;
+//  float specular_limit,specular_coef,specular_mult;
 } c_LIGHT;
+
+typedef struct _c_FOG { /* fog struct */
+  int type;
+  float znear;
+  float fognear;
+  float zfar;
+  float fogfar;
+  c_RGB color;
+} c_FOG;
+
+typedef struct _c_BACKGR { /* background struct */
+  int type;
+  c_RGB color;
+} c_BACKGR;
 
 typedef struct _c_CAMERA { /* camera struct */
   char     *name;                        /* camera name                */
@@ -228,12 +326,19 @@ typedef struct _c_CAMERA { /* camera struct */
   c_MATRIX matrix;                       /* camera matrix              */
 } c_CAMERA;
 
+typedef struct _c_MAPPING {
+  int32    type;                         /* 0=planar 1=cylin. 2=sphere */
+  float    utile,vtile;                  /* U and V tile               */
+  c_VECTOR pos;                          /* X,Y,Z position             */
+  c_MATRIX matrix;                       /* matrix                     */
+} c_MAPPING;
+
 typedef struct _c_OBJECT { /* object struct */
   char       *name;                      /* object name                */
   int32      id, parent;                 /* object id, object parent   */
   int32      numverts;                   /* number of vertices         */
   int32      numfaces;                   /* number of faces            */
-  int32      flags;                      /* object flags: ast3d_obj_*   */
+  int32      flags;                      /* object flags: ast3d_obj_*  */
   c_VERTEX   *vertices;                  /* object vertices            */
   c_FACE     *faces;                     /* object faces               */
   c_VECTOR   pivot;                      /* object pivot point         */
@@ -243,6 +348,7 @@ typedef struct _c_OBJECT { /* object struct */
   c_QUAT     rotate;                     /* object rotation quaternion */
   c_MORPH    morph;                      /* object morph               */
   c_MATRIX   matrix;                     /* object keyframer matrix    */
+  c_MAPPING  mapping;                    /* texture mapping info       */
 } c_OBJECT;
 
 typedef struct _c_AMBIENT { /* ambient struct */
@@ -334,10 +440,21 @@ typedef struct _k_NODE { /* keyframer node */
   struct _k_NODE *next, *prev;           /* next/previous node     */
 } k_NODE;
 
+typedef struct _c_FRUSTUM {
+  float znear,zfar,x,y;
+} c_FRUSTUM;
+
 typedef struct _c_SCENE { /* scene (world, keyframer) */
   float    f_start, f_end, f_current;    /* start/end/current frame */
   w_NODE   *world, *wtail;               /* world                   */
   k_NODE   *keyframer, *ktail;           /* keyframer               */
+  c_FOG    fog;
+  c_BACKGR backgr;
+  c_FRUSTUM frustum;
+  c_CAMERA *cam;
+  float lightcorona_scale;
+  int directional_lighting;
+  int sphere_map;
 } c_SCENE;
 
 /*****************************************************************************
@@ -354,6 +471,10 @@ extern "C" {
 /*****************************************************************************
   library functions (astral 3d api)
 *****************************************************************************/
+
+  void ast3d_fixUV();
+/* ast3d_fixUV:  Build bugfixed texture U,V table for each face */
+
 
   int32 ast3d_init (int32 flags);
 /*
@@ -423,31 +544,19 @@ extern "C" {
   int32 ast3d_free_scene (c_SCENE *scene);
   void qt_identity (c_QUAT *out);
   void qt_zero (c_QUAT *out);
-  void mat_zero (c_MATRIX out);
-  void vec_zero (c_VECTOR *out);
   int32 ast3d_load_scene (char *filename, c_SCENE *scene);
   void qt_scale (c_QUAT *a, float s, c_QUAT *out);
   void qt_print (c_QUAT *a);
-  void vec_print (c_VECTOR *a);
-  void mat_print (c_MATRIX a);
-  int32 mat_invscale (c_MATRIX a, c_MATRIX out);
-  void mat_mulnorm (c_MATRIX a, c_VECTOR *b, c_VECTOR *out);
-  void vec_midpoint (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out);
   int32 ast3d_free_mesh (c_SCENE *scene);
   void ast3d_print_world ();
   void ast3d_print_keyframer ();
   void qt_rescale (c_QUAT *a, float s, c_QUAT *out);
-  void vec_rescale (c_VECTOR *a, float s, c_VECTOR *out);
   int32 ast3d_getkey_hide (t_TRACK *track, float frame, int32 *out);
   int32 ast3d_getkey_morph (t_TRACK *track, float frame, c_MORPH *out);
   int32 ast3d_setactive_camera (c_CAMERA *cam);
   int32 ast3d_save_scene (char *filename, c_SCENE *scene);
-  int32 mat_normalize (c_MATRIX a, c_MATRIX out);
   int32 qt_equal (c_QUAT *a, c_QUAT *b);
-  void mat_toeuler (c_MATRIX mat, c_VECTOR *out);
-  void mat_pretrans (c_VECTOR *v, c_MATRIX mat, c_MATRIX out);
   float spline_ease (float t, float a, float b);
-  void mat_transpose (c_MATRIX a, c_MATRIX out);
   int32 ast3d_collide (w_NODE *a, w_NODE *b, int32 *result);
   float qt_length (c_QUAT *a);
   float qt_dot (c_QUAT *a, c_QUAT *b);
@@ -498,182 +607,6 @@ extern "C" {
                             c_CAMERA.aspectratio.
 */
 
-/*****************************************************************************
-  library functions (matrix routines)
-*****************************************************************************/
-
-  void mat_identity (c_MATRIX out);
-/*
-  void mat_identity (c_MATRIX out)
-  returns identity matrix in "out".
-*/
-
-  void mat_copy (c_MATRIX a, c_MATRIX out);
-/*
-  void mat_copy (c_MATRIX a, c_MATRIX out)
-  copies matrix "a" to matrix "out".
-*/
-
-  void mat_add (c_MATRIX a, c_MATRIX b, c_MATRIX out);
-/*
-  void mat_add (c_MATRIX a, c_MATRIX b, c_MATRIX out)
-  matrix addition, [out] = [a]+[b].
-*/
-
-  void mat_sub (c_MATRIX a, c_MATRIX b, c_MATRIX out);
-/*
-  void mat_sub (c_MATRIX a, c_MATRIX b, c_MATRIX out)
-  matrix substraction, [out]=[a]-[b].
-*/
-
-  void mat_mul (c_MATRIX a, c_MATRIX b, c_MATRIX out);
-/*
-  void mat_mul (c_MATRIX a, c_MATRIX b, c_MATRIX out)
-  matrix multiplication, [out]=[a]*[b].
-*/
-
-  int32 mat_inverse (c_MATRIX a, c_MATRIX out);
-/*
-  void mat_inverse (c_MATRIX a, c_MATRIX out)
-  calculates inverse matrix of "a", giving result in "out".
-  returns error codes: ast3d_ok, ast3d_singular, ast3d_undefined.
-*/
-
-  void mat_settrans (c_VECTOR *v, c_MATRIX out);
-/*
-  void mat_settrans (c_VECTOR *v, c_MATRIX out)
-  creates translation matrix "out" from vector "v".
-*/
-
-  void mat_setscale (c_VECTOR *v, c_MATRIX out);
-/*
-  void mat_setscale (c_VECTOR *v, c_MATRIX out)
-  creates a scale matrix "out" from vector "v".
-*/
-
-  void mat_rotateX (float ang, c_MATRIX out);
-/*
-  void mat_rotateX (float ang, c_MATRIX out)
-  creates rotation matrix around X axis "ang" degrees.
-*/
-
-  void mat_rotateY (float ang, c_MATRIX out);
-/*
-  void mat_rotateY (float ang, c_MATRIX out)
-  creates rotation matrix around Y axis "ang" degrees.
-*/
-
-  void mat_rotateZ (float ang, c_MATRIX out);
-/*
-  void mat_rotateZ (float ang, c_MATRIX out)
-  creates rotation matrix around Z axis "ang" degrees.
-*/
-
-  void mat_mulvec (c_MATRIX a, c_VECTOR *b, c_VECTOR *out);
-/*
-  void mat_mulvec (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
-  multiplies vector "b" by matrix "a", giving result in "out".
-*/
-
-/*****************************************************************************
-  library functions (vector routines)
-*****************************************************************************/
-
-  void vec_make (float x, float y, float z, c_VECTOR *out);
-/*
-  void vec_make (float x, float y, float z, c_VECTOR *out)
-  create vector, out = [x,y,z].
-*/
-
-  void vec_copy (c_VECTOR *a, c_VECTOR *out);
-/*
-  void vec_copy (c_VECTOR *a, c_VECTOR *out)
-  vector copy, out = a.
-*/
-
-  void vec_add (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out);
-/*
-  void vec_add (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
-  vector addition, out = a+b.
-*/
-
-  void vec_sub (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out);
-/*
-  void vec_sub (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
-  vector substraction, out = a-b.
-*/
-
-  void vec_mul (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out);
-/*
-  void vec_mul (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
-  vector multiplication, out=a*b;
-*/
-
-  void vec_scale (c_VECTOR *a, float s, c_VECTOR *out);
-/*
-  void vec_scale (c_VECTOR *a, float s, c_VECTOR *out)
-  scales vector "a" to a new length, giving result in "out".
-*/
-
-  void vec_negate (c_VECTOR *a, c_VECTOR *out);
-/*
-  void vec_negate (c_VECTOR *a, c_VECTOR *out)
-  negates vector "a", giving result in "out".
-*/
-
-  int32 vec_equal (c_VECTOR *a, c_VECTOR *b);
-/*
-  int32 vec_equal (c_VECTOR *a, c_VECTOR *b)
-  compares two vector "a" and "b".
-*/
-
-  float vec_length (c_VECTOR *a);
-/*
-  float vec_length (c_VECTOR *a)
-  computes vector length.
-*/
-
-  float vec_distance (c_VECTOR *a, c_VECTOR *b);
-/*
-  float vec_distance (c_VECTOR *a, c_VECTOR *b)
-  computes distance between two vectors "a" and "b".
-*/
-
-  float vec_dot (c_VECTOR *a, c_VECTOR *b);
-/*
-  float vec_dot (c_VECTOR *a, c_VECTOR *b)
-  computes dot product of two vectors "a" and "b".
-*/
-
-  void vec_cross (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out);
-/*
-  void vec_cross (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
-  computes cross product of two vectors "a" and "b", giving
-  result in "out".
-*/
-
-  void vec_lerp (c_VECTOR *a, c_VECTOR *b, float alpha, c_VECTOR *out);
-/*
-  void vec_lerp (c_VECTOR *a, c_VECTOR *b, float alpha, c_VECTOR *out)
-  liner interpolation of vectors.
-  interpolates vectors "a" and "b", with interpolation parameter
-  "alpha" (range 0 - 1.0) giving result in "out".
-*/
-
-  void vec_combine (c_VECTOR *a, c_VECTOR *b, float as, float bs,
-                    c_VECTOR *out);
-/*
-  void vec_combine (c_VECTOR *a, c_VECTOR *b, float as, float bs,
-                    c_VECTOR *out)
-  computes linear combination of two vectors "a" and "b", with
-  scalar "as" and "bs", giving result in "out".
-*/
-
-  void vec_normalize (c_VECTOR *a, c_VECTOR *out);
-/*
-  void vec_normalize (c_VECTOR *a, c_VECTOR *out)
-  computes normalized vector "a", giving result in "out".
-*/
 
 /*****************************************************************************
   library functions (quaternion routines)
@@ -768,6 +701,8 @@ void qt_slerp (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out);
   void qt_invmatrix (c_QUAT *a, c_MATRIX mat)
   creates an inverse matrix from quaternion "q", giving result in "mat".
 */
+
+  void qt_make_objmat(c_OBJECT *obj);
 
   void qt_frommat (c_MATRIX mat, c_QUAT *out);
 /*

@@ -6,6 +6,9 @@
 #include "ast3d.h"
 #include "ast3di.h"
 
+#include "vector.h"
+#include "matrix.h"
+
 /*****************************************************************************
   copyright, format table, etc...
 *****************************************************************************/
@@ -32,69 +35,128 @@ struct {
   internal functions
 *****************************************************************************/
 
+#include "fix_uv.c"
+
+#ifdef TRIANGLE_STRIP
+#include "sortface.c"
+#endif
+
+
+static void optimize_vertex (c_OBJECT *obj){
+  int32     i, j, k;
+  int opt=0;
+
+  for (i = 0; i < obj->numverts; i++){
+    for (j = 0; j < i; j++){
+      obj->vertices[i].visible=0;
+      if( obj->vertices[i].vert.x==obj->vertices[j].vert.x &&
+          obj->vertices[i].vert.y==obj->vertices[j].vert.y &&
+          obj->vertices[i].vert.z==obj->vertices[j].vert.z &&
+          obj->vertices[i].u==obj->vertices[j].u &&
+          obj->vertices[i].v==obj->vertices[j].v ) {
+        ++opt;
+        obj->vertices[i].visible=j;
+        break;
+      }
+    }
+  }
+  printf("%d vertices optimized!\n",opt);
+
+/* pass-2 */
+        for(k=0;k<obj->numfaces;k++){
+          int j;
+          if((j=obj->faces[k].pa->visible)){
+            obj->faces[k].a=j; obj->faces[k].pa=&obj->vertices[j];
+            obj->faces[k].pa->visible=0;
+          }
+          if((j=obj->faces[k].pb->visible)){
+            obj->faces[k].b=j; obj->faces[k].pb=&obj->vertices[j];
+            obj->faces[k].pb->visible=0;
+          }
+          if((j=obj->faces[k].pc->visible)){
+            obj->faces[k].c=j; obj->faces[k].pc=&obj->vertices[j];
+            obj->faces[k].pc->visible=0;
+          }
+        }
+ 
+}
+
+
 static void calc_objnormals (c_OBJECT *obj)
 {
-/*
-  calc_normals: calculates face/vertex normals.
-*/
-  c_VECTOR  a, b, normal;
-  int32     i, j, num;
+  c_VECTOR  normal;
+  int32     i, j;
 
-  for (i = 0; i < obj->numfaces; i++) { /* face normals */
-    vec_sub (&obj->faces[i].pa->vert,
-             &obj->faces[i].pb->vert, &a);
-    vec_sub (&obj->faces[i].pb->vert,
-             &obj->faces[i].pc->vert, &b);
-    vec_cross (&a, &b, &normal);
-    vec_normalize (&normal, &obj->faces[i].norm);
+  /* PASS-1  vertexnormals=0 */
+  for (i = 0; i < obj->numverts; i++) { 
+    vec_zero (&obj->vertices[i].norm);
   }
-  for (i = 0; i < obj->numverts; i++) { /* vertex normals */
-    num = 0;
-    vec_zero (&normal);
-    for (j = 0; j < obj->numfaces; j++) {
-      if (obj->faces[j].a == i ||
-          obj->faces[j].b == i ||
-          obj->faces[j].c == i) {
-        vec_add (&normal, &obj->faces[j].norm, &normal);
-        num++;
-      }
-    }
-    if (num) vec_scale (&normal, 1.0 / (float)num, &normal);
-      vec_normalize (&normal, &obj->vertices[i].norm);
+
+  /* PASS-2  calculate facenormals & vertexnormals in same time */
+  for (i = 0; i < obj->numfaces; i++) { 
+    /* facenormals: */
+    c_VECTOR *p1=&obj->faces[i].pa->vert;
+    c_VECTOR *p2=&obj->faces[i].pb->vert;
+    c_VECTOR *p3=&obj->faces[i].pc->vert;
+    normal.x=-(p1->y-p2->y)*(p1->z-p3->z) + (p1->z-p2->z)*(p1->y-p3->y);
+    normal.y=-(p1->z-p2->z)*(p1->x-p3->x) + (p1->x-p2->x)*(p1->z-p3->z);
+    normal.z=-(p1->x-p2->x)*(p1->y-p3->y) + (p1->y-p2->y)*(p1->x-p3->x);
+
+    /* vertexnormals: */
+    j=obj->faces[i].a;vec_add (&normal, &obj->vertices[j].norm, &obj->vertices[j].norm);
+    j=obj->faces[i].b;vec_add (&normal, &obj->vertices[j].norm, &obj->vertices[j].norm);
+    j=obj->faces[i].c;vec_add (&normal, &obj->vertices[j].norm, &obj->vertices[j].norm);
+
+    vec_normalize (&normal, &normal);
+    vec_copy (&normal, &obj->faces[i].norm);
+    
+    obj->faces[i].D=normal.x*p1->x+normal.y*p1->y+normal.z*p1->z;
+    
   }
+
+  /* PASS-3  normalize vertex normals */
+  for (i = 0; i < obj->numverts; i++) { 
+    vec_normalize (&obj->vertices[i].norm, &obj->vertices[i].norm);
+  }
+  
 }
 
+#if 0
 static void recalc_objnormals (c_OBJECT *obj)
 {
-/*
-  calc_normals: calculates face/vertex normals.
-*/
-  c_VECTOR  a, b, normal;
-  int32     i, j, num;
+  c_VECTOR  normal;
+  int32     i, j;
 
-  for (i = 0; i < obj->numfaces; i++) { /* face normals */
-    vec_sub (&obj->faces[i].pa->pvert,
-             &obj->faces[i].pb->pvert, &a);
-    vec_sub (&obj->faces[i].pb->pvert,
-             &obj->faces[i].pc->pvert, &b);
-    vec_cross (&a, &b, &normal);
-    vec_normalize (&normal, &obj->faces[i].pnorm);
+  /* PASS-1  vertexnormals=0 */
+  for (i = 0; i < obj->numverts; i++) { 
+    vec_zero (&obj->vertices[i].pnorm);
   }
-  for (i = 0; i < obj->numverts; i++) { /* vertex normals */
-    num = 0;
-    vec_zero (&normal);
-    for (j = 0; j < obj->numfaces; j++) {
-      if (obj->faces[j].a == i ||
-          obj->faces[j].b == i ||
-          obj->faces[j].c == i) {
-        vec_add (&normal, &obj->faces[j].pnorm, &normal);
-        num++;
-      }
-    }
-    if (num) vec_scale (&normal, 1.0 / (float)num, &normal);
-      vec_normalize (&normal, &obj->vertices[i].pnorm);
+
+  /* PASS-2  calculate facenormals & vertexnormals in same time */
+  for (i = 0; i < obj->numfaces; i++) { 
+    /* facenormals: */
+    c_VECTOR *p1=&obj->faces[i].pa->pvert;
+    c_VECTOR *p2=&obj->faces[i].pb->pvert;
+    c_VECTOR *p3=&obj->faces[i].pc->pvert;
+    normal.x=+(p1->y-p2->y)*(p1->z-p3->z) - (p1->z-p2->z)*(p1->y-p3->y);
+    normal.y=+(p1->z-p2->z)*(p1->x-p3->x) - (p1->x-p2->x)*(p1->z-p3->z);
+    normal.z=+(p1->x-p2->x)*(p1->y-p3->y) - (p1->y-p2->y)*(p1->x-p3->x);
+
+    vec_normalize (&normal, &normal);
+    vec_copy (&normal, &obj->faces[i].pnorm);
+    /* vertexnormals: */
+    j=obj->faces[i].a;
+    vec_add (&normal, &obj->vertices[j].pnorm, &obj->vertices[j].pnorm);
+    j=obj->faces[i].b;vec_add (&normal, &obj->vertices[j].pnorm, &obj->vertices[j].pnorm);
+    j=obj->faces[i].c;vec_add (&normal, &obj->vertices[j].pnorm, &obj->vertices[j].pnorm);
+  }
+
+  /* PASS-3  normalize vertex normals */
+  for (i = 0; i < obj->numverts; i++) { 
+    vec_normalize (&obj->vertices[i].pnorm, &obj->vertices[i].pnorm);
   }
 }
+#endif
 
 static void calc_normals ()
 {
@@ -104,8 +166,13 @@ static void calc_normals ()
   w_NODE *node;
 
   for (node = ast3d_scene->world; node; node = node->next)
-    if (node->type == ast3d_obj_object)
+    if (node->type == ast3d_obj_object){
+//      optimize_vertex ((c_OBJECT *)node->object);
       calc_objnormals ((c_OBJECT *)node->object);
+    }
+
+  ast3d_NOfixUV();
+
 }
 
 static void calc_bbox ()
@@ -135,6 +202,11 @@ static void calc_bbox ()
           obj->bbox.max.y = obj->vertices[i].vert.y;
         if (obj->vertices[i].vert.z > obj->bbox.max.z)
           obj->bbox.max.z = obj->vertices[i].vert.z;
+      }
+      for(i=0;i<8;i++){
+        obj->bbox.p[i].x= (i&1) ? obj->bbox.max.x : obj->bbox.min.x;
+        obj->bbox.p[i].y= (i&2) ? obj->bbox.max.y : obj->bbox.min.y;
+        obj->bbox.p[i].z= (i&4) ? obj->bbox.max.z : obj->bbox.min.z;
       }
     }
 }
@@ -531,6 +603,10 @@ int32 ast3d_alloc_scene (c_SCENE **scene)
   (*scene)->wtail = NULL;
   (*scene)->keyframer = NULL;
   (*scene)->ktail = NULL;
+  (*scene)->fog.type = 0;
+  (*scene)->backgr.type = 0;
+  (*scene)->directional_lighting = 0;
+  (*scene)->sphere_map = 0;
   return ast3d_err_ok;
 }
 
@@ -602,7 +678,6 @@ int32 ast3d_load_motion (char *filename, c_SCENE *scene)
     return error;
   }
   ast3d_setframe (0);
-  ast3d_update ();
   ast3d_setactive_scene (old_scene);
   return ast3d_err_ok;
 }
@@ -840,14 +915,13 @@ int32 ast3d_getkey_rgb (t_TRACK *track, float frame, c_RGB *out)
 /*
   ast3d_getkey_rgb: return rgb key at frame "frame".
 */
-//  c_VECTOR *vect = (c_VECTOR *)out;
-  c_VECTOR *vect;
-  int32    aa;    
+  c_VECTOR vect;
+  int32    aa;
 
-  aa = spline_getkey_vect (track, frame, vect);
-  out->rgb[0]=vect->x;
-  out->rgb[1]=vect->y;
-  out->rgb[2]=vect->z;
+  aa = spline_getkey_vect (track, frame,&vect);
+  out->rgb[0]=vect.x;
+  out->rgb[1]=vect.y;
+  out->rgb[2]=vect.z;
   return aa;
 }
 
@@ -858,7 +932,6 @@ int32 ast3d_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
 */
   t_KEY *keys;
   float  alpha;
-  int    error;
 
   if (frame < 0.0) return ast3d_err_badframe;
   if (!track || !track->keys) return ast3d_err_nullptr;
@@ -1012,7 +1085,7 @@ int32 ast3d_update ()
   c_OBJECT    *obj,*cobj;
   t_OBJECT    *tobj;
   float        frame = ast3d_scene->f_current;
-  c_MATRIX     c, d;
+//  c_MATRIX     c, d;
   int32        hidden;
 
   if (!ast3d_scene) return ast3d_err_notloaded;
@@ -1064,12 +1137,18 @@ int32 ast3d_update ()
             else obj->flags &= ~ast3d_obj_morph;
         if (hidden) obj->flags |= ast3d_obj_hidden; else
           obj->flags &= ~ast3d_obj_hidden;
-        qt_invmatrix (&obj->rotate, c);
-        mat_setscale (&obj->scale, d);
-        c[X][W] = obj->translate.x;
-        c[Y][W] = obj->translate.y;
-        c[Z][W] = obj->translate.z;
-        mat_mul (c, d, obj->matrix);
+
+        qt_make_objmat(obj);
+/*
+        qt_i (&obj->rotate, obj->matrix);
+        obj->matrix[X][W] = obj->translate.x;
+        obj->matrix[Y][W] = obj->translate.y;
+        obj->matrix[Z][W] = obj->translate.z;
+        obj->matrix[X][X]*=obj->scale.x;
+        obj->matrix[Y][Y]*=obj->scale.y;
+        obj->matrix[Z][Z]*=obj->scale.z;
+        mat_copy(c,obj->matrix);
+*/
         break;
       case ast3d_track_ambient:
         amb = (c_AMBIENT *)node->object;

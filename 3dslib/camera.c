@@ -3,6 +3,9 @@
 #include "ast3d.h"
 #include "ast3di.h"
 
+#include "vector.h"
+#include "matrix.h"
+
 void cam_lens_fov (float lens, float *fov)
 {
 /*
@@ -31,19 +34,15 @@ void cam_update (c_CAMERA *cam)
 */
   c_VECTOR c, pivot;
   c_MATRIX mat;
-  float    tanfov, focus;
+  float    focus;
   float    ax, ay, az;
-  float    sinx, siny, sinz,
-           cosx, cosy, cosz;
+  float    sinx, siny, sinz,cosx, cosy, cosz;
   float	   sxsz, sxcz, szcx, cxcz;
 
   mat_identity (mat);
   vec_negate (&cam->pos, &pivot);
   vec_sub (&cam->target, &cam->pos, &c);
   focus = vec_length (&c);
-  tanfov = tan ((cam->fov / 2) / 180 * M_PI);
-  cam->perspX = cam->sizeX / 2 / tanfov;
-  cam->perspY = cam->sizeY / 2 / cam->aspectratio / tanfov;
 
   ax = -atan2 (c.x, c.z);
   ay = asin (c.y / focus);
@@ -65,9 +64,9 @@ void cam_update (c_CAMERA *cam)
   cam->matrix[Y][Y] =  cosy * cosz;
   cam->matrix[Y][Z] = -cxcz * siny - sxsz;
 
-  cam->matrix[Z][X] = -sinx * cosy;
-  cam->matrix[Z][Y] =  siny;
-  cam->matrix[Z][Z] =  cosx * cosy;
+  cam->matrix[Z][X] =  sinx * cosy;
+  cam->matrix[Z][Y] = -siny;
+  cam->matrix[Z][Z] = -cosx * cosy;
 
   cam->matrix[X][W] =  pivot.x*cam->matrix[X][X]+
                        pivot.y*cam->matrix[X][Y]+

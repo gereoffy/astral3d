@@ -1,4 +1,5 @@
 /* compilation defines */
+#include "../afs/afs.h"
 
 #define ast3d_SWAP_YZ          /* swap y and z when loading 3ds file     */
 #define ast3d_DEBUG            /* debug mode                             */

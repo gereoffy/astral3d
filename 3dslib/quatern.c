@@ -202,8 +202,6 @@ float qt_length (c_QUAT *a)
 /*
   qt_length: computes quaternion magnitude.
 */
-  float len;
-
   return sqrt (a->w*a->w + a->x*a->x + a->y*a->y + a->z*a->z);
 }
 
@@ -401,7 +399,6 @@ void qt_slerpl (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out)
   float  k1, k2;
   float  angle, anglespin;
   float  sina, cosa;
-  int32  flip;
 
   cosa = qt_dotunit (a, b);
   if (1.0 - fabs (cosa) < EPSILON) {
@@ -482,6 +479,37 @@ void qt_invmatrix (c_QUAT *a, c_MATRIX mat)
   mat[Z][Z] = 1.0 - (xx + yy);
   mat[Z][W] = 0.0;
 }
+
+void qt_make_objmat(c_OBJECT *obj){
+/*
+  qt_invmatrix: convert a unit quaternion to inversed rotation matrix.
+      ( 1-yy-zz , xy-wz   , xz+wy   )
+  T = ( xy+wz   , 1-xx-zz , yz-wx   )
+      ( xz-wy   , yz+wx   , 1-xx-yy )
+*/
+  float x2, y2, z2, wx, wy, wz, xx, xy, xz, yy, yz, zz;
+
+  { c_QUAT *a=&obj->rotate;
+    x2 = a->x + a->x; y2 = a->y + a->y; z2 = a->z + a->z;
+    wx = a->w * x2;   wy = a->w * y2;   wz = a->w * z2;
+    xx = a->x * x2;   xy = a->x * y2;   xz = a->x * z2;
+    yy = a->y * y2;   yz = a->y * z2;   zz = a->z * z2;
+  }
+    obj->matrix[X][X] = obj->scale.x*(1.0 - (yy + zz));
+    obj->matrix[X][Y] = xy - wz;
+    obj->matrix[X][Z] = xz + wy;
+    obj->matrix[X][W] = obj->translate.x;
+    obj->matrix[Y][X] = xy + wz;
+    obj->matrix[Y][Y] = obj->scale.y*(1.0 - (xx + zz));
+    obj->matrix[Y][Z] = yz - wx;
+    obj->matrix[Y][W] = obj->translate.y;
+    obj->matrix[Z][X] = xz - wy;
+    obj->matrix[Z][Y] = yz + wx;
+    obj->matrix[Z][Z] = obj->scale.z*(1.0 - (xx + yy));
+    obj->matrix[Z][W] = obj->translate.z;
+}
+
+
 
 void qt_frommat (c_MATRIX mat, c_QUAT *out)
 {

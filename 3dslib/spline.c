@@ -3,6 +3,8 @@
 #include "ast3d.h"
 #include "ast3di.h"
 
+#include "vector.h"
+
 static void CompElementDeriv (float pp,  float p,   float pn,
                               float *ds, float *dd, float ksm,
                               float ksp, float kdm, float kdp)
@@ -199,7 +201,6 @@ static void CompAB (t_KEY *prev, t_KEY *cur, t_KEY *next)
   c_QUAT QAA, QAB, QAC;     /* key angle/axis representation */
   float  tm, cm, cp, bm, bp, tmcm, tmcp, ksm, ksp, kdm, kdp;
   float  dt, fp, fn, c;
-  int32  i;
 
   qt_copy (&cur->val._quat, &QAB);
   qt_copy (&cur->qa, &QB);

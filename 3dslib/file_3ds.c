@@ -6,6 +6,9 @@
 #include "ast3d.h"
 #include "ast3di.h"
 
+#include "vector.h"
+#include "matrix.h"
+
 /*****************************************************************************
   chunks/readers definitions, structures
 *****************************************************************************/
@@ -15,21 +18,59 @@ enum ast3d_3ds_chunks_ { /* Chunk ID */
   CHUNK_PRJ          = 0xC23D, CHUNK_MLI          = 0x3DAA,
   CHUNK_MAIN         = 0x4D4D, CHUNK_OBJMESH      = 0x3D3D,
   CHUNK_BKGCOLOR     = 0x1200, CHUNK_AMBCOLOR     = 0x2100,
+  CHUNK_FOGPARAMS    = 0x2200,
+
+  CHUNK_EN_FOG       = 0x2201,
+  CHUNK_EN_DISTCUE   = 0x2301,
+  CHUNK_EN_LAYERED   = 0x2303,
+
+  CHUNK_EN_BG_BMP    = 0x1101,
+  CHUNK_EN_BG_SOLID  = 0x1201,
+  CHUNK_EN_BG_GRAD   = 0x1301,
+
   CHUNK_OBJBLOCK     = 0x4000, CHUNK_TRIMESH      = 0x4100,
   CHUNK_VERTLIST     = 0x4110, CHUNK_VERTFLAGS    = 0x4111,
   CHUNK_FACELIST     = 0x4120, CHUNK_FACEMAT      = 0x4130,
   CHUNK_MAPLIST      = 0x4140, CHUNK_SMOOLIST     = 0x4150,
   CHUNK_TRMATRIX     = 0x4160, CHUNK_MESHCOLOR    = 0x4165,
-  CHUNK_TXTINFO      = 0x4170, CHUNK_LIGHT        = 0x4600,
-  CHUNK_SPOTLIGHT    = 0x4610, CHUNK_CAMERA       = 0x4700,
-  CHUNK_HIERARCHY    = 0x4F00, CHUNK_VIEWPORT     = 0x7001,
-  CHUNK_MATERIAL     = 0xAFFF, CHUNK_MATNAME      = 0xA000,
-  CHUNK_AMBIENT      = 0xA010, CHUNK_DIFFUSE      = 0xA020,
-  CHUNK_SPECULAR     = 0xA030, CHUNK_TEXTURE      = 0xA200,
-  CHUNK_BUMPMAP      = 0xA230, CHUNK_REFLECTION   = 0xA220,
+  CHUNK_TXTINFO      = 0x4170, 
+  
+  CHUNK_LIGHT        = 0x4600,  CHUNK_SPOTLIGHT    = 0x4610,
+  CHUNK_CAMERA       = 0x4700,  CHUNK_HIERARCHY    = 0x4F00,
+  CHUNK_VIEWPORT     = 0x7001,
+  CHUNK_MATERIAL     = 0xAFFF, 
+
+  CHUNK_MATNAME      = 0xA000, CHUNK_AMBIENT      = 0xA010,
+  CHUNK_DIFFUSE      = 0xA020, CHUNK_SPECULAR     = 0xA030,
+  CHUNK_SHININESS    = 0xA040, CHUNK_SHINSTRENGTH = 0xA041,
+  CHUNK_TRANSPARENCY = 0xA050, CHUNK_TRANSFALLOFF = 0xA052,
+  CHUNK_REFBLUR      = 0xA053, CHUNK_SELFILLUM    = 0xA084,
+  CHUNK_TWOSIDED     = 0xA081, CHUNK_TRANSADD     = 0xA083,
+  CHUNK_WIREON       = 0xA085, CHUNK_SOFTEN       = 0xA08C,
+  CHUNK_MATTYPE      = 0xA100, CHUNK_AMOUNTOF     = 0x0030,
+  CHUNK_TEXTURE      = 0xA200,
+  CHUNK_TEXTURE2     = 0xA33A,
+  CHUNK_OPACITYMAP   = 0xA210,
+  CHUNK_BUMPMAP      = 0xA230,
+  CHUNK_SPECULARMAP  = 0xA204,
+  CHUNK_SHINENESSMAP = 0xA33C,
+  CHUNK_SELFILLMAP   = 0xA33D,
+  CHUNK_REFLECTION   = 0xA220,
+
+  CHUNK_MTEXTURE     = 0xA33E,
+  CHUNK_MTEXTURE2    = 0xA340,
+  CHUNK_MOPACITYMAP  = 0xA342,
+  CHUNK_MBUMPMAP     = 0xA344,
+  CHUNK_MSPECULARMAP = 0xA348,
+  CHUNK_MSHINENESSMAP= 0xA346,
+  CHUNK_MSELFILLMAP  = 0xA34A,
+  CHUNK_MREFLECTION  = 0xA34C,
+  
   CHUNK_MAPFILE      = 0xA300, CHUNK_MAPFLAGS     = 0xA351,
-  CHUNK_MAPUSCALE    = 0xA354, CHUNK_MAPVSCALE    = 0xA356,
-  CHUNK_MAPUOFFSET   = 0xA358, CHUNK_MAPVOFFSET   = 0xA35A,
+  CHUNK_MAPBLUR      = 0xA353, CHUNK_MAPUSCALE    = 0xA354, 
+  CHUNK_MAPVSCALE    = 0xA356, CHUNK_MAPUOFFSET   = 0xA358, 
+  CHUNK_MAPVOFFSET   = 0xA35A, CHUNK_MAPROTANGLE  = 0xA35C,
+
   CHUNK_KEYFRAMER    = 0xB000, CHUNK_AMBIENTKEY   = 0xB001,
   CHUNK_TRACKINFO    = 0xB002, CHUNK_TRACKOBJNAME = 0xB010,
   CHUNK_TRACKPIVOT   = 0xB013, CHUNK_TRACKPOS     = 0xB020,
@@ -40,13 +81,8 @@ enum ast3d_3ds_chunks_ { /* Chunk ID */
   CHUNK_TRACKCAMTGT  = 0xB004, CHUNK_TRACKLIGHT   = 0xB005,
   CHUNK_TRACKLIGTGT  = 0xB006, CHUNK_TRACKSPOTL   = 0xB007,
   CHUNK_TRACKCOLOR   = 0xB025, CHUNK_FRAMES       = 0xB008,
-  CHUNK_DUMMYNAME    = 0xB011, CHUNK_MAPROTANGLE  = 0xA35C,
-  CHUNK_SHININESS    = 0xA040, CHUNK_SHINSTRENGTH = 0xA041,
-  CHUNK_TRANSPARENCY = 0xA050, CHUNK_TRANSFALLOFF = 0xA052,
-  CHUNK_REFBLUR      = 0xA053, CHUNK_SELFILLUM    = 0xA084,
-  CHUNK_TWOSIDED     = 0xA081, CHUNK_TRANSADD     = 0xA083,
-  CHUNK_WIREON       = 0xA085, CHUNK_SOFTEN       = 0xA08C,
-  CHUNK_MATTYPE      = 0xA100, CHUNK_AMOUNTOF     = 0x0030
+  CHUNK_DUMMYNAME    = 0xB011
+ 
 };
 
 typedef struct { /* 3DS chunk structure */
@@ -101,6 +137,11 @@ static int read_MAPVSCALE    (afs_FILE *f); /* Map 1/V scale           */
 static int read_MAPUOFFSET   (afs_FILE *f); /* Map U offset            */
 static int read_MAPVOFFSET   (afs_FILE *f); /* Map V offset            */
 static int read_MAPROTANGLE  (afs_FILE *f); /* Map rotation angle      */
+static int read_TXTINFO (afs_FILE *f);
+static int read_FOGPARAMS (afs_FILE *f);
+static int read_ENABLE (afs_FILE *f);
+
+static c_MAP* get_map_pointer(c_MATERIAL *mat);
 
 static c_LISTWORLD world_chunks[] = { /* World definition chunks */
   {CHUNK_RGBF,         0, read_RGBF},
@@ -112,6 +153,15 @@ static c_LISTWORLD world_chunks[] = { /* World definition chunks */
   {CHUNK_OBJMESH,      1, read_NULL},
   {CHUNK_BKGCOLOR,     1, read_NULL},
   {CHUNK_AMBCOLOR,     1, read_NULL},
+  {CHUNK_FOGPARAMS,    0, read_FOGPARAMS},
+
+  {CHUNK_EN_FOG,       0, read_ENABLE},
+  {CHUNK_EN_DISTCUE,   0, read_ENABLE},
+  {CHUNK_EN_LAYERED,   0, read_ENABLE},
+  {CHUNK_EN_BG_BMP,    0, read_ENABLE},
+  {CHUNK_EN_BG_SOLID,  0, read_ENABLE},
+  {CHUNK_EN_BG_GRAD,   0, read_ENABLE},
+
   {CHUNK_OBJBLOCK,     1, read_ASCIIZ},
   {CHUNK_TRIMESH,      1, read_TRIMESH},
   {CHUNK_VERTLIST,     0, read_VERTLIST},
@@ -120,7 +170,7 @@ static c_LISTWORLD world_chunks[] = { /* World definition chunks */
   {CHUNK_MESHCOLOR,    0, read_NULL},
   {CHUNK_FACEMAT,      0, read_FACEMAT},
   {CHUNK_MAPLIST,      0, read_MAPLIST},
-  {CHUNK_TXTINFO,      0, read_NULL},
+  {CHUNK_TXTINFO,      0, read_TXTINFO},
   {CHUNK_SMOOLIST,     0, read_NULL},
   {CHUNK_TRMATRIX,     0, read_TRMATRIX},
   {CHUNK_LIGHT,        1, read_LIGHT},
@@ -133,9 +183,25 @@ static c_LISTWORLD world_chunks[] = { /* World definition chunks */
   {CHUNK_AMBIENT,      1, read_NULL},
   {CHUNK_DIFFUSE,      1, read_NULL},
   {CHUNK_SPECULAR,     1, read_NULL},
+  
   {CHUNK_TEXTURE,      1, read_NULL},
+  {CHUNK_TEXTURE2,     1, read_NULL},
+  {CHUNK_OPACITYMAP,   1, read_NULL},
   {CHUNK_BUMPMAP,      1, read_NULL},
+  {CHUNK_SPECULARMAP,  1, read_NULL},
+  {CHUNK_SHINENESSMAP, 1, read_NULL},
+  {CHUNK_SELFILLMAP,   1, read_NULL},
   {CHUNK_REFLECTION,   1, read_NULL},
+
+  {CHUNK_MTEXTURE,      1, read_NULL},
+  {CHUNK_MTEXTURE2,     1, read_NULL},
+  {CHUNK_MOPACITYMAP,   1, read_NULL},
+  {CHUNK_MBUMPMAP,      1, read_NULL},
+  {CHUNK_MSPECULARMAP,  1, read_NULL},
+  {CHUNK_MSHINENESSMAP, 1, read_NULL},
+  {CHUNK_MSELFILLMAP,   1, read_NULL},
+  {CHUNK_MREFLECTION,   1, read_NULL},
+ 
   {CHUNK_MAPFILE,      0, read_MAPFILE},
   {CHUNK_MAPFLAGS,     0, read_MAPFLAGS},
   {CHUNK_MAPUSCALE,    0, read_MAPUSCALE},
@@ -143,6 +209,7 @@ static c_LISTWORLD world_chunks[] = { /* World definition chunks */
   {CHUNK_MAPUOFFSET,   0, read_MAPUOFFSET},
   {CHUNK_MAPVOFFSET,   0, read_MAPVOFFSET},
   {CHUNK_MAPROTANGLE,  0, read_MAPROTANGLE},
+  
   {CHUNK_SHININESS,    1, read_NULL},
   {CHUNK_SHINSTRENGTH, 1, read_NULL},
   {CHUNK_TRANSPARENCY, 1, read_NULL},
@@ -262,8 +329,9 @@ static void clear_map (c_MAP *map)
 */
   map->file = NULL;
   map->flags = 0;
-  map->U_scale = 0.0;
-  map->V_scale = 0.0;
+  map->amountof = 1.0;
+  map->U_scale = 1.0;
+  map->V_scale = 1.0;
   map->U_offset = 0.0;
   map->V_offset = 0.0;
   map->rot_angle = 0.0;
@@ -277,8 +345,23 @@ static void clear_mat (c_MATERIAL *mat)
   mat->shading = 0;
   mat->flags = 0;
   clear_map (&mat->texture);
+  clear_map (&mat->texture2);
   clear_map (&mat->bump);
   clear_map (&mat->reflection);
+  clear_map (&mat->opacitymap);
+  clear_map (&mat->specularmap);
+  clear_map (&mat->shinenessmap);
+  clear_map (&mat->selfillmap);
+
+  clear_map (&mat->texture_mask);
+  clear_map (&mat->texture2_mask);
+  clear_map (&mat->bump_mask);
+  clear_map (&mat->reflection_mask);
+  clear_map (&mat->opacitymap_mask);
+  clear_map (&mat->specularmap_mask);
+  clear_map (&mat->shinenessmap_mask);
+  clear_map (&mat->selfillmap_mask);
+
 }
 
 static t_TRACK *alloc_track ()
@@ -321,6 +404,19 @@ static int add_key (t_TRACK *track, t_KEY *key, int frame)
 /*****************************************************************************
   chunk readers (world)
 *****************************************************************************/
+
+static int read_ENABLE (afs_FILE *f){
+  if (f) {} /* to skip the warning */
+  switch (c_chunk_curr) {
+    case CHUNK_EN_FOG:      { ast3d_scene->fog.type|=ast3d_fog_fog; break;}
+    case CHUNK_EN_DISTCUE:  { ast3d_scene->fog.type|=ast3d_fog_distcue; break;}
+    case CHUNK_EN_LAYERED:  { ast3d_scene->fog.type|=ast3d_fog_layered; break;}
+    case CHUNK_EN_BG_BMP:   { ast3d_scene->backgr.type|=ast3d_backgr_solidcolor; break;}
+    case CHUNK_EN_BG_SOLID: { ast3d_scene->backgr.type|=ast3d_backgr_gradient; break;}
+    case CHUNK_EN_BG_GRAD:  { ast3d_scene->backgr.type|=ast3d_backgr_bitmap; break;}
+  }
+  return ast3d_err_ok;
+}
 
 static int read_NULL (afs_FILE *f)
 {
@@ -385,9 +481,11 @@ static int read_AMOUNTOF (afs_FILE *f)
   read_AMOUNTOF: "amount of" reader.
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
+  c_MAP      *map = get_map_pointer(mat);
   float      *fl = NULL;
   word        w;
 
+  if(map) fl=&map->amountof;
   switch (c_chunk_last) {
     case CHUNK_SHININESS:    fl = &(mat->shininess); break;
     case CHUNK_SHINSTRENGTH: fl = &(mat->shin_strength); break;
@@ -397,7 +495,8 @@ static int read_AMOUNTOF (afs_FILE *f)
     case CHUNK_SELFILLUM:    fl = &(mat->self_illum);
   }
   if (afs_fread (&w, sizeof (w), 1, f) != 1) return ast3d_err_badfile;
-  if (fl) *fl = (float)w / 100.0 *128;
+  if (fl) *fl = (float)w / 100.0;
+  else printf("Found AMOUNTOF=%d for unknown chunk %04X\n",w,c_chunk_last);
   return ast3d_err_ok;
 }
 
@@ -426,8 +525,13 @@ static int read_TRIMESH (afs_FILE *f)
   if ((obj = (c_OBJECT *)malloc (sizeof (c_OBJECT))) == NULL)
     return ast3d_err_nomem;
   if ((obj->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
+//  printf("Loading object '%s'\n",c_string);
   obj->id = c_id++;
   obj->parent = -1;
+  obj->numverts=0;
+  obj->numfaces=0;
+  obj->vertices=NULL;
+  obj->faces=NULL;
   obj->flags = 0;
   vec_zero (&obj->pivot);
   vec_zero (&obj->translate);
@@ -454,12 +558,14 @@ static int read_VERTLIST (afs_FILE *f)
     return ast3d_err_nomem;
   obj->vertices = v;
   obj->numverts = nv;
+//  printf("vertices=%d\n",nv);
   while (nv-- > 0) {
     if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
     vec_make (c[0], c[1], c[2], &v->vert);
     vec_swap (&v->vert);
     v->u = 0.0;
     v->v = 0.0;
+    v->visible = 0;
     v++;
   }
   return ast3d_err_ok;
@@ -480,6 +586,7 @@ static int read_FACELIST (afs_FILE *f)
     return ast3d_err_nomem;
   obj->faces = fc;
   obj->numfaces = nv;
+//  printf("faces=%d\n",nv);
   while (nv-- > 0) {
     if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
     if (afs_fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
@@ -489,10 +596,16 @@ static int read_FACELIST (afs_FILE *f)
     fc->pa = &obj->vertices[c[0]];
     fc->pb = &obj->vertices[c[1]];
     fc->pc = &obj->vertices[c[2]];
-    fc->flags = 0;
     fc->mat = 0;
+    fc->pmat = NULL;
+    fc->visible = 0;
+#if 0
+    fc->flags = 0;
     if (flags & 0x08) fc->flags |= ast3d_face_wrapU;
     if (flags & 0x10) fc->flags |= ast3d_face_wrapV;
+#else
+    fc->flags = flags;
+#endif    
     fc++;
   }
   return ast3d_err_ok;
@@ -513,11 +626,14 @@ static int read_FACEMAT (afs_FILE *f)
   ast3d_byname (c_string, &node);
   if (!node) return ast3d_err_undefined;
   mat = (c_MATERIAL *)node->object;
+//  printf("Setting material %d to faces:",(int)mat);
   while (n-- > 0) {
     if (afs_fread (&nf, sizeof (nf), 1, f) != 1) return ast3d_err_badfile;
     fc[nf].mat = mat->id;
     fc[nf].pmat = mat;
+//    printf(" %d",nf);
   }
+//  printf("\n");
   return ast3d_err_ok;
 }
 
@@ -531,6 +647,7 @@ static int read_MAPLIST (afs_FILE *f)
   word      nv;
 
   if (afs_fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
+//  printf("reading texture UVs for %d vertices.\n",nv);
   while (nv-- > 0) {
     if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
     v->u = c[0];
@@ -570,6 +687,25 @@ static int read_TRMATRIX (afs_FILE *f)
   return ast3d_err_ok;
 }
 
+static int read_FOGPARAMS (afs_FILE *f)
+{
+/*
+  read_FOGPARAMS: Fog reader.
+*/
+  float   c[4];
+  c_FOG *fog=&ast3d_scene->fog;
+  if (afs_fread (c, 4*4, 1, f) != 1) return ast3d_err_badfile;
+  fog->znear=c[0];  
+  fog->fognear=c[1];  
+  fog->zfar=c[2];  
+  fog->fogfar=c[3];
+//  fog->type|=ast3d_fog_fog;
+  if (afs_fread (c, 3*2, 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&fog->color, 3*4, 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (c, 3*2, 1, f) != 1) return ast3d_err_badfile;
+  return ast3d_err_ok;
+}
+
 static int read_LIGHT (afs_FILE *f)
 {
 /*
@@ -584,6 +720,13 @@ static int read_LIGHT (afs_FILE *f)
   if ((light->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
   light->id = c_id++;
   light->flags = ast3d_light_omni;
+  light->enabled=1;
+  light->use_zbuffer=1;
+  light->corona_scale=1.0;
+  light->attenuation[0]=1.0;
+  light->attenuation[1]=0.0;
+  light->attenuation[2]=0.0;
+  
   vec_make (c[0], c[1], c[2], &light->pos);
   vec_swap (&light->pos);
   c_node = light;
@@ -635,6 +778,52 @@ static int read_CAMERA (afs_FILE *f)
   return ast3d_err_ok;
 }
 
+static int read_TXTINFO (afs_FILE *f){
+  c_OBJECT *obj = (c_OBJECT *)c_node;
+  word mt;
+  float    c[2];
+  int i,j;
+  
+//  printf("Reading MAPPING INFO for obj '%s'\n",obj->name);
+  if (afs_fread (&mt, sizeof (mt), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  obj->mapping.type=mt;
+  obj->mapping.utile=c[0];
+  obj->mapping.vtile=c[1];
+  
+  mat_identity(obj->mapping.matrix);
+  for (i = 0; i < 3; i++)
+    for (j = 0; j < 3; j++)
+      if (afs_fread (&obj->mapping.matrix[i][j], sizeof (float), 1, f) != 1)
+        return ast3d_err_badfile;
+
+  for (i = 0; i < 3; i++)
+      if (afs_fread (&obj->mapping.matrix[i][3], sizeof (float), 1, f) != 1)
+        return ast3d_err_badfile;
+
+//  if (afs_fread (pivot, sizeof (pivot), 1, f) != 1) return ast3d_err_badfile;
+//  vec_make (pivot[0], pivot[1], pivot[2], &piv);
+
+/*  
+  obj->mapping.pos.x=c[2];
+  obj->mapping.pos.y=c[3];
+  obj->mapping.pos.z=c[4];
+  if (afs_fread (obj->mapping.matrix, sizeof (c_MATRIX), 1, f) != 1) return ast3d_err_badfile;
+*/
+
+#if 0
+  printf("tile: %1.1f x %1.1f,  pos: %3.3f ; %3.3f ; %3.3f\n",c[0],c[1],c[2],c[3],c[4]);
+  { int i,j;
+    for(i=0;i<3;i++){
+      printf("M%d:  ",i);
+      for(j=0;j<4;j++) printf("%8.3f",obj->mapping.matrix[i][j]);
+      printf("\n");
+    }  
+  }
+#endif
+  return ast3d_err_ok;
+}
+
 static int read_MATERIAL (afs_FILE *f)
 {
 /*
@@ -646,7 +835,7 @@ static int read_MATERIAL (afs_FILE *f)
   if ((mat = (c_MATERIAL *)malloc (sizeof (c_MATERIAL))) == NULL)
     return ast3d_err_nomem;
   clear_mat (mat);
-  mat->id = c_id++;    //fontos!!!!!
+  mat->id = c_id++;
   c_node = mat;
   ast3d_add_world (ast3d_obj_material, mat);
   return ast3d_err_ok;
@@ -725,22 +914,45 @@ static int read_MATTRANSADD (afs_FILE *f)
   return ast3d_err_ok;
 }
 
+static c_MAP* get_map_pointer(c_MATERIAL *mat){
+  c_MAP      *map = NULL;
+  switch (c_chunk_last) {
+    case CHUNK_TEXTURE: map = &(mat->texture); break;
+    case CHUNK_TEXTURE2: map = &(mat->texture2); break;
+    case CHUNK_BUMPMAP: map = &(mat->bump); break;
+    case CHUNK_OPACITYMAP: map = &(mat->opacitymap); break;
+    case CHUNK_SPECULARMAP: map = &(mat->specularmap); break;
+    case CHUNK_SHINENESSMAP: map = &(mat->shinenessmap); break;
+    case CHUNK_SELFILLMAP: map = &(mat->selfillmap); break;
+    case CHUNK_REFLECTION: map = &(mat->reflection); break;
+
+    case CHUNK_MTEXTURE: map = &(mat->texture_mask); break;
+    case CHUNK_MTEXTURE2: map = &(mat->texture2_mask); break;
+    case CHUNK_MBUMPMAP: map = &(mat->bump_mask); break;
+    case CHUNK_MOPACITYMAP: map = &(mat->opacitymap_mask); break;
+    case CHUNK_MSPECULARMAP: map = &(mat->specularmap_mask); break;
+    case CHUNK_MSHINENESSMAP: map = &(mat->shinenessmap_mask); break;
+    case CHUNK_MSELFILLMAP: map = &(mat->selfillmap_mask); break;
+    case CHUNK_MREFLECTION: map = &(mat->reflection_mask);
+  }
+//  if(!map) printf("Found BITMAP for unknown chunk %04X\n",c_chunk_last);
+  return map;
+}
+
 static int read_MAPFILE (afs_FILE *f)
 {
 /*
   read_MAPFILE: MAP file reader.
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
-  c_MAP      *map = NULL;
+  c_MAP      *map = get_map_pointer(mat);
 
   if (read_ASCIIZ (f)) return ast3d_err_badfile;
-  switch (c_chunk_last) {
-    case CHUNK_TEXTURE: map = &(mat->texture); break;
-    case CHUNK_BUMPMAP: map = &(mat->bump); break;
-    case CHUNK_REFLECTION: map = &(mat->reflection);
-  }
-  if (map)
+//  printf("Found mapfile '%s' for chunk %04X\n",c_string,c_chunk_last);
+  if (map){
     if ((map->file = strcopy (c_string)) == NULL) return ast3d_err_nomem;
+  } else printf("Found MAPFILE=%s for unknown chunk %04X\n",c_string,c_chunk_last);
+
   return ast3d_err_ok;
 }
 
@@ -750,16 +962,12 @@ static int read_MAPFLAGS (afs_FILE *f)
   read_MAPFLAGS: MAP flags reader.
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
-  c_MAP      *map = NULL;
+  c_MAP      *map = get_map_pointer(mat);
   word        flags;
 
   if (afs_fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
-  switch (c_chunk_last) {
-    case CHUNK_TEXTURE: map = &(mat->texture); break;
-    case CHUNK_BUMPMAP: map = &(mat->bump); break;
-    case CHUNK_REFLECTION: map = &(mat->reflection);
-  }
   if (map) map->flags = flags;
+  else printf("Found MAPFLAGS=%04X for unknown chunk %04X\n",flags,c_chunk_last);
   return ast3d_err_ok;
 }
 
@@ -769,15 +977,10 @@ static int read_MAPUSCALE (afs_FILE *f)
   read_MAPUSCALE: MAP U scale reader.
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
-  c_MAP      *map = NULL;
+  c_MAP      *map = get_map_pointer(mat);
   float       U;
 
   if (afs_fread (&U, sizeof (U), 1, f) != 1) return ast3d_err_badfile;
-  switch (c_chunk_last) {
-    case CHUNK_TEXTURE: map = &(mat->texture); break;
-    case CHUNK_BUMPMAP: map = &(mat->bump); break;
-    case CHUNK_REFLECTION: map = &(mat->reflection);
-  }
   if (map) map->U_scale = U;
   return ast3d_err_ok;
 }
@@ -788,15 +991,10 @@ static int read_MAPVSCALE (afs_FILE *f)
   read_MAPUSCALE: MAP U scale reader.
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
-  c_MAP      *map = NULL;
+  c_MAP      *map = get_map_pointer(mat);
   float       V;
 
   if (afs_fread (&V, sizeof (V), 1, f) != 1) return ast3d_err_badfile;
-  switch (c_chunk_last) {
-    case CHUNK_TEXTURE: map = &(mat->texture); break;
-    case CHUNK_BUMPMAP: map = &(mat->bump); break;
-    case CHUNK_REFLECTION: map = &(mat->reflection);
-  }
   if (map) map->V_scale = V;
   return ast3d_err_ok;
 }
@@ -807,15 +1005,10 @@ static int read_MAPUOFFSET (afs_FILE *f)
   read_MAPUSCALE: MAP U offset reader.
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
-  c_MAP      *map = NULL;
+  c_MAP      *map = get_map_pointer(mat);
   float       U;
 
   if (afs_fread (&U, sizeof (U), 1, f) != 1) return ast3d_err_badfile;
-  switch (c_chunk_last) {
-    case CHUNK_TEXTURE: map = &(mat->texture); break;
-    case CHUNK_BUMPMAP: map = &(mat->bump); break;
-    case CHUNK_REFLECTION: map = &(mat->reflection);
-  }
   if (map) map->U_offset = U;
   return ast3d_err_ok;
 }
@@ -826,15 +1019,10 @@ static int read_MAPVOFFSET (afs_FILE *f)
   read_MAPUSCALE: MAP V offset reader.
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
-  c_MAP      *map = NULL;
+  c_MAP      *map = get_map_pointer(mat);
   float       V;
 
   if (afs_fread (&V, sizeof (V), 1, f) != 1) return ast3d_err_badfile;
-  switch (c_chunk_last) {
-    case CHUNK_TEXTURE: map = &(mat->texture); break;
-    case CHUNK_BUMPMAP: map = &(mat->bump); break;
-    case CHUNK_REFLECTION: map = &(mat->reflection);
-  }
   if (map) map->V_offset = V;
   return ast3d_err_ok;
 }
@@ -845,18 +1033,14 @@ static int read_MAPROTANGLE (afs_FILE *f)
   read_MAPUSCALE: MAP rotation angle reader.
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
-  c_MAP      *map = NULL;
+  c_MAP      *map = get_map_pointer(mat);
   float       angle;
 
   if (afs_fread (&angle, sizeof (angle), 1, f) != 1) return ast3d_err_badfile;
-  switch (c_chunk_last) {
-    case CHUNK_TEXTURE: map = &(mat->texture); break;
-    case CHUNK_BUMPMAP: map = &(mat->bump); break;
-    case CHUNK_REFLECTION: map = &(mat->reflection);
-  }
   if (map) map->rot_angle = angle;
   return ast3d_err_ok;
 }
+
 
 /*****************************************************************************
   chunk readers (keyframer)
@@ -1127,7 +1311,7 @@ static int read_TRACKROT (afs_FILE *f)
   c_QUAT   q, old;
   float    pos[4];
   word     keys,n, nf;
-  int angle;
+  float angle = 0;
 
   track = alloc_track();
   qt_identity (&old);
@@ -1140,7 +1324,8 @@ static int read_TRACKROT (afs_FILE *f)
     if (afs_fread (pos, sizeof(pos), 1, f) != 1) return ast3d_err_badfile;
     qt_fromang (pos[0], pos[1], pos[2], pos[3], &q);
         // !!! FIX !!! I SAID ANGLE IS ABSOLUTE!!!!!!!!!
-    if (keys == n-1) angle = pos[0]; else angle += pos[0];
+//    if (keys == n-1) angle = pos[0]; else angle += pos[0];
+    angle += pos[0];
     qt_make (angle, pos[1], pos[2], pos[3], &key->val._quat);
     qt_swap (&key->val._quat);
     qt_swap (&q);
@@ -1150,6 +1335,7 @@ static int read_TRACKROT (afs_FILE *f)
   }
   spline_initrot (track);
   ast3d_set_track (ast3d_key_rotate, c_id, track);
+//  printf("Hello %d\n",5);
   return ast3d_err_ok;
 }
 
@@ -1315,8 +1501,16 @@ static int ChunkReaderWorld (afs_FILE *f, long p, word parent)
         n = i;
         break;
       }
-    if (n < 0) afs_fseek (f, pc + h.chunk_size, SEEK_SET);
-    else {
+    if (n < 0) {
+#if 0
+      int i;
+      for (i = 0; i < sizeof (key_chunks) / sizeof (key_chunks[0]); i++)
+        if (h.chunk_id == key_chunks[i].id) goto key_chunk;
+      printf("Unknown chunk: %04X  parent=%04X  size=%ld\n",h.chunk_id,parent,h.chunk_size-6);
+      key_chunk:
+#endif
+      afs_fseek (f, pc + h.chunk_size, SEEK_SET);
+    } else {
       pc = pc + h.chunk_size;
       if ((error = world_chunks[n].func (f)) != 0) return error;
       if (world_chunks[n].sub)
@@ -1338,6 +1532,8 @@ static int ChunkReaderKey (afs_FILE *f, long p, word parent)
   c_CHUNK h;
   long    pc;
   int     n, i, error;
+  
+//  putchar('.');fflush(stdout);
 
   c_chunk_last = parent;
   while ((pc = afs_ftell (f)) < p) {
