@@ -68,6 +68,7 @@ char* update_LookAt(node_st *node){
   to.y=(*tomat)[Y][W];
   to.z=(*tomat)[Z][W];
   // create mat from lat->from, to, lat->roll, lat->scale
+  if(!lat->from) printf("Fatal! LookAt pos=NULL\n");
   mat_from_lookat(lat->mat,lat->from,&to,*lat->roll,lat->scale,lat->scaleaxis,lat->axis);
 //  printf("updating LookAt\n");
 //  printf("  from: %8.5f  %8.5f  %8.5f\n",lat->from->x,lat->from->y,lat->from->z);
@@ -215,7 +216,8 @@ int i;
     node_st *node=node_by_id(i);
     class_st *node_cl=class_by_node(node);
     char *err=NULL;
-    if(node_cl)
+    if(node_cl){
+      printf("Init_node #%d\n",i);
     switch(node_cl->type){
       case CLASSTYPE_ORIENTATION: {
         switch(node_cl->subtype){
@@ -234,7 +236,7 @@ int i;
       case CLASSTYPE_EULER_XYZ: err=init_EulerXYZ(node); break;
       case CLASSTYPE_VECTOR_XYZ: err=init_VectorXYZ(node); break;
       
-    }
+    }}
     if(err) printf("Error: %s\n",err);
   }
 

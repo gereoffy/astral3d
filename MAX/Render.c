@@ -7,13 +7,13 @@
 #include <math.h>
 #include <string.h>
 
-#include "agl/agl.h"
+#include "../agl/agl.h"
 #include <GL/glut.h>
 
-#include "afs/afs.h"
-#include "afs/afsmangle.h"
-#include "timer/timer.h"
-#include "loadmap/loadmaps.h"
+#include "../afs/afs.h"
+#include "../afs/afsmangle.h"
+#include "../timer/timer.h"
+#include "../loadmap/loadmaps.h"
 
 
 #include "load.c"
@@ -90,7 +90,10 @@ void draw_scene(){
         printf("Rendering mesh: %s\n",n->name);
 #if 1
         Mesh_Transform(mesh,trmat,normat);
-        if(mesh->numtfaces>0) aglTexture(coins_id); else aglTexture(0);
+//        if(mesh->numtfaces>0) aglTexture(coins_id); else aglTexture(0);
+        aglTexture(coins_id);
+        aglBlend(AGL_BLEND_ADD);
+        aglZbuffer(AGL_ZBUFFER_NONE);
         glBegin(GL_TRIANGLES);
         for(i=0;i<mesh->numfaces;i++){
           Face* f=&mesh->faces[i];
@@ -110,10 +113,28 @@ void draw_scene(){
             glTexCoord2f(tv3->u,tv3->v);
             glColor3f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y,0.5-0.5*v3->tn.z);glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);
           } else {
+#if 1
+            // Envmap
+#if 0
+            // white
+            glTexCoord2f(0.5+0.5*v1->tn.x,0.5+0.5*v1->tn.y);glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z);
+            glTexCoord2f(0.5+0.5*v2->tn.x,0.5+0.5*v2->tn.y);glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z);
+            glTexCoord2f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y);glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);
+#else
+            // Normal-color
+            glTexCoord2f(0.5+0.5*v1->tn.x,0.5+0.5*v1->tn.y);
+            glColor3f(0.5+0.5*v1->tn.x,0.5+0.5*v1->tn.y,0.5-0.5*v1->tn.z);glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z);
+            glTexCoord2f(0.5+0.5*v2->tn.x,0.5+0.5*v2->tn.y);
+            glColor3f(0.5+0.5*v2->tn.x,0.5+0.5*v2->tn.y,0.5-0.5*v2->tn.z);glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z);
+            glTexCoord2f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y);
+            glColor3f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y,0.5-0.5*v3->tn.z);glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);
+#endif
+#else
             // Gouraud only
             glColor3f(0.5+0.5*v1->tn.x,0.5+0.5*v1->tn.y,0.5-0.5*v1->tn.z);glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z);
             glColor3f(0.5+0.5*v2->tn.x,0.5+0.5*v2->tn.y,0.5-0.5*v2->tn.z);glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z);
             glColor3f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y,0.5-0.5*v3->tn.z);glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);
+#endif
           }
         }
         glEnd();
@@ -187,7 +208,7 @@ int main(int argc,char* argv[]){
     afs_init("",AFS_TYPE_FILES);
 
     // Load Scene:
-    of=OLE2_Open(fopen((argc>1)?argv[1]:"teszt7b.max","rb"));
+    of=OLE2_Open(fopen((argc>1)?argv[1]:"test.max","rb"));
     if(!of){ printf("File not found!\n");exit(1);}
     f1=afs_open_OLE2(of,"ClassDirectory3");
     if(!f1) f1=afs_open_OLE2(of,"ClassDirectory2");

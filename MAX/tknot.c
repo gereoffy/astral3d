@@ -116,11 +116,11 @@ char* update_TorusKnot(node_st *objnode){
 	for (ix=0; ix<=segs; ix++){
     Point3 mValue,mValue2,mNormal,mTangent,mBinormal; // FrenetFrame
     // radius:
-    float Radius2=radius2+radius2*LumpHeight*(0.5f - 0.5f * (float)cos((theta+Rotation)*Lumps));
+    float Radius2=radius2+radius2*LumpHeight*(0.5f - 0.5f * (float)cos(sin(theta+Rotation)*Lumps));
     float Radius2s=E*Radius2;
     float Radius2c=(1.0f/E)*Radius2;
-    float SinTwistTheta=sin(Twist*theta);
-    float CosTwistTheta=cos(Twist*theta);
+    float SinTwistTheta=sin(Twist*sin(theta));
+    float CosTwistTheta=cos(Twist*sin(theta));
     // calc. base curve:
     torusKnot(&mValue,theta,P,Q,radius);
     torusKnot(&mValue2,theta+deltaT,P,Q,radius);
