@@ -60,4 +60,32 @@ void dump_chunk_data(FILE *f,int *size){
   }
 }
 
+// Olyasmi mint a printf() de a parametereket a file-bol olvassa be:
+void format_chunk_data(FILE *f,int *chunk_size,char *s){
+            while(*s){
+              int c=*s++;
+              if(c==92){
+                c=*s++;
+                switch(c){
+                  case 'n': printf("\n");break;
+                  case 't': printf("\t");break;
+                }
+                continue;
+              }
+              if(c=='%'){
+                c=*s++;
+                switch(c){
+                  case '%': putchar(c);
+                  case 'f': printf("%f",float_reader(f,chunk_size));break;
+                  case 'i': printf("%d",int_reader(f,chunk_size));break;
+                  case 'x': printf("%08X",int_reader(f,chunk_size));break;
+                  case 'b': printf("%d",byte_reader(f,chunk_size));break;
+                  case 's': printf("%s",string_reader(f,chunk_size));break;
+                  case 'S': printf("%s",string8_reader(f,chunk_size));break;
+                }
+                continue;
+              }
+              putchar(c);
+            }
+}
 

@@ -8,12 +8,13 @@ typedef struct {
 } TCBparams;
 
 typedef struct {
-  int flags;
-  int frame_from,frame_to;
-  int numkeys;
+  int flags;   // track flags
+  Point3 val_vect; // float (x) or vect/color (xyz) value
+  Quat val_quat;   // quaternion (xyzw) value
+  int numkeys; // number of keys
+  int frame_from,frame_to; // frame of first&last keys
   int keytype; // chunk id
-  void* value;
-  void* keys;
+  void* keys;  // key data
 } Track;
 
 //====================== Float Key ====================
@@ -38,7 +39,7 @@ typedef struct {
   int frame,flags;
   float value;
   TCBparams tcb;
-  int x1,x2;
+  float deriv1,deriv2;
 } TCB_Float_Key;
 
 //====================== Pos Key ====================
@@ -52,14 +53,14 @@ typedef struct {
   int frame,flags;
   Point3 value;
   TCBparams tcb;
-  int x1,x2,x3,x4,x5,x6;   // derivaltak?
+  Point3 deriv1,deriv2;
 } TCB_Pos_Key;
 
 typedef struct {
   int frame,flags;
   Point3 value;
-  float x1,x2,x3,x4,x5,x6;   // derivaltak?
-  int y1,y2,y3;              // 0
+  Point3 in_tan,out_tan;
+  int tmp1,tmp2,tmp3;      // 0     ????????
 } Bezier_Pos_Key;
 
 //====================== Rot Key ====================
@@ -69,7 +70,7 @@ typedef struct {
   Quat quatvalue; //int y1,y2,y3,y4; // ? quaternion
   TCBparams tcb;
   Quat value;
-  int x1,x2,x3,x4,x5,x6,x7,x8; // derivaltak???
+  Quat deriv1,deriv2;
 } TCB_Rot_Key;
 
 //====================== Scale Key ====================
@@ -85,9 +86,19 @@ typedef struct {
   Point3 value;
   Quat axisvalue;
   TCBparams tcb;
-  int x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14; // derivaltak??? (2*7)
+  Point3 d1_value;
+  Quat d1_axis;
+  Point3 d2_value;
+  Quat d2_axis;
 } TCB_Scale_Key;
 
-
-
+typedef struct {
+  int frame,flags;
+  Point3 value;
+  Quat axisvalue;
+  Point3 it_value;
+  Quat it_axis;
+  Point3 ot_value;
+  Quat ot_axis;
+} Bezier_Scale_Key;
 

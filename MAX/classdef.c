@@ -33,7 +33,7 @@ FILE *f=fopen("classdef.txt","rt");
     }
     if(!name) continue;
     // commands:
-    printf("cmd='%s' name='%s'\n",cmd,name);
+//    printf("cmd='%s' name='%s'\n",cmd,name);
     if(strncmp(cmd,"CLASS ",6)==0){
       for(classid=0;classid<classdb;classid++)
         if(strcmp(classtab[classid].name,name)==0) break;
@@ -44,7 +44,7 @@ FILE *f=fopen("classdef.txt","rt");
         for(i=0;i<32;i++) chelp->params[i]=(char**)NULL;
         chelp->chunks=NULL;
         classtab[classid].chelp=chelp;
-        printf("Setting class to #%d\n",classid);
+//        printf("Setting class to #%d\n",classid);
       } else chelp=NULL;
       continue;
     }
@@ -53,7 +53,7 @@ FILE *f=fopen("classdef.txt","rt");
       refno=0;
       cmd+=4; while(*cmd>='0' && *cmd<='9'){ refno=refno*10+(*cmd)-'0';++cmd;}
       chelp->refs[refno]=strdup(name);
-      printf("Setting ref #%d to '%s'\n",refno,name);
+//      printf("Setting ref #%d to '%s'\n",refno,name);
       continue;
     }
     if(strncmp(cmd,"PARAM ",6)==0){
@@ -65,7 +65,7 @@ FILE *f=fopen("classdef.txt","rt");
         for(i=0;i<32;i++) chelp->params[refno][i]=NULL;
       }
       chelp->params[refno][i]=strdup(name);
-      printf("Setting param #%d of ref #%d to '%s'\n",i,refno,name);
+//      printf("Setting param #%d of ref #%d to '%s'\n",i,refno,name);
       continue;
     }
     if(strncmp(cmd,"CHUNK ",6)==0){
@@ -83,7 +83,7 @@ FILE *f=fopen("classdef.txt","rt");
       ch->id=cid;
       ch->name=strdup(name);
       ch->next=chelp->chunks; chelp->chunks=ch;
-      printf("Setting chunk %04X to '%s'\n",cid,name);
+//      printf("Setting chunk %04X to '%s'\n",cid,name);
       continue;
     }
   }

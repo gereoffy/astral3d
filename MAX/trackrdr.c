@@ -1,5 +1,5 @@
 //==========================================================================
-//                       Key/Track Classes reader
+//                       Key/Track Class reader
 //==========================================================================
 
 #include "track.h"
@@ -57,48 +57,68 @@ void track_init(node_st *node){
   Track *tr=malloc(sizeof(Track));
   tr->numkeys=0;
   tr->keytype=0;
-  tr->keys=tr->value=NULL;
+  tr->keys=NULL;
   tr->flags=0;
   node->data=tr;
 }
 
 void track_uninit(node_st *node){
   Track *track=node->data;
+  int subtype=classtab[node->classid].subtype;
   int i;
+  printf("  Value: ");
+  switch(subtype&15){
+    // (subtype&15): key element  1=float 2=color 3=pos 4=rot 5=scale
+    case 1: printf("%f\n",track->val_vect.x);break;
+    case 2: printf("rgb %f %f %f\n",track->val_vect.x,track->val_vect.y,track->val_vect.z);break;
+    case 3: printf("xyz %f %f %f\n",track->val_vect.x,track->val_vect.y,track->val_vect.z);break;
+    case 4: printf("axis %f %f %f w: %f\n",track->val_quat.x,track->val_quat.y,track->val_quat.z,track->val_quat.w);break;
+    case 5: 
+      printf("scale %f %f %f ",track->val_vect.x,track->val_vect.y,track->val_vect.z);
+      printf("axis %f %f %f w: %f\n",track->val_quat.x,track->val_quat.y,track->val_quat.z,track->val_quat.w);
+      break;
+    default: printf("UNKNOWN TYPE\n");
+  }
   printf("  Keys: %d\n",track->numkeys);
   for(i=0;i<track->numkeys;i++){
 //    Key* key=&track->keys[i];
     switch(track->keytype){
 #define PRINT_KEY(tipus) tipus *key=track->keys;tipus *k=&key[i];printf("    Key %5.1f [%04X] ",(float)k->frame/160.0f,k->flags);
-#define PRINT_FLOAT printf("%f",k->value);
-#define PRINT_POINT3 printf("%f,%f,%f",k->value.x,k->value.y,k->value.z);
-#define PRINT_QUAT printf("%f,%f,%f,%f",k->value.w,k->value.x,k->value.y,k->value.z);
+#define PRINT_FLOAT(value) printf("%f",k->value);
+#define PRINT_POINT3(value) printf("%f,%f,%f",k->value.x,k->value.y,k->value.z);
+#define PRINT_QUAT(value) printf("%f,%f,%f,%f",k->value.w,k->value.x,k->value.y,k->value.z);
 #define PRINT_TCB printf(" T:%4.1f",k->tcb.tens*25+25); printf(" C:%4.1f",k->tcb.cont*25+25); printf(" B:%4.1f",k->tcb.bias*25+25); printf(" Ef:%4.1f",k->tcb.easefrom*50); printf(" Et:%4.1f",k->tcb.easeto*50);
       case 0x2511: {
-        PRINT_KEY(Linear_Float_Key) PRINT_FLOAT
+        PRINT_KEY(Linear_Float_Key) PRINT_FLOAT(value)
         break; }
       case 0x2516: {
-        PRINT_KEY(Bezier_Float_Key) PRINT_FLOAT
+        PRINT_KEY(Bezier_Float_Key) PRINT_FLOAT(value)
         printf(" (%f,%f)",k->in_tan,k->out_tan);
         break; }
+      case 0x2519: {
+        PRINT_KEY(Bezier_Scale_Key) PRINT_POINT3(value)
+        break; }
       case 0x2520: {
-        PRINT_KEY(TCB_Float_Key) PRINT_FLOAT
+        PRINT_KEY(TCB_Float_Key) PRINT_FLOAT(value)
         PRINT_TCB
         break; }
       case 0x2521: {
-        PRINT_KEY(TCB_Pos_Key) PRINT_POINT3
+        PRINT_KEY(TCB_Pos_Key) PRINT_POINT3(value)
         PRINT_TCB
+        printf("\n      D1: ");PRINT_POINT3(deriv1) printf(" D2: ");PRINT_POINT3(deriv2)
         break; }
       case 0x2522: {
-        PRINT_KEY(TCB_Rot_Key) PRINT_QUAT
+        PRINT_KEY(TCB_Rot_Key) PRINT_QUAT(value)
         PRINT_TCB
+        printf("\n      D1: ");PRINT_QUAT(deriv1) printf(" D2: ");PRINT_QUAT(deriv2)
         break; }
       case 0x2523: {
-        PRINT_KEY(TCB_Scale_Key) PRINT_POINT3
+        PRINT_KEY(TCB_Scale_Key) PRINT_POINT3(value)
         PRINT_TCB
         break; }
       case 0x2524: {
-        PRINT_KEY(Bezier_Pos_Key) PRINT_POINT3
+        PRINT_KEY(Bezier_Pos_Key) PRINT_POINT3(value)
+        printf("\n      D1: ");PRINT_POINT3(in_tan) printf(" D2: ");PRINT_POINT3(out_tan)
         break; }
     }
     printf("\n");
@@ -117,28 +137,74 @@ switch(chunk_id){
 
   // ----------- value
   case 0x2501:
-    if((subtype&15)==1) printf("  Float key: %f\n",float_reader(f,&chunk_size)); else
-    if((subtype&15)==2) printf("  Color key: %f %f %f\n",float_reader(f,&chunk_size),float_reader(f,&chunk_size),float_reader(f,&chunk_size)); else
-    printf("  Float/Color key\n");
+//  case 0x2502:    // ??????
+  case 0x2503:
+  case 0x2504:
+  case 0x2505: {
+    switch(subtype&15){  // val_vect
+      case 1: track->val_vect.x=float_reader(f,&chunk_size);break;
+      case 2:
+      case 3:
+      case 5:
+        track->val_vect.x=float_reader(f,&chunk_size);
+        track->val_vect.y=float_reader(f,&chunk_size);
+        track->val_vect.z=float_reader(f,&chunk_size);
+        break;
+    }
+    switch(subtype&15){  // val_quat
+      case 4:
+      case 5:
+        track->val_quat.x=float_reader(f,&chunk_size);
+        track->val_quat.y=float_reader(f,&chunk_size);
+        track->val_quat.z=float_reader(f,&chunk_size);
+        track->val_quat.w=float_reader(f,&chunk_size);
+        break;
+    }
+    if(chunk_size!=0) printf("!!! warning, value chunk size mismatch !!! (%d)\n",chunk_size);
+
+/*
+  int n=chunk_size/sizeof(float);
+    if(n<1 || n>7){ printf("Invalid size for this value type\n");break;}
+    fread(track->value,n,sizeof(float),f); chunk_size-=n*sizeof(float);
+*/
     break;
-  case 0x2503: printf("  Position key\n"); break;
-  case 0x2504: printf("  Rotation key\n"); break;
-  case 0x2505: printf("  Scale key\n"); break;
+  }
+
+/*
+  case 0x2501:
+    if((subtype&15)==1)
+      format_chunk_data(f,&chunk_size,"  Value: (float) %f\n"); else
+    if((subtype&15)==2)
+      format_chunk_data(f,&chunk_size,"  Value: (RGB) %f %f %f\n"); else
+    printf("  Float/Color key ???\n");
+    break;
+  case 0x2503:
+    format_chunk_data(f,&chunk_size,"  Value: (vect) %f %f %f\n");break;
+  case 0x2504:
+    format_chunk_data(f,&chunk_size,"  Value: (quat) %f %f %f  angle: %f\n");break;
+  case 0x2505:
+    format_chunk_data(f,&chunk_size,"  Value: (scale) %f %f %f  axis: %f %f %f angle: %f\n");break;
+*/
+
+//  case 0x2503: printf("  Position key (%d)\n",chunk_size); break;
+//  case 0x2504: printf("  Rotation key (%d)\n",chunk_size); break;
+//  case 0x2505: printf("  Scale key (%d)\n",chunk_size); break;
 
   // ----------- keys
 #define READKEYS(tipus) track->numkeys=chunk_size/sizeof(tipus);track->keys=malloc(track->numkeys*sizeof(tipus));fread(track->keys,sizeof(tipus),track->numkeys,f);track->keytype=chunk_id;
   case 0x2511: READKEYS(Linear_Float_Key);break;
   case 0x2516: READKEYS(Bezier_Float_Key);break;
+  case 0x2519: READKEYS(Bezier_Scale_Key);break;
   case 0x2520: READKEYS(TCB_Float_Key);break;
   case 0x2521: READKEYS(TCB_Pos_Key);break;
   case 0x2522: READKEYS(TCB_Rot_Key);break;
   case 0x2523: READKEYS(TCB_Scale_Key);break;
   case 0x2524: READKEYS(Bezier_Pos_Key);break;
 
-  case 0x2519: // bezier scale
-    dump_chunk_data(f,&chunk_size);
-    break;
-    
+//  case 0x2519: // bezier scale
+//    dump_chunk_data(f,&chunk_size);
+//    break;
+
   // ----------- track params
   case 0x3002: track->flags=int_reader(f,&chunk_size);
      printf("  Track flags: %d =",track->flags);

@@ -56,9 +56,9 @@ void init_classreaders(){
   register_classreader("Linear Rotation",0x04,track_init,track_chunk_reader,track_uninit);
   register_classreader("Bezier Rotation",0x14,track_init,track_chunk_reader,track_uninit);
   register_classreader("TCB Rotation",0x24,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Linear Scale",0x04,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Bezier Scale",0x14,track_init,track_chunk_reader,track_uninit);
-  register_classreader("TCB Scale",0x24,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Linear Scale",0x05,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Bezier Scale",0x15,track_init,track_chunk_reader,track_uninit);
+  register_classreader("TCB Scale",0x25,track_init,track_chunk_reader,track_uninit);
   // Text:
   register_classreader("Text",0,NULL,text_chunk_reader,NULL);
   // Node:
@@ -150,26 +150,8 @@ switch(chunk_id){
         chunkhelp_st *p=nodeclass->chelp->chunks;
         while(p){
           if(p->id==chunk_id){
-            char *s=p->name;
             printf("  ; ");
-            while(*s){
-              int c=*s++;
-              if(c=='%'){
-                c=*s++;
-                switch(c){
-                  case '%': putchar(c);
-                  case 'f': printf("%f",float_reader(f,&chunk_size));break;
-                  case 'i': printf("%d",int_reader(f,&chunk_size));break;
-                  case 'x': printf("%x",int_reader(f,&chunk_size));break;
-                  case 'b': printf("%d",byte_reader(f,&chunk_size));break;
-                  case 's': printf("%s",string_reader(f,&chunk_size));break;
-                  case 'S': printf("%s",string8_reader(f,&chunk_size));break;
-                }
-                continue;
-              }
-              putchar(c);
-            }
-            //printf("  ; %s",p->name);
+            format_chunk_data(f,&chunk_size,p->name);
           }
           p=p->next;
         }
