@@ -1,5 +1,8 @@
-// Astral OpenGL State Manager  v0.1     (C) 2000. by A'rpi/Astral
+// Astral OpenGL State Manager  v0.11    (C) 2000. by A'rpi/Astral
 // simple routines to reduce OGL calls.
+
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 // aglBlend:  set BLEND mode
 #define AGL_BLEND_NONE 0
@@ -8,10 +11,6 @@
 #define AGL_BLEND_COLOR 3
 #define AGL_BLEND_MUL 4
 void aglBlend(int mode);
-//    aglBlend((ast3d_blend<1.0)?AGL_BLEND_ALPHA:AGL_BLEND_NONE);
-//    aglZbuffer(AGL_ZBUFFER_NONE);
-//    aglTexture(lightmap);
-//    aglBlend(AGL_BLEND_ADD);
 
 // aglTexture:  disable (if id=0) texturing or enable and set texture ID
 #define AGL_TEXTURE_NONE 0
@@ -26,11 +25,11 @@ void aglTexture(int id);
 #define AGL_ZBUFFER_EQ (AGL_ZBUFFER_EQ_FLAG|AGL_ZBUFFER_R)
 void aglZbuffer(int mode);
 
+// aglInit: sync AGL with OpenGL  (call once per frame)
 void aglInit();
 
+// agl state variables:
 extern int agl_blendmode;
 extern int agl_textureid;
 extern int agl_zbuffermode;
-
-
 

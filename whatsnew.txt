@@ -526,6 +526,23 @@ v3.9  00/01/27  by  A'rpi    -
   oka: max 3 nem exportal ambient lightot, javitva
 - ha nincs egyaltalan light a sceneben akkor elszall vagy bugzik
 
+v3.a  00/01/30 by Strepto
+- win verzio fixed minden hianyzo makefilet beraktam amiket nem talalt meg
+pl : windows.h,M_PI azt megkapta.
+- afs es a loadmap lib ben van igy atlathatobb :)
+- Az alpha II az uj compileval mashogy nez ki. A Csajszin latszik hogy a 
+perspectiva mar nem 1. Valamint a morph tunnelben mashogy nez ki az envmap
+mint 3ds-ben vilagosabb. 
+
+v3.b  00/02/01 by A'rpi
+- winver visszaportolasa a forrasba
+  (egyszerubb lenne a regi helyett a winver hasznalata, de abbol
+  meg hianyoznak a linuxos attributumok, azokat meg nincs kedvem
+  ujra beallitgatni)
+- #include <GL/gl.h> es <GL/glu.h> atteve agl.h-ba
+  tehat eleg az agl.h-t includeolni!!!!
+- par .OLD file es felesleges, regi konyvtar torlese
+
 
 
 TERVEK a 4.0-ba:

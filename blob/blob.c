@@ -76,10 +76,9 @@ static long Vlimit=Vlimit1;
 
 #ifndef __GNUC__
 #include <windows.h>
+#define M_PI 3.1415926527
 #endif
 
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include "../agl/agl.h"
 
 extern int window_w,window_h;

@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-//#include <GL/glut.h>
+#ifndef __GNUC__
+#include <windows.h>
+#define M_PI 3.1415926527
+#endif
+
 #include "../agl/agl.h"
 
 #include "fdtunnel.h"

@@ -10,7 +10,6 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-//#include "../agl/agl.h"
 
 #include "../loadmap/load_map.h"
 #include "../loadmap/loadtxtr.h"

@@ -9,7 +9,6 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-//#include "../agl/agl.h"
 
 #include "../3dslib/ast3d.h"
 #include "../render/render.h"
