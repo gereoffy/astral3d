@@ -23,6 +23,7 @@ V("scene",scrCLASS_fx, 3,0, 1,1); P_SCENE(1);
 V("fixUV",scrCLASS_scene, 4,3, 0,-1);
 V("fixU" ,scrCLASS_scene, 4,1, 0,-1);
 V("fixV" ,scrCLASS_scene, 4,2, 0,-1);
+V("smoothing" ,scrCLASS_scene, 4,8, 0,-1); // apply smoothing groups
 
 // 5:  light lightno
 V("light",scrCLASS_scene, 5,0, 1,1); P_CONST(1,0);

@@ -29,6 +29,7 @@ void ast3d_fixUV(char *objname,int uvflag){
           }
 
 /*---------------------- RENDER TRIANGLES -----------------------*/
+  if(!(uvflag&8))
     for (i=0;i<obj->numfaces;i++){
       c_VERTEX *pa=obj->faces[i].pa;
       c_VERTEX *pb=obj->faces[i].pb;
@@ -76,6 +77,8 @@ if(uvflag&2){ PREUV(v1,v2,v3); MINMAX(v1,v2,v3); FIXUV(v1); FIXUV(v2); FIXUV(v3)
     if( uvflag&4 || 
         (obj->pmat && obj->pmat->bump.file)
     ) calc_uv_grads(obj);
+
+    if( uvflag&8 ){ smoothing_group(obj);calc_objnormals(obj);}
 
     }}
 

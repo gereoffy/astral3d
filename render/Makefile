@@ -3,7 +3,7 @@
 SRCS = render.c particle.c
 OBJS = render.o particle.o
 CC   = gcc
-CFLAGS = -O2 -mpentiumpro -pipe
+CFLAGS = -g -O2 -mpentiumpro -pipe
 
 .SUFFIXES: .c .o
 
@@ -44,9 +44,8 @@ render.o: /usr/include/bits/mathcalls.h
 render.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
 render.o: /usr/include/GL/gl.h /usr/include/GL/glu.h ../agl/agl.h
 render.o: ../3dslib/ast3d.h ../3dslib/vector.h ../3dslib/matrix.h render.h
-render.o: ../prof.h triangle.c frustum.c light.c vertlits.c 1_transf.c
-render.o: 1a_fcull.c 2_mater.c 3_light.c 4_textur.c 4a_bump.c 5_envmap.c
-render.o: 6_lightmap.c 7_speclr.c
+render.o: ../prof.h triangle.c light.c vertlits.c 2_mater.c 3_light.c
+render.o: 4_textur.c 4a_bump.c 5_envmap.c 6_lightmap.c 7_speclr.c
 particle.o: /usr/include/stdio.h /usr/include/features.h
 particle.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
 particle.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/stddef.h

@@ -6,8 +6,7 @@
 #include "vector.h"
 #include "matrix.h"
 
-void cam_lens_fov (float lens, float *fov)
-{
+float cam_lens_fov (float lens){
 /*
   cam_lens_fov: converts 3dstudio lens to fov.
 */
@@ -19,16 +18,13 @@ void cam_lens_fov (float lens, float *fov)
     {35.0,  63.0},  {50.0, 46.0},     {85.0, 28.0}, {135.0, 18.0},
     {200.0, 12.0}
   };
-
-  for (i = 0; i < 9; i++) if (lens == lens_table[i].lens) {
-    *fov = lens_table[i].fov;
-    return;
-  }
-  *fov = 15.0 / lens * 160; /* hello adept :) */
+  for (i = 0; i < 9; i++)
+    if (lens == lens_table[i].lens)
+      return lens_table[i].fov;
+  return (15.0 / lens * 160); /* hello adept :) */
 }
 
-void cam_update (c_CAMERA *cam)
-{
+void cam_update (c_CAMERA *cam){
 /*
   cam_update: updates the camera matrix.
 */
@@ -44,12 +40,14 @@ void cam_update (c_CAMERA *cam)
   vec_sub (&cam->target, &cam->pos, &c);
   focus = vec_length (&c);
 
+  /* Convert to Euler angles:  */
   ax = -atan2 (c.x, c.z);
   ay = asin (c.y / focus);
   az = -cam->roll * M_PI / 180;
 
-  sinx = sin (ax); cosx = cos (ax); siny = sin (ay);
-  cosy = cos (ay); sinz = sin (az); cosz = cos (az);
+  sinx = sin (ax); cosx = cos (ax);
+  siny = sin (ay); cosy = cos (ay);
+  sinz = sin (az); cosz = cos (az);
 
   sxsz = sinx*sinz;
   sxcz = sinx*cosz;
@@ -77,4 +75,12 @@ void cam_update (c_CAMERA *cam)
   cam->matrix[Z][W] =  pivot.x*cam->matrix[Z][X]+
                        pivot.y*cam->matrix[Z][Y]+
                        pivot.z*cam->matrix[Z][Z];
+
+{ float t=tan( cam->fov * M_PI / 360.0 );
+  cam->frustum.x=t*cam->aspectratio;
+  cam->frustum.y=t;
+  cam->frustum.znear=-ast3d_scene->znear;
+  cam->frustum.zfar =-ast3d_scene->zfar;
+}
+
 }

@@ -7,8 +7,8 @@
 
 //------------------------- BUMP -----------------------
     for (i = 0; i < obj->numverts; i++){
-      if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){
-        obj->vertices[i].visible=0;
+      if(obj->flags&ast3d_obj_allvisible || obj->vert_visible[i]){
+//        obj->vertices[i].visible=0;
         { c_VERTEX *v=&obj->vertices[i];
           c_VECTOR *normal=&obj->vertices[i].pnorm;
           c_VECTOR u_normal,v_normal,delta;
@@ -17,7 +17,7 @@
           float z=l->ppos.z - v->pvert.z;
           float len=x*x+y*y+z*z;
           if(len>0){ len=1.0/sqrt(len);x*=len;y*=len;z*=len;}
-	  
+
           u_normal.x= v->u_grad.x*normat[X][X] + v->u_grad.y*normat[X][Y] + v->u_grad.z*normat[X][Z];
           u_normal.y= v->u_grad.x*normat[Y][X] + v->u_grad.y*normat[Y][Y] + v->u_grad.z*normat[Y][Z];
           u_normal.z= v->u_grad.x*normat[Z][X] + v->u_grad.y*normat[Z][Y] + v->u_grad.z*normat[Z][Z];
@@ -61,14 +61,34 @@
       specular_limit4=specular_limit/4.0;
     }
     if(matflags&ast3d_mat_specularmap) specular=1;
+
+//    obj->flags&ast3d_obj_allvisible;  // HACK
   
     for (i = 0; i < obj->numverts; i++){
-      if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){
-        obj->vertices[i].visible=0;
+      if(obj->flags&ast3d_obj_allvisible || obj->vert_visible[i]){
+//      if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){
+//        obj->vertices[i].visible=0;
         { c_VECTOR *p=&obj->vertices[i].pvert;
           c_VECTOR *n=&obj->vertices[i].pnorm;
           int li;
           float r=base_r,g=base_g,b=base_b;
+///          if(matflags&(ast3d_mat_reflect|ast3d_mat_env_positional)==(ast3d_mat_reflect|ast3d_mat_env_positional)){
+          if((matflags&ast3d_mat_reflect)&&(matflags&ast3d_mat_env_positional)){
+            /* Reflection (real envmap) */
+            c_VECTOR t;
+            float d=2*(p->x*n->x+p->y*n->y+p->z*n->z);
+            t.x=(n->x*d-p->x);
+            t.y=(n->y*d-p->y);
+            t.z=(n->z*d-p->z);
+            d=(t.x*t.x+t.y*t.y+t.z*t.z);
+            if(matflags&ast3d_mat_env_sphere){
+              float dist=sqrt(d);
+              d=t.x*t.x+t.y*t.y+(dist+t.z)*(dist+t.z);
+            }
+            if(d>0) d=1.0/sqrt(d); else d=1.0;
+            obj->vertices[i].env_u=0.5+t.x*d;
+            obj->vertices[i].env_v=0.5+t.y*d;
+          }
           for(li=0;li<lightno;li++) if(lights[li]->enabled){
             c_LIGHT *l=lights[li];
             float x=l->ppos.x - p->x;
@@ -203,6 +223,7 @@ if(l->flags&ast3d_light_attenuation){
             obj->vertices[i].refl_rgb[2]=clip_255_blend(b,ast3d_blend);
             obj->vertices[i].refl_rgb[3]=src_alpha;
           }
+//          printf("Lighting vertex %d color=%f %f %f\n",i,r,g,b);
         }
       }
     }

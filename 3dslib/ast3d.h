@@ -143,7 +143,9 @@ enum ast3d_mat_flags_ { /* astral 3d material flags */
   ast3d_mat_transparent  = 256,           /* transparent object  */
   ast3d_mat_specularmap  = 512,           /* specular phongmap   */
   ast3d_mat_lightmap  = 1024,             /* object has lightmap */
-  ast3d_mat_bump      = 2048              /* object has bump map */
+  ast3d_mat_bump      = 2048,             /* object has bump map */
+  ast3d_mat_env_positional = 4096,        /* envmap is positional */
+  ast3d_mat_env_sphere = 8192             /* envmap uses sphere mapping */
 };
 
 enum ast3d_map_flags_ { /* astral 3d map flags */
@@ -265,7 +267,7 @@ typedef struct _c_MATERIAL { /* material struct */
 } c_MATERIAL;
 
 typedef struct _c_VERTEX { /* vertex struct */
-  int      visible;
+//  int      visible;
   unsigned char rgb[4];
   unsigned char refl_rgb[4];
   c_VECTOR vert, pvert;                  /* vertex              */
@@ -274,7 +276,11 @@ typedef struct _c_VERTEX { /* vertex struct */
   float    bump_du, bump_dv;             /* bump texture coordinate offsets */
   c_VECTOR u_grad,v_grad;                /* u,v gradient vectors */
   float    u, v;                         /* texture coordinates */
+  float    env_u,env_v;                  /* environment mapping coords */
   float    weight;
+#ifdef OTIMIZE_VERTEX
+  int opt_tmp;                           /* temp var. for optimvertex */
+#endif
 } c_VERTEX;
 
 typedef struct _c_FACE { /* face struct */
@@ -286,7 +292,7 @@ typedef struct _c_FACE { /* face struct */
   c_VECTOR   norm;                         /* face normal             */
 //  c_VECTOR   pnorm;                        /* face normal             */
   float      D;                            /* distance from 0;0;0     */
-  int        visible;                      /* visibility flag         */
+//  int        visible;                      /* visibility flag         */
   float u1,v1,u2,v2,u3,v3;                 /* texture coords          */
   float lu1,lv1,lu2,lv2,lu3,lv3;           /* lightmap coords         */
 #ifdef TRIANGLE_STRIP
@@ -331,15 +337,20 @@ typedef struct _c_BACKGR { /* background struct */
   c_RGB color;
 } c_BACKGR;
 
+typedef struct _c_FRUSTUM {
+  float znear,zfar,x,y;
+} c_FRUSTUM;
+
 typedef struct _c_CAMERA { /* camera struct */
   char     *name;                        /* camera name                */
   int32    id, parent1, parent2;         /* object id, parent          */
   c_VECTOR pos, target;                  /* source, target vectors     */
   float    fov, roll;                    /* field of view, roll        */
-  float    sizeX, sizeY;                 /* screen size (set by user)  */
+//  float    sizeX, sizeY;                 /* screen size (set by user)  */
   float    aspectratio;                  /* aspect ratio (set by user) */
-  float    perspX, perspY;               /* perspective multipliers    */
+//  float    perspX, perspY;               /* perspective multipliers    */
   c_MATRIX matrix;                       /* camera matrix              */
+  c_FRUSTUM frustum;                     /* frustum in camera space    */
 } c_CAMERA;
 
 typedef struct _c_MAPPING {
@@ -356,6 +367,53 @@ typedef struct _c_AMBIENT { /* ambient struct */
   c_RGB color;                           /* ambient color   */
 } c_AMBIENT;
 
+typedef struct _c_PART {
+  float color[3];
+  float energy;
+  c_VECTOR p; // float p[1][3];
+  float v[3];
+} c_PART;
+
+typedef struct _c_PARTICLE {
+  c_PART *p; // =NULL
+  int np,maxnp;  // =0
+  int texture_id;
+  float eject_r,eject_vy,eject_vl,ridtri;
+  float energy; // 0.8 energy scale
+  int sizelimit; // 0  maximum sprite size
+  float dieratio; // 0.0018  energy--
+  float agrav; // -9.8  gravitation
+  float colordecrement; // 0.999
+} c_PARTICLE;
+
+typedef struct _c_OBJECT { /* object struct */
+  char       *name;                      /* object name                */
+  int32      id, parent;                 /* object id, object parent   */
+  int32      numverts;                   /* number of vertices         */
+  int32      numfaces;                   /* number of faces            */
+  int32      flags;                      /* object flags: ast3d_obj_*  */
+  c_VERTEX   *vertices;                  /* object vertices            */
+  c_FACE     *faces;                     /* object faces               */
+  unsigned int *smoothing;               /* smoothing groups */
+  char       *vert_visible;              /* vertex visibility */
+  char       *face_visible;              /* face visibility */
+  c_MATERIAL *pmat;                      /* pointer to material        */
+  c_VECTOR   pivot;                      /* object pivot point         */
+  c_VECTOR   translate;                  /* object translation vector  */
+  c_VECTOR   scale;                      /* object scale vector        */
+  c_BOUNDBOX bbox, pbbox;                /* object bounding box        */
+  c_QUAT     rotate;                     /* object rotation quaternion */
+  void       *morph;                     /* object morph  (t_TRACK *)  */
+  c_MATRIX   matrix;                     /* object keyframer matrix    */
+  c_MAPPING  mapping;                    /* texture mapping info       */
+  float      bumpdepth;
+  c_PARTICLE particle;
+  int        enable_zbuffer;         /* 1=use zbuffer */
+  float      vertexlights;           /* 0=disable   other=vertex light scale */
+  float      explode_speed;
+  float      explode_frame;
+} c_OBJECT;
+
 typedef struct _w_NODE { /* world node */
   int32          type;                   /* object type           */
   void           *object;                /* object                */
@@ -371,6 +429,7 @@ typedef union _t_KDATA { /* key data union */
   float    _float;                       /* float                          */
   c_VECTOR _vect;                        /* vector                         */
   c_QUAT   _quat;                        /* quaternion                     */
+  c_OBJECT* _obj;                        /* morph object                   */
 } t_KDATA;
 
 typedef struct _t_KEY { /* key struct */
@@ -388,13 +447,6 @@ typedef struct _t_KEY { /* key struct */
   struct _t_KEY *next, *prev;            /* elozo/kovetkezo key vagy NULL */
   struct _t_KEY *loop_next, *loop_prev;  /* loop eseten mindig mutat valahova */
 } t_KEY;
-
-typedef struct _c_MORPH { /* morph struct */
-  int32 from, to;                        /* morph: from/to object  */
-  float alpha;                           /* morph stage (0 -> 1.0) */
-  t_KEY *key;
-} c_MORPH;
-
 
 typedef struct _t_TRACK { /* track struct */
   int32  flags;                          /* track flags              */
@@ -453,55 +505,6 @@ typedef struct _k_NODE { /* keyframer node */
   struct _k_NODE *next, *prev;           /* next/previous node     */
 } k_NODE;
 
-typedef struct _c_FRUSTUM {
-  float znear,zfar,x,y;
-} c_FRUSTUM;
-
-typedef struct _c_PART {
-  float color[3];
-  float energy;
-  c_VECTOR p; // float p[1][3];
-  float v[3];
-} c_PART;
-
-typedef struct _c_PARTICLE {
-  c_PART *p; // =NULL
-  int np,maxnp;  // =0
-  int texture_id;
-  float eject_r,eject_vy,eject_vl,ridtri;
-  float energy; // 0.8 energy scale
-  int sizelimit; // 0  maximum sprite size
-  float dieratio; // 0.0018  energy--
-  float agrav; // -9.8  gravitation
-  float colordecrement; // 0.999
-} c_PARTICLE;
-
-typedef struct _c_OBJECT { /* object struct */
-  char       *name;                      /* object name                */
-  int32      id, parent;                 /* object id, object parent   */
-  int32      numverts;                   /* number of vertices         */
-  int32      numfaces;                   /* number of faces            */
-  int32      flags;                      /* object flags: ast3d_obj_*  */
-  c_VERTEX   *vertices;                  /* object vertices            */
-  c_FACE     *faces;                     /* object faces               */
-  c_MATERIAL *pmat;                      /* pointer to material        */
-  c_VECTOR   pivot;                      /* object pivot point         */
-  c_VECTOR   translate;                  /* object translation vector  */
-  c_VECTOR   scale;                      /* object scale vector        */
-  c_BOUNDBOX bbox, pbbox;                /* object bounding box        */
-  c_QUAT     rotate;                     /* object rotation quaternion */
-//  c_VECTOR   rotate;                     /* object rotation angles     */
-  c_MORPH    morph;                      /* object morph               */
-  c_MATRIX   matrix;                     /* object keyframer matrix    */
-  c_MAPPING  mapping;                    /* texture mapping info       */
-  float      bumpdepth;
-  c_PARTICLE particle;
-//  int        additivetexture;
-  int        enable_zbuffer;         /* 1=use zbuffer */
-  float      vertexlights;           /* 0=disable   other=vertex light scale */
-  float      explode_speed;
-  float      explode_frame;
-} c_OBJECT;
 
 
 typedef struct _c_SCENE { /* scene (world, keyframer) */
@@ -510,11 +513,11 @@ typedef struct _c_SCENE { /* scene (world, keyframer) */
   k_NODE   *keyframer, *ktail;           /* keyframer               */
   c_FOG    fog;
   c_BACKGR backgr;
-  c_FRUSTUM frustum;
+//  c_FRUSTUM frustum;
   c_CAMERA *cam;
   float lightcorona_scale;
   int directional_lighting;
-  int sphere_map;
+//  int sphere_map;
   float znear,zfar;
   int frustum_cull;
 } c_SCENE;
@@ -587,7 +590,7 @@ void ast3d_fixUV(char *objname,int uvflag);
         using any other astral 3d functions.
 */
 
-  void cam_lens_fov (float lens, float *fov);
+  float cam_lens_fov (float lens);
   int32 ast3d_getactive_scene (c_SCENE **scene);
   int32 ast3d_getactive_camera (c_CAMERA **camera);
   int32 ast3d_byname (char *name, w_NODE **node);
@@ -615,7 +618,8 @@ void ast3d_fixUV(char *objname,int uvflag);
   void ast3d_print_keyframer ();
   void qt_rescale (c_QUAT *a, float s, c_QUAT *out);
   int32 ast3d_getkey_hide (t_TRACK *track, float frame, int32 *out);
-  int32 ast3d_getkey_morph (t_TRACK *track, float frame, c_MORPH *out);
+  int32 ast3d_getkey_morph (t_TRACK *track, float frame, void **out);
+//  int32 ast3d_getkey_morph (t_TRACK *track, float frame, c_MORPH *out);
   int32 ast3d_setactive_camera (c_CAMERA *cam);
   int32 ast3d_save_scene (char *filename, c_SCENE *scene);
   int32 qt_equal (c_QUAT *a, c_QUAT *b);

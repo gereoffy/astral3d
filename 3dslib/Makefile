@@ -47,9 +47,10 @@ ast3d.o: /usr/include/ctype.h /usr/include/math.h
 ast3d.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
 ast3d.o: /usr/include/bits/mathcalls.h
 ast3d.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
-ast3d.o: ast3d.h ast3di.h ../afs/afs.h vector.h matrix.h uv_grad.c fix_uv.c
-ast3d.o: optimvert.c normals.c getkey.c do_trans.c morph-new.h morph-new.c
-ast3d.o: morph-old.c visibchk.c update.c
+ast3d.o: ast3d.h ast3di.h ../afs/afs.h vector.h matrix.h uv_grad.c
+ast3d.o: smoothgrp.c normals.c fix_uv.c optimvert.c getkey.c do_trans.c
+ast3d.o: morph-spl.h frustcul.h morph-spl.c morph-lin.c visibchk.c transfrm.c
+ast3d.o: frustcul.c update.c
 camera.o: /usr/include/math.h /usr/include/features.h
 camera.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
 camera.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h

@@ -1,6 +1,6 @@
 /* Frustum culling */
 
-#define SET_MINMAX(x,min,max) if(x<min) min=x;if(x>max) max=x;
+// #define SET_MINMAX(x,min,max) if(x<min) min=x;if(x>max) max=x;
 
 static INLINE int ast3d_Frustum_Cull(c_FACE *f){
   c_VECTOR min,max;
@@ -23,8 +23,8 @@ static INLINE int ast3d_Frustum_Cull(c_FACE *f){
   
   /* Frustum test */
   if(// (min.z< scene->frustum.znear) &&
-      (max.x> scene->frustum.x*min.z && min.x<-scene->frustum.x*min.z)
-  &&  (max.y> scene->frustum.y*min.z && min.y<-scene->frustum.y*min.z)
+      (max.x> FRUSTUM.x*min.z && min.x<-FRUSTUM.x*min.z)
+  &&  (max.y> FRUSTUM.y*min.z && min.y<-FRUSTUM.y*min.z)
   ) return 1;
   return 0;
 }

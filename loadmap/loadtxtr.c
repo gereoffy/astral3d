@@ -111,8 +111,9 @@ int i;
 
   glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_txtsize);
   printf("GL_MAX_TEXTURE_SIZE=%d\n",max_txtsize);
-  if(max_txtsize<64 || max_txtsize>512) max_txtsize=512;
-  
+//  if(max_txtsize<64 || max_txtsize>512) max_txtsize=512;
+  if(max_txtsize>=512) max_txtsize=512; else max_txtsize=256;
+
   /* Find optimal size */
   if(t->xsize>256 || t->ysize>256) t->xsize=t->ysize=max_txtsize; else
   if(t->xsize>128 || t->ysize>128) t->xsize=t->ysize=256; else

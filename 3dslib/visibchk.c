@@ -12,20 +12,13 @@
             cit.z = b.x*inv[Z][X] + b.y*inv[Z][Y] + b.z*inv[Z][Z];
           }
 
-#if 0  /* "ez azert van hogy te boldog legy" --strepto  */
-          { c_VECTOR v;
-            mat_mulvec2(objmat,&cit,&v);
-            printf("cam in camspace: %f  %f  %f\n",v.x,v.y,v.z);
-          }
-#endif
-
         for (i = 0; i < obj->numfaces; i++){
           c_VECTOR *vec=&obj->faces[i].norm;
           if(cit.x*vec->x+cit.y*vec->y+cit.z*vec->z >= obj->faces[i].D){
-            obj->faces[i].pa->visible=
-            obj->faces[i].pb->visible=
-            obj->faces[i].pc->visible=
-            obj->faces[i].visible=1;
-          } else obj->faces[i].visible=0;
+            obj->vert_visible[(obj->faces[i].a)]=
+            obj->vert_visible[(obj->faces[i].b)]=
+            obj->vert_visible[(obj->faces[i].c)]=
+            obj->face_visible[i]=1;
+          } else obj->face_visible[i]=0;
         } // for
 

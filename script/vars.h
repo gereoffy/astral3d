@@ -125,6 +125,9 @@ VAR_MAT(scrTYPE_flag ,"additivetexture",flags,ast3d_mat_transadd);
 VAR_MAT(scrTYPE_float,"transparency",transparency,0);
 VAR_MAT(scrTYPE_float,"self_illumination",self_illum,0);
 
+VAR_MAT(scrTYPE_flag ,"env_positional",flags,ast3d_mat_env_positional);
+VAR_MAT(scrTYPE_flag ,"env_spheremap",flags,ast3d_mat_env_sphere);
+
 #undef VAR_MAT
 
 //=============================

@@ -1,8 +1,8 @@
 
 int calc_v_grad(c_VERTEX *P,c_VERTEX *A,c_VERTEX *B,
                 float Pu,float Au,float Bu,
-		float Pv,float Av,float Bv,
-		c_VECTOR *v_grad){
+                float Pv,float Av,float Bv,
+                c_VECTOR *v_grad){
 c_VECTOR PQ;
 float t,len;
 
@@ -38,6 +38,7 @@ void calc_uv_grads(c_OBJECT *obj){
 int i;
   for(i=0;i<obj->numfaces;i++){
     c_FACE* f=&obj->faces[i];
+
     calc_v_grad(f->pa,f->pb,f->pc,  f->u1,f->u2,f->u3,  f->v1,f->v2,f->v3, &f->pa->v_grad);
     calc_v_grad(f->pa,f->pb,f->pc,  f->v1,f->v2,f->v3,  f->u1,f->u2,f->u3, &f->pa->u_grad);
 

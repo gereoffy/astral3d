@@ -10,8 +10,8 @@
           clip_255_blend(lights[0]->MatSpec[2],ast3d_blend),
           src_alpha);
         for (i=0;i<obj->numfaces;i++)
-         if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible)
-           ast3d_DrawGLTriangle_specularmap(&obj->faces[i]);   /* %%%%%%%%%%% */
+          if(obj->flags&ast3d_obj_allvisible || obj->face_visible[i])
+            ast3d_DrawGLTriangle_specularmap(&obj->faces[i]);   /* %%%%%%%%%%% */
       glEnd();
       if(scene->fog.type&ast3d_fog_fog) glEnable(GL_FOG);
     }  // if(reflect)

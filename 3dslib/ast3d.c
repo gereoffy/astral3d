@@ -25,6 +25,8 @@ int32     ast3d_flags=0;     /* curreng flags         */
 *****************************************************************************/
 
 #include "uv_grad.c"
+#include "smoothgrp.c"
+#include "normals.c"
 #include "fix_uv.c"
 
 #ifdef TRIANGLE_STRIP
@@ -34,8 +36,6 @@ int32     ast3d_flags=0;     /* curreng flags         */
 #ifdef OTIMIZE_VERTEX
 #include "optimvert.c"
 #endif
-
-#include "normals.c"
 
 static void calc_normals (){
 /*
@@ -48,6 +48,7 @@ static void calc_normals (){
 #ifdef OTIMIZE_VERTEX
       optimize_vertex ((c_OBJECT *)node->object);
 #endif
+//      smoothing_group((c_OBJECT *)node->object);
       calc_objnormals ((c_OBJECT *)node->object);
     }
 }
@@ -423,7 +424,7 @@ int32 ast3d_alloc_scene (c_SCENE **scene){
   (*scene)->fog.type = 0;
   (*scene)->backgr.type = 0;
   (*scene)->directional_lighting = 0;
-  (*scene)->sphere_map = 0;
+//  (*scene)->sphere_map = 0;
   (*scene)->znear=10.0;
   (*scene)->zfar=10000.0;
   (*scene)->frustum_cull=1;

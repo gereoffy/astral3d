@@ -84,11 +84,11 @@
       glBegin(GL_TRIANGLES);
       if(matflags&ast3d_mat_texture){
         for (i=0;i<obj->numfaces;i++)
-          if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible)
+          if(obj->flags&ast3d_obj_allvisible || obj->face_visible[i])
             ast3d_DrawGLTriangle_texture(&obj->faces[i]);   /* %%%%%%%%%%% */
       } else {
         for (i=0;i<obj->numfaces;i++)
-          if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible)
+          if(obj->flags&ast3d_obj_allvisible || obj->face_visible[i])
             ast3d_DrawGLTriangle_gouraud(&obj->faces[i]);   /* %%%%%%%%%%% */
       }
       glEnd();

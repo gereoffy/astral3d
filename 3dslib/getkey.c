@@ -122,13 +122,17 @@ int32 ast3d_getkey_quat (t_TRACK *track, float frame, c_QUAT *out){
 
 
 
-int32 ast3d_getkey_morph (t_TRACK *track, float frame, c_MORPH *out){
+int32 ast3d_getkey_morph (t_TRACK *track, float frame, void **out){
 /*
   ast3d_getkey_morph: return morph key at frame "frame".
 */
   int err=ast3d_update_track (track,frame);
+  (*out)=NULL;
   if(err!=ast3d_err_ok) return err;
 
+#if 1
+  (*out)=(void*)track;
+#else
   out->alpha = track->alpha;
   out->key=(t_KEY*) NULL;
   out->from = track->last->val._int;
@@ -137,7 +141,7 @@ int32 ast3d_getkey_morph (t_TRACK *track, float frame, c_MORPH *out){
     if(track->numkeys>2) out->key = track->last; // 3 or more keys, spline morph
   } else
     out->to = out->from;
-
+#endif
   return ast3d_err_ok;
 }
 

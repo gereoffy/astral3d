@@ -44,27 +44,9 @@ c_AMBIENT *ambient=NULL;
 int lightno;
 
 #include "triangle.c"
-#include "frustum.c"
+//#include "frustum.c"
 #include "light.c"
 #include "vertlits.c"
-
-void ast3d_Perspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar ){
-   GLdouble xmin, xmax, ymin, ymax, t;
-
-   t=tan( fovy * M_PI / 360.0 );
-   ymax = zNear * t;
-   ymin = -ymax;
-
-   xmin = ymin * aspect;
-   xmax = ymax * aspect;
-   
-   scene->frustum.x=t*aspect;
-   scene->frustum.y=t;
-   scene->frustum.znear=-zNear;
-   scene->frustum.zfar=-zFar;
-
-   glFrustum( xmin, xmax, ymin, ymax, zNear, zFar );
-}
 
 void draw3dsframe(void){
     int i;
@@ -75,11 +57,14 @@ void draw3dsframe(void){
     float base_r,base_g,base_b;
     int specular=0;
     unsigned char src_alpha=255;
+    
+    ast3d_update();        // keyframing & transformations
 
 PROF_START(prof_3d_matrixmode);
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    ast3d_Perspective(scene->cam->fov,1.0,scene->znear,scene->zfar);
+//    ast3d_Perspective(scene->cam->fov,scene->cam->aspectratio,scene->znear,scene->zfar);
+    gluPerspective(scene->cam->fov,scene->cam->aspectratio,scene->znear,scene->zfar);
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 PROF_END(prof_3d_matrixmode);
@@ -87,7 +72,7 @@ PROF_END(prof_3d_matrixmode);
 PROF_START(prof_3d_setuplight);
     SetupLightMode();
 PROF_END(prof_3d_setuplight);
-
+   
 /*------------------ START OF RENDERING LOOP --------------------*/
     for (node = scene->world; node; node=node->next) {
       if (node->type == ast3d_obj_object) {
@@ -126,12 +111,13 @@ PROF_END(prof_3d_setuplight);
 PROF_START(prof_3d_calc);
 
 PROF_START(prof_3d_transform);
-#include "1_transf.c"
+//#include "1_transf.c"
 PROF_END(prof_3d_transform);
 
 PROF_START(prof_3d_frustumcull);
-#include "1a_fcull.c"
+//#include "1a_fcull.c"
 PROF_END(prof_3d_frustumcull);
+
 
 PROF_START(prof_3d_material);
 #include "2_mater.c"

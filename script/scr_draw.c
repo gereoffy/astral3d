@@ -81,9 +81,11 @@ int active_faders=0;
 //      aglZbuffer(AGL_ZBUFFER_RW);
 //      printf("Playing SCENE for fx #%d\n",f);
       scene=fx->scene; ast3d_setactive_scene(scene);
+//      scene->cam->aspectratio=(float)window_w/(float)window_h;
+      scene->cam->aspectratio=640.0F/480.0F;
       ast3d_setactive_camera(scene->cam);
       ast3d_setframe(fx->frame);
-      ast3d_update();
+//      ast3d_update();
       draw3dsframe(); 
       if(fx->loop_scene)
       { float frame,frames;

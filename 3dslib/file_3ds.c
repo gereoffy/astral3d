@@ -31,10 +31,10 @@ enum ast3d_3ds_chunks_ { /* Chunk ID */
   CHUNK_OBJBLOCK     = 0x4000, CHUNK_TRIMESH      = 0x4100,
   CHUNK_VERTLIST     = 0x4110, CHUNK_VERTFLAGS    = 0x4111,
   CHUNK_FACELIST     = 0x4120, CHUNK_FACEMAT      = 0x4130,
-  CHUNK_MAPLIST      = 0x4140, CHUNK_SMOOLIST     = 0x4150,
+  CHUNK_MAPLIST      = 0x4140, CHUNK_SMOOTHLIST   = 0x4150,
   CHUNK_TRMATRIX     = 0x4160, CHUNK_MESHCOLOR    = 0x4165,
   CHUNK_TXTINFO      = 0x4170, 
-  
+
   CHUNK_LIGHT        = 0x4600,  CHUNK_SPOTLIGHT    = 0x4610,
   CHUNK_CAMERA       = 0x4700,  CHUNK_HIERARCHY    = 0x4F00,
   CHUNK_VIEWPORT     = 0x7001,
@@ -105,6 +105,7 @@ static int read_TRIMESH      (afs_FILE *f); /* Triangular mesh         */
 static int read_VERTLIST     (afs_FILE *f); /* Vertex list             */
 static int read_FACELIST     (afs_FILE *f); /* Face list               */
 static int read_FACEMAT      (afs_FILE *f); /* Face material           */
+static int read_SMOOTHLIST   (afs_FILE *f); /* Smoothing groups        */
 static int read_MAPLIST      (afs_FILE *f); /* Mapping list            */
 static int read_TRMATRIX     (afs_FILE *f); /* Transformation matrix   */
 static int read_LIGHT        (afs_FILE *f); /* Light                   */
@@ -171,7 +172,7 @@ static c_LISTWORLD world_chunks[] = { /* World definition chunks */
   {CHUNK_FACEMAT,      0, read_FACEMAT},
   {CHUNK_MAPLIST,      0, read_MAPLIST},
   {CHUNK_TXTINFO,      0, read_TXTINFO},
-  {CHUNK_SMOOLIST,     0, read_NULL},
+  {CHUNK_SMOOTHLIST,   0, read_SMOOTHLIST},
   {CHUNK_TRMATRIX,     0, read_TRMATRIX},
   {CHUNK_LIGHT,        1, read_LIGHT},
   {CHUNK_SPOTLIGHT,    0, read_SPOTLIGHT},
@@ -541,6 +542,9 @@ static int read_TRIMESH (afs_FILE *f)
   obj->numfaces=0;
   obj->vertices=NULL;
   obj->faces=NULL;
+  obj->vert_visible=NULL;
+  obj->face_visible=NULL;
+  obj->smoothing=NULL;
   obj->flags = 0;
   obj->bumpdepth=0.005;
   obj->enable_zbuffer=1;
@@ -574,6 +578,7 @@ static int read_VERTLIST (afs_FILE *f)
   if (afs_fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
   if ((v = (c_VERTEX *)malloc (nv * sizeof (c_VERTEX))) == NULL)
     return ast3d_err_nomem;
+  if(!(obj->vert_visible = (char *)malloc(nv))) return ast3d_err_nomem;
   obj->vertices = v;
   obj->numverts = nv;
 //  printf("vertices=%d\n",nv);
@@ -583,54 +588,57 @@ static int read_VERTLIST (afs_FILE *f)
     vec_swap (&v->vert);
     v->u = 0.0;
     v->v = 0.0;
-    v->visible = 0;
+//    v->visible = 0;
     v++;
   }
   return ast3d_err_ok;
 }
 
-static int read_FACELIST (afs_FILE *f)
-{
+static int read_SMOOTHLIST (afs_FILE *f){
+/*
+  read_SMOOTHLIST: Smoothing group list reader.
+*/
+  c_OBJECT *obj = (c_OBJECT *)c_node;
+  
+  obj->smoothing=malloc(obj->numfaces*sizeof(int));
+  if(!obj->smoothing) return ast3d_err_nomem;
+  if(afs_fread(obj->smoothing,obj->numfaces*sizeof(int),1,f) != 1) return ast3d_err_badfile;
+  return ast3d_err_ok;
+}
+
+static int read_FACELIST (afs_FILE *f){
 /*
   read_FACELIST: Face list reader.
 */
   c_OBJECT *obj = (c_OBJECT *)c_node;
   c_FACE   *fc;
-  word      c[3];
-  word      nv, flags;
+  word      c[4];
+  word      nv;
 
   if (afs_fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
-  if ((fc = (c_FACE *)malloc (nv * sizeof (c_FACE))) == NULL)
-    return ast3d_err_nomem;
+  if ((fc = (c_FACE *)malloc (nv * sizeof (c_FACE))) == NULL) return ast3d_err_nomem;
+  if(!(obj->face_visible = (char *)malloc(nv))) return ast3d_err_nomem;
   obj->faces = fc;
   obj->numfaces = nv;
 //  printf("faces=%d\n",nv);
   while (nv-- > 0) {
     if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
-    if (afs_fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
     fc->a = c[0];
     fc->b = c[1];
     fc->c = c[2];
+    fc->flags = c[3];
     fc->pa = &obj->vertices[c[0]];
     fc->pb = &obj->vertices[c[1]];
     fc->pc = &obj->vertices[c[2]];
 //    fc->mat = 0;
 //    fc->pmat = NULL;
-    fc->visible = 0;
-#if 0
-    fc->flags = 0;
-    if (flags & 0x08) fc->flags |= ast3d_face_wrapU;
-    if (flags & 0x10) fc->flags |= ast3d_face_wrapV;
-#else
-    fc->flags = flags;
-#endif    
+//    fc->visible = 0;
     fc++;
   }
   return ast3d_err_ok;
 }
 
-static int read_FACEMAT (afs_FILE *f)
-{
+static int read_FACEMAT (afs_FILE *f){
 /*
   read_FACEMAT: Face material reader.
 */
@@ -795,13 +803,13 @@ static int read_CAMERA (afs_FILE *f)
   float    c[8];
   c_CAMERA *cam;
 
-  if ((cam = (c_CAMERA *)malloc (sizeof (c_CAMERA))) == NULL)
-    return ast3d_err_nomem;
+  if(!(cam = (c_CAMERA *)malloc (sizeof (c_CAMERA)))) return ast3d_err_nomem;
   if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if ((cam->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
   cam->id = c_id++;
   cam->roll = c[6];
-  cam_lens_fov (c[7], &cam->fov);
+  cam->fov = cam_lens_fov (c[7]);
+  cam->aspectratio=1.0;
   vec_make (c[0], c[1], c[2], &cam->pos);
   vec_make (c[3], c[4], c[5], &cam->target);
   vec_swap (&cam->pos);
@@ -1482,7 +1490,7 @@ static int read_TRACKMORPH (afs_FILE *f)
     if (read_ASCIIZ (f)) return ast3d_err_badfile;
     ast3d_byname (c_string, &node);
     if (!node) return ast3d_err_undefined;
-    key->val._int = ((c_OBJECT *)node->object)->id;
+    key->val._obj = (c_OBJECT *)node->object;
     add_key (track, key, nf);
   }
   spline_init (track); /*!! NEW !!*/
@@ -1544,6 +1552,17 @@ static int ChunkReaderWorld (afs_FILE *f, long p, word parent){
   pc = afs_ftell (f);
   while (pc < p) {
     if (read_CHUNK (f, &h) != 0) return ast3d_err_badfile;
+#if 0
+    if(h.chunk_id==0x4150 && h.chunk_size>4000){
+      char *mem=malloc(h.chunk_size);
+      FILE *f2=fopen("chunk4150.dat","wb");
+      afs_fread(mem,1,h.chunk_size,f);
+      fwrite(mem,1,h.chunk_size,f2);
+      fclose(f2);
+      free(mem);
+      afs_fseek(f,pc+6,SEEK_SET);
+    }
+#endif    
     c_chunk_curr=h.chunk_id;
     pc+=h.chunk_size;
     printf("%*s%04X (%ld)\n",chunk_level*2,"",h.chunk_id,h.chunk_size);

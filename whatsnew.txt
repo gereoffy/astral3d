@@ -445,18 +445,87 @@ v3.6  00/01/13  by  A'rpi    - bugfixing... & optimize
 - spline.c-bol a Loop-os derivalok kiszedve, mivel felesleges (ugyanaz mint
   a nem loopos, csak a frame-hoz hozza kell adni a total framet)
 - spline.c: CompElementDeriv() mostantol makro, meg egy kis speed optim.
+- voodoo 3 texturesize detect fix
+
+v3.7  00/01/15-17  by  A'rpi    - killing clax & optimize & bugfix
+- transformations es frustum culling atrakva render.c-bol 3dslib-be
+  problema volt: NO_LIGHTING a render.h-ban volt definalva... es ezert
+  bugzott rendesen, mert #ifdef nem teljesult... javitva.
+- ast3d_update():  eddig a linux.c es a script/scr_draw.c hivogatta a
+  draw3dsframe() hivasa elott. mostantol a draw3dsframe() hivja meg!!!
+  !! FONTOS !!  win.c-bol kitorolni az ast3d_update() hivasat!!!!
+- frustum es aspect ratio: mivel az ast3d_update() meghivasakor mar
+  tudni kell az aspect ratiot (a frustum cull miatt), viszont az
+  ast3d_perspective-hez kell az updatelt kamera, kicsit at kellett rendezni:
+  mostantol a kamera strukturaban levo aspectratio valtozoba kell az 
+  ast3d_update() hivasa elott berakni a window_w/window_h-t. A frustum
+  struktura pedig atkerult a scene-bol a camera strukturaba. updatelni
+  pedig az ast3d_perspective helyett az update_camera fogja.
+
+- visibility: a visible flag eddig a c_VERTEX es c_FACE strukturaban volt,
+  es int tipusu. mostantol kulon van 2 char tip. tomb: vert_visible[] es
+  face_visible[]. a c_OBJECT strukturaban van rajuk pointer.
+  Miert? -> kevesebb memoriat hasznal, es gyorsabb a cache miatt 
+  (csak akkor kell a face/vertex strukturahoz nyulnia ha telleg lathato 
+  az a face/vert. torolni es visib. check is gyorsabb kell legyen)
+- morph:  c_MORPH struktura mexuntetve, helyette az obj->morph a morph
+  trackra mutat (abban ui. megtalalhato a key es az alpha, masra meg nincs
+  is szukseg). ehhez do_morph, getkey, ast3d.h es morph-* atirva.
+  btw. morph-old.c atnevezve morph-lin.c-re, a -new pedig -spl-re.
+- camera.c: cam_lens_fov atirva hogy ne void fv. legyen, hanem a fov-ot
+  adja vissza...  lenyegtelen, de igy szebb a parameter-atadas.
+- aspect ratio bug fixed: egy ideje fixen 1.0-ra volt allitva!
+  valtozas:
+    linux.c:  cam->aspectratio = (float)window_w/(float)window_h;
+      (a (float) nagyon fontos, azert bugzott eddig a keskeny ablakoknal
+      mert int-nek vette, es az eredmeny lefele kerekitve 0 lett)
+    scr_draw.c:  cam->aspectratio = 640.0F / 480.0F;
+      Hogy miert fix? mert kulonben a demok atemretezett ablakban elegge
+      furcsan neztek ki... (a tobbi effekt torzult, a 3d sceneknel pedig
+      a fovx>180 lett (fovx=fov*aspratio), backface cull behulyult stb...)
+      Masreszt mindig fullscreenben fut, es a kepernyo fizikailag minden
+      felbontasban ugyanakkora...
+- timer bug fixed: ismet...
+  a helyes(?) megoldas:  unsigned int-et kell a GetTimer() visszadjon,
+  mivel ez ha tulcsordul akkor sincs baj.
+  (az int nem valt be, mert atmegy negativba, a float pedig nem eleg
+  pontos ha nagy a masodperc szam)
+- ambient light:  leteszteltem (/2/alpha2/ambient.3ds), mukodik.
+- smoothing group support:  (3dslib/smoothgrp.c)
+  elvileg muxik, de vannak meg gondok...
+  pl. birdshow.3ds-ben van olyan hogy group=0. ilyenkor mi van?
+  feltunoen sok uj vertexet general. szerintem nem kene ennyit...
+  environment mapping rendesen bebugzik tole a sik feluleteken (astrans3.3ds)
+  viszont a fenyek sokkal szebbek.
+
+v3.8  00/01/18  by  A'rpi    - real environment mapping
+- real (positional) environment mapping
+  lenyege: a vertex koordinatakat (egesz pontosan a camerapos->vertexpos
+  iranyvektort) is figyelembe veszi -> igy mukodik sik feluletekre is!
+  c_OBJECT-bol toroltem sphere_map-ot, helyette a matflags-ban
+  van 2 uj bit:
+    ast3d_mat_env_positional   =  directional vagy positional a reflection
+    ast3d_mat_env_sphere       =  linear vagy spheremap az xyz->uv lekepzes
+- smoothing group kiszedve defaultbol.
+  megjegyzes: morphos dolgokra NEM MUKODIK! ui. mas mas vertexszamot general
+  a fazisokra, es igy szetmegy vagy elszall a code...
+- uj script valtozok:
+    env_positional  (MATERIAL/FLAG)   default=0
+    env_spheremap   (MATERIAL/FLAG)   default=0
+  uj script parancsok:
+    smoothing [obj1name [obj2...]]    (ugyanugy mint a fixUV)
 
 
 TERVEK a 4.0-ba:
-- CLAX kiolese, ujrairasa
-- uj .3ds loader  (memoriaba olvassa egyben, lancolt lista chunkokrol.)
+- optimize vertex-be: textura koordinatakra figyelni!!!
+- atlatszo objectekre valami egyszerusitett BSP
+- loop-ot tesztelni (rotation, float, vect)
 - BUGok javitasa:
-  - loop mindenre (rotation, float, vect)
-  - ambient light/color
-  - voodoo 3 texturesize detect fix
   - fdtunnel
   - frustum_cull / backface cull bug (lasd beta-ban eltuno facek + particle)
-- hierarchy-t ellenornizni, szerintem csak 1 szintig muxik. es nem mindenre.
+- CLAX kiolese, ujrairasa
+- uj .3ds loader  (memoriaba olvassa egyben, lancolt lista chunkokrol.)
+- hierarchy-t ellenorizni, szerintem csak 1 szintig muxik. es nem mindenre.
 - render-bol lighting es transformations-t attenni 3dslib-be? (do_trans.c)
   elony: szepen szet lenne valasztva a calc es a draw code
   hatrany: opengl-es lighting, material optim stb... ?
@@ -469,16 +538,6 @@ TERVEK a 4.0-ba:
 - gyorstekeres scriptrendszerbe
 - commandline opciok: window/fullscreen, felbontas, mipmap on/off, fps
 - textura caching (betolti a texturakat a kartyaba)
-- bbox helyett bounding sphere (gyorsabb sokkal, es egyszerubb, nincs gond forgatassal stb)
-  nem biztos hogy egyszerubb... foleg frustum-sphere metszes vizsgalatnal.
-  bar a FOV ismereteben konnyu kiszamolni a 4 erintesi pontot, ahol a
-  gomb es a frustum eloszor talalkozik (illetve 6, ha near/far clippinget is
-  nezunk), es eleg ezeket vizsgalni.
-  A gomb pedig jobban kozeliti a legtobb 3d objectet. meg sokat nem jol... :(
-  igazibol ellipszoidot kene nezni, kulon Rx,Ry,Rz sugarral, amit elotte
-  objmat-al transzformalunk. igy viszont bonyolultabb lesz mint a bbox... :(
-  5let: megnezni precalc idoben hogy melyik terfogata a kisebb, es azt
-  kell hasznalni (flag jelzi...)
 
 KELL MEG:
 - hair (szor) effekt
@@ -494,6 +553,24 @@ KELL MEG:
 
 EGYEB:
 - bug: chevy szelvedojen nincs specular!  -- specularmap-al van!!!!!
+  FIXED!
 - Morfnal pretrans face cull  -- megbeszeltuk hogy nem lehet, mert az
   interpolalt normalok szarok, es a D-t is kene interpolalni
-
+- normalokat kulon tombbe rakni, smoothing group miatt
+  nem lehet - visibility miatt (nem tudnank melyik normalokat kell forgatni)
+               -> lehet erre kulon egy visibility tomb
+            - fenyszamolas miatt (ahany normal - annyi rgb, env_uv stb)
+  csak akkor lehetne ha lenne konverzio normal es vertex szamok kozott
+  => meg lehet oldani, bonyolultan, de nem eri meg!  mert keves faces 
+  dolgokra kell csak smoothing. azoknal meg ugyse szamit a speed
+- bbox helyett bounding sphere (gyorsabb sokkal, es egyszerubb, nincs gond forgatassal stb)
+  nem biztos hogy egyszerubb... foleg frustum-sphere metszes vizsgalatnal.
+  bar a FOV ismereteben konnyu kiszamolni a 4 erintesi pontot, ahol a
+  gomb es a frustum eloszor talalkozik (illetve 6, ha near/far clippinget is
+  nezunk), es eleg ezeket vizsgalni.
+  A gomb pedig jobban kozeliti a legtobb 3d objectet. meg sokat nem jol... :(
+  igazibol ellipszoidot kene nezni, kulon Rx,Ry,Rz sugarral, amit elotte
+  objmat-al transzformalunk. igy viszont bonyolultabb lesz mint a bbox... :(
+  5let: megnezni precalc idoben hogy melyik terfogata a kisebb, es azt
+  kell hasznalni (flag jelzi...)
+  
