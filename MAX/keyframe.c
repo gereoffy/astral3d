@@ -13,7 +13,7 @@ void update_track(node_st *node,float frame){
   keyno=track->current_key;
   if(keyno<0 || frame<track->frames[keyno]) keyno=0;
   while((keyno+1)<track->numkeys && frame>=track->frames[keyno+1]) ++keyno;
-  if((keyno+1)<track->numkeys){
+  if(frame>=track->frames[keyno] && (keyno+1)<track->numkeys){
     dt=(track->frames[keyno+1]-track->frames[keyno]);
     alpha=(frame-track->frames[keyno])/dt;
     keyno1=keyno+1;
@@ -110,6 +110,33 @@ void update_track(node_st *node,float frame){
                               (h1*keys[keyno].out_tan.z) +
                               (h2*keys[keyno1].in_tan.z) +
                               (h3*keys[keyno1].value.z);
+        }
+        break; }
+
+    case 0x2519: { SET_KEY(Bezier_Scale_Key)
+        if(alpha==0.0){
+          track->val_vect.x=keys[keyno].value.amount.x;
+          track->val_vect.y=keys[keyno].value.amount.y;
+          track->val_vect.z=keys[keyno].value.amount.z;
+        } else {
+          float u=alpha,u1=1-u;
+          float h0=u1*u1*(u1+3*u);
+          float h1=dt*u*u1*u1;
+          float h2=dt*u*u*u1;
+          float h3=u*u*(u+3*u1);
+          
+          track->val_vect.x = (h0*keys[keyno].value.amount.x) +
+                              (h1*keys[keyno].out_tan.amount.x) +
+                              (h2*keys[keyno1].in_tan.amount.x) +
+                              (h3*keys[keyno1].value.amount.x);
+          track->val_vect.y = (h0*keys[keyno].value.amount.y) +
+                              (h1*keys[keyno].out_tan.amount.y) +
+                              (h2*keys[keyno1].in_tan.amount.y) +
+                              (h3*keys[keyno1].value.amount.y);
+          track->val_vect.z = (h0*keys[keyno].value.amount.z) +
+                              (h1*keys[keyno].out_tan.amount.z) +
+                              (h2*keys[keyno1].in_tan.amount.z) +
+                              (h3*keys[keyno1].value.amount.z);
         }
         break; }
 

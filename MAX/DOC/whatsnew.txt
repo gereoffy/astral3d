@@ -88,6 +88,26 @@ MAX3D v0.71   2000.04.09.  by A'rpi
 - Render.c tud texturazni is (ofkoz COINS.BMP...) egyelore csak UV teszteleshez
 
 
+MAX3D v0.8   2000.04.14.  by A'rpi
+=========================
+- DOC/sorrend.txt: arrol szol, milyen sorrendben kell implementalni/tesztelni
+  az egyes modulokat, hogy mind hibatlan legyen.
+  (azaz ne legyen csomo minden elbaszva egy korai tevedes (pl. rossz
+  PRS matrix) miatt)
+- ha nincs kamera akkor az origobol nez 0,0,-1 fele (azaz nincs szorazs
+  cammat-al) tehat worldspace-t mutat camspace helyett
+- Keyframer bugfix: nem kezelte azt az esetet amikor frame<firstkey.frame
+- tesztelesek 1.:  (lasd. sorrend.txt)
+  simple:
+     - PRS/pos ok  (bezier pos mozgas)
+     - PRS/rot ok  (X, Y, Z iranyban, de csak angle=-90/0/+90 fok)
+     - PRS/scale ok  (XYZ, X-only Y-only XY-only Z-only)
+  pivot:
+     - pivot.pos -> PRS/rot ok
+     - pivot.rot -> PRS/rot ok
+     - pivot.scale -> PRS ok
+
+
 RULEZ, a modifierek forrasa megvan a MAXSDK3-ban! (twist,taper,bend,skew etc...)
 RULEZ az FFD modifier, nagyon durva objecteket lehet vele csinalni egyszeruen!
 

@@ -1,4 +1,5 @@
-#define FPS 120
+#define FPS 520
+
 #define INLINE inline
 
 #include <stdio.h>
@@ -20,7 +21,7 @@
 int play_frame = 2;
 int play_back_frame = 0;
 float frame;
-node_st *max3d_camera;
+node_st *max3d_camera=NULL;
 int window_w,window_h;
 int coins_id=0;
 
@@ -38,11 +39,14 @@ void draw_scene(){
   Matrix objmat;
   Matrix cammat;
   Matrix trmat;
-  Class_Node *camnode=max3d_camera->data;
+  Class_Node *camnode=NULL;
 
   update(frame);  // update Tracks and Nodes
   
-  mat_inverse_cam(cammat,camnode->mat);
+  if(max3d_camera){
+    camnode=max3d_camera->data;
+    mat_inverse_cam(cammat,camnode->mat);
+  }
 
   aglInit();
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -54,7 +58,7 @@ void draw_scene(){
   glLoadIdentity();
 
   // render objects
-  printf("Rendering objs from %s   frame=%f\n",camnode->name,frame);
+  printf("Rendering objs from %s   frame=%f\n",camnode?camnode->name:"0,0,0  LookAt 0,0,-1",frame);
 //  mat_print(cammat); mat_test(cammat);
   
   node=scene.Nodes; while(node){
@@ -62,16 +66,22 @@ void draw_scene(){
     Point3 pos;
     Point3 pos0;
     pos0.x=pos0.y=pos0.z=0;
+
 //    mat_mul(trmat,n->mat,cammat);
     mat_mul(objmat,n->mat,n->tm_mat);
-    mat_mul(trmat,cammat,objmat);
+
+    if(camnode)
+      mat_mul(trmat,cammat,objmat);
+    else
+      mat_copy(trmat,objmat);
+    
     mat_mulvec(&pos,&pos0,trmat);
 //    printf("Node '%s':  %8.3f  %8.3f  %8.3f\n",n->name,pos.x,pos.y,pos.z);
     glColor3ubv(n->wirecolor);
     if(n->mesh){
       Class_EditableMesh *mesh=n->mesh;
       int i;
-#if 1
+#if 0
         if(mesh->numtfaces>0) aglTexture(coins_id);
         glBegin(GL_TRIANGLES);
         for(i=0;i<mesh->numfaces;i++){
@@ -191,7 +201,7 @@ int main(int argc,char* argv[]){
 
     max3d_camera=node_by_name(scene.Nodes,"Camera01");
     if(!max3d_camera) max3d_camera=node_by_name(scene.Nodes,"rolli");
-    if(!max3d_camera) {printf("No camera found!!!\n"); return 1;} // error
+//    if(!max3d_camera) {printf("No camera found!!!\n"); return 1;} // error
 
     InitTimer();
     
