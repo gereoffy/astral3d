@@ -104,6 +104,10 @@ Quat* getkey_quat(node_st *node){
     Track *track=node->data;
     return &(track->val_quat);
   }
+  if(classtype_by_node(node)==CLASSTYPE_EULER_XYZ){
+    Class_EulerXYZ *euler=node->data;
+    return &(euler->quat);
+  }
   printf("Getkey_quat: invalid classtype\n");
   return NULL;
 }

@@ -164,12 +164,30 @@ MAX3D v0.81  2000.04.15.  by A'rpi
   - Linear Rot
   - Linear Scale
   - Smooth Rot (ez meg nincs szamolva, csak betoltve)
-- Specialis controllerek:
+- Uj specialis controllerek:
   - Position XYZ
   - ScaleXYZ
   Mindkettohoz az uj Class_VectorXYZ tipust hasznalja. Az egesz a get.c-ben
   van lekezelve, igy barmihez hasznalhato (PRS,LookAt,PBlock)
+- Bezier bugfix: az atirt keyframe.c-ben a beziernel mas volt a h[]
+  elemeinek a sorrendje...
 
+MAX3D v0.82  2000.04.16.  by A'rpi
+=========================
+- uj quat_from_euler(), ez mar vegre mukodik jol.
+  atirva hogy az EulerXYZ-hez is ezt hasznalja, get.c kezeli le...
+
+MAX3D v0.83  2000.04.26.  by A'rpi
+=========================
+- mesh koruli dolgok
+  - Class_EditableMesh hleyett csak Mesh. kiveve ahol nem :)
+  - 2 init_mesh() volt, fixalva
+  - vertex strukturaba kerult tp es tn (transzformalt p es n)
+  - face strukturaba n (facenormal) es D (distance from origo)
+  - Mesh_Transform() - ez forgatja vertexeket es normalokat
+  => birdshow.3ds tok jol nez ki
+  Tomcat kuldott kalner.max-et, egyelore nem sok latszik belole.
+  'Edit mesh'-t is implementalni kell!!!
 
 ################################################################################
 RULEZ, a modifierek forrasa megvan a MAXSDK3-ban! (twist,taper,bend,skew etc...)

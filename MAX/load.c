@@ -15,6 +15,7 @@ int nodeno=0;
 Scene scene;
 
 #include "mesh.c"
+#include "normals.c"
 
 #include "get.c"
 #include "reader.c"

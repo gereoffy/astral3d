@@ -193,7 +193,7 @@ INLINE void mat_mul2(Matrix a,Matrix b){  // from CLAX
 }
 
 //void quat_from_euler(Quat *quat,float roll,float pitch,float yaw){
-void quat_from_euler(Quat *quat,float roll,float pitch,float yaw){
+void quat_from_euler_SUX(Quat *quat,float roll,float pitch,float yaw){
 //void quat_from_euler(Quat *quat,float yaw,float pitch,float roll){
 // from WEB "Gamasutra - Rotating Objects Using Quaternions"
 
@@ -233,6 +233,31 @@ INLINE float vec_length(Point3 *a){  // from CLAX
   if (len == 0.0) return 1.0;
   return sqrt(len);
 }
+
+INLINE void vec_add(Point3 *out,Point3 *a,Point3 *b){  // by A'rpi
+  out->x=a->x+b->x;
+  out->y=a->y+b->y;
+  out->z=a->z+b->z;
+}
+
+INLINE void vec_addto(Point3 *out,Point3 *a){  // by A'rpi
+  out->x+=a->x;
+  out->y+=a->y;
+  out->z+=a->z;
+}
+
+INLINE void vec_copy(Point3 *out,Point3 *a){  // by A'rpi
+  out->x=a->x;
+  out->y=a->y;
+  out->z=a->z;
+}
+
+INLINE void vec_sub(Point3 *out,Point3 *a,Point3 *b){  // by A'rpi
+  out->x=a->x-b->x;
+  out->y=a->y-b->y;
+  out->z=a->z-b->z;
+}
+
 
 INLINE void mat_identity(Matrix out){  // by A'rpi
   out[X][X]=1; out[X][Y]=0; out[X][Z]=0; out[X][W]=0;
@@ -344,6 +369,14 @@ INLINE float quat_dot(Quat *a,Quat *b){
 INLINE float quat_dotunit(Quat *a,Quat *b){
 /*  qt_dot: computes dot product of a*b.*/
   return (a->w*b->w + a->x*b->x + a->y*b->y + a->z*b->z);
+}
+
+INLINE void quat_mul3(Quat *out,Quat *a,Quat *b){
+/*  qt_multiply: quaternion multiplication (out = a*b).*/
+  out->w = a->w*b->w - a->x*b->x - a->y*b->y - a->z*b->z;
+  out->x = a->w*b->x + a->x*b->w + a->y*b->z - a->z*b->y;
+  out->y = a->w*b->y + a->y*b->w + a->z*b->x - a->x*b->z;
+  out->z = a->w*b->z + a->z*b->w + a->x*b->y - a->y*b->x;
 }
 
 INLINE void quat_mul(Quat *out,Quat *a,Quat *b){
@@ -470,5 +503,38 @@ void mat_from_euler(Matrix out,Point3 *pos,float x,float y,float z,Point3 *scale
   out[X][W]=pos->x;
   out[Y][W]=pos->y;
   out[Z][W]=pos->z;
+}
+
+void quat_fromang(Quat *out,float ang, float x, float y, float z){
+/*  qt_fromang: compute quaternion from [angle,axis] representation.*/
+  float s;
+  ang*=0.5f;
+  out->w = cos (ang);
+  s = sin (ang);
+  out->x = x * s;
+  out->y = y * s;
+  out->z = z * s;
+}
+
+void quat_from_euler(Quat *out,float x,float y,float z){
+  Quat q1,q2,q3,tmp;
+  quat_fromang(&q1,-x,1,0,0);
+  quat_fromang(&q2,-y,0,1,0);
+  quat_fromang(&q3,-z,0,0,1);
+  quat_mul3(&tmp,&q1,&q2);
+  quat_mul3(out,&tmp,&q3);
+}
+
+void mat_normalize(Matrix out,Matrix a){
+/*   mat_normalize: normalize matrix. */
+  int i;
+  for(i=0; i<3; i++){
+    float len=sqrt(a[i][X]*a[i][X] + a[i][Y]*a[i][Y] + a[i][Z]*a[i][Z]);
+    if(len!=0.0) len=1.0/len; else len=1.0;
+    out[i][X]=a[i][X]*len;
+    out[i][Y]=a[i][Y]*len;
+    out[i][Z]=a[i][Z]*len;
+    out[i][W]=a[i][W];
+  }
 }
 

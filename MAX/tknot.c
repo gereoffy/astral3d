@@ -1,5 +1,7 @@
 
 // TorusKnot Object Generator
+// by A'rpi/Astral
+// based on knot.cpp from MaxSdk3
 
 #ifndef PI
 #define PI M_PI
@@ -44,7 +46,7 @@ void torusKnot(Point3 *p,float t,float P,float Q,float Radius1){
 
 char* update_TorusKnot(node_st *objnode){
   Class_TorusKnot *knot=objnode->data;
-  Class_EditableMesh* mesh=&knot->mesh;
+  Mesh* mesh=&knot->mesh;
 
   float P, Q, E, Twist, Lumps, LumpHeight, Rotation, WarpHeight, WarpFreq;
   int BaseCurve;

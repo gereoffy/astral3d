@@ -1,6 +1,24 @@
+Config chunks:
+==============
+20B0 Time config
+
+Classdir chunks:
+================
+2040 Class definition
+2042 Class name (string)
+2060 Class id&data (16 byte)
+
+Scene chunks:
+=============
+2003 3DS Max 2.5 file
+2004 3DS Max 3.0 file
+2034 Reference
+2035 Reference
+
 Track chunks:
 =============
 Value:
+2500 Frame range (2*int)
 2501 Float/Color value
 2503 Position value
 2504 Rotation value

@@ -39,6 +39,7 @@ void draw_scene(){
 //  Matrix objmat;
   Matrix cammat;
   Matrix trmat;
+  Matrix normat;
   Class_Node *camnode=NULL;
 
   update(frame);  // update Tracks and Nodes
@@ -73,18 +74,22 @@ void draw_scene(){
 //    mat_mul(trmat,n->mat,cammat);
 //    mat_mul(objmat,n->mat,n->tm_mat);
 
-    if(camnode){
+    if(camnode)
       mat_mul(trmat,cammat,n->objmat);
-    } else
+    else
       mat_copy(trmat,n->objmat);
+    mat_normalize(normat,trmat);
     
     mat_mulvec(&pos,&pos0,trmat);
 //    printf("Node '%s':  %8.3f  %8.3f  %8.3f\n",n->name,pos.x,pos.y,pos.z);
+
     glColor3ubv(n->wirecolor);
     if(n->mesh){
-      Class_EditableMesh *mesh=n->mesh;
+      Mesh *mesh=n->mesh;
       int i;
-#if 0
+        printf("Rendering mesh: %s\n",n->name);
+#if 1
+        Mesh_Transform(mesh,trmat,normat);
         if(mesh->numtfaces>0) aglTexture(coins_id); else aglTexture(0);
         glBegin(GL_TRIANGLES);
         for(i=0;i<mesh->numfaces;i++){
@@ -92,10 +97,6 @@ void draw_scene(){
           Vertex *v1=&mesh->vertices[f->verts[0]];
           Vertex *v2=&mesh->vertices[f->verts[1]];
           Vertex *v3=&mesh->vertices[f->verts[2]];
-          Point3 p1,p2,p3;
-          mat_mulvec(&p1,&v1->p,trmat);
-          mat_mulvec(&p2,&v2->p,trmat);
-          mat_mulvec(&p3,&v3->p,trmat);
           if(mesh->numtfaces>0){
             TFace* tf=&mesh->tfaces[i];
             TVertex *tv1=&mesh->tvertices[tf->verts[0]];
@@ -103,33 +104,30 @@ void draw_scene(){
             TVertex *tv3=&mesh->tvertices[tf->verts[2]];
             // Textured
             glTexCoord2f(tv1->u,tv1->v);
-            glColor3f(v1->n.x,v1->n.y,v1->n.z);glVertex3f(p1.x,p1.y,p1.z);
+            glColor3f(0.5+0.5*v1->tn.x,0.5+0.5*v1->tn.y,0.5-0.5*v1->tn.z);glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z);
             glTexCoord2f(tv2->u,tv2->v);
-            glColor3f(v2->n.x,v2->n.y,v2->n.z);glVertex3f(p2.x,p2.y,p2.z);
+            glColor3f(0.5+0.5*v2->tn.x,0.5+0.5*v2->tn.y,0.5-0.5*v2->tn.z);glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z);
             glTexCoord2f(tv3->u,tv3->v);
-            glColor3f(v3->n.x,v3->n.y,v3->n.z);glVertex3f(p3.x,p3.y,p3.z);
+            glColor3f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y,0.5-0.5*v3->tn.z);glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);
           } else {
             // Gouraud only
-            glColor3f(v1->n.x,v1->n.y,v1->n.z);glVertex3f(p1.x,p1.y,p1.z);
-            glColor3f(v2->n.x,v2->n.y,v2->n.z);glVertex3f(p2.x,p2.y,p2.z);
-            glColor3f(v3->n.x,v3->n.y,v3->n.z);glVertex3f(p3.x,p3.y,p3.z);
+            glColor3f(0.5+0.5*v1->tn.x,0.5+0.5*v1->tn.y,0.5-0.5*v1->tn.z);glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z);
+            glColor3f(0.5+0.5*v2->tn.x,0.5+0.5*v2->tn.y,0.5-0.5*v2->tn.z);glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z);
+            glColor3f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y,0.5-0.5*v3->tn.z);glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);
           }
         }
         glEnd();
 #else
+        Mesh_Transform(mesh,trmat,NULL);
         glBegin(GL_LINES);
         for(i=0;i<mesh->numfaces;i++){
           Face* f=&mesh->faces[i];
           Vertex *v1=&mesh->vertices[f->verts[0]];
           Vertex *v2=&mesh->vertices[f->verts[1]];
           Vertex *v3=&mesh->vertices[f->verts[2]];
-          Point3 p1,p2,p3;
-          mat_mulvec(&p1,&v1->p,trmat);
-          mat_mulvec(&p2,&v2->p,trmat);
-          mat_mulvec(&p3,&v3->p,trmat);
-          if(f->flags&EDGE_A){ glVertex3f(p1.x,p1.y,p1.z); glVertex3f(p2.x,p2.y,p2.z);}
-          if(f->flags&EDGE_B){ glVertex3f(p2.x,p2.y,p2.z); glVertex3f(p3.x,p3.y,p3.z);}
-          if(f->flags&EDGE_C){ glVertex3f(p3.x,p3.y,p3.z); glVertex3f(p1.x,p1.y,p1.z);}
+          if(f->flags&EDGE_A){ glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z); glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z);}
+          if(f->flags&EDGE_B){ glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z); glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);}
+          if(f->flags&EDGE_C){ glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z); glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z);}
         }
         glEnd();
 #endif

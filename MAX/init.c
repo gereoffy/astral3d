@@ -18,11 +18,13 @@ char* update_PRS(node_st *node){
   Class_PRS *prs=node->data;
 //  printf("POS: %f %f %f\n",prs->pos->x,prs->pos->y,prs->pos->z);
 //  printf("SCALE: %f %f %f\n",prs->scale->x,prs->scale->y,prs->scale->z);
+#if 0
   if(prs->euler)
     mat_from_euler(prs->mat,prs->pos,
       *(prs->euler->x),*(prs->euler->y),*(prs->euler->z),
       prs->scale,prs->scaleaxis);
   else
+#endif
     mat_from_prs(prs->mat,prs->pos,prs->rot,prs->scale,prs->scaleaxis);
 //  printf("updating PRS\n");
 //  printf("  Quat: w: %8.5f  x: %8.5f y: %8.5f z: %8.5f\n",prs->rot->w,prs->rot->x,prs->rot->y,prs->rot->z);
@@ -40,13 +42,15 @@ char* init_PRS(node_st *node){
   // POS:
   prs->pos=getkey_vect(posnode);
   // ROT:
+  prs->euler=NULL;
+#if 0
   if(classtype_by_node(rotnode)==CLASSTYPE_EULER_XYZ){
     prs->euler=rotnode->data;
     prs->rot=NULL;
-  } else {
+  } else
+#endif
     prs->rot=getkey_quat(rotnode);
-    prs->euler=NULL;
-  }
+//  }
   // SCALE:
   prs->scale=getkey_vect(scalenode);
   prs->scaleaxis=getkey_quat(scalenode);
@@ -124,7 +128,7 @@ char* init_Node(node_st *node){
   node_st *object;
   node_st *parent=node_by_id(n->parent);
   printf("Node %s refdb=%d\n",n->name,node->refdb);
-  if(node->refdb==8){
+  if(node->refdb==8 || node->refdb==6){
     orient=dep_node_by_ref(node,0);
     object=dep_node_by_ref(node,1);
   } else {
