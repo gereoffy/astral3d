@@ -34,6 +34,7 @@ void ExitDemo(){
   if(fx_debug) fclose(fx_debug);
 //  printf("\nTexture memory used:  32bpp: %d k    16bpp: %d k\n",
 //    map_memory_used/1024,map_memory_used_16bpp/1024);
+  PrintMAPinfo();
   printf("\nTotal frames: %d\n",total_frames);
   exit(0);
 }
@@ -85,8 +86,8 @@ GLvoid IdleFunc(){
 
 
 int main(int argc,char* argv[]){
-int fullscreen=0;
 char* scriptname="astral.scr";
+int fullscreen=0;
 int xs=640;
 int ys=480;
 

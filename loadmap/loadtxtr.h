@@ -29,4 +29,7 @@ texture_st* load_texture(char *txt1,char *txt1m,float txt1a,
                          char *alp,char *alpm,float alpa,int negflags);
                          
 extern void PrintMAPinfo();
+
+extern void Download_Textures();
+
                          

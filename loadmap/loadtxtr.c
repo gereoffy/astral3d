@@ -52,6 +52,36 @@ static INLINE unsigned char clip_255(float x){
   return (y<0)?0:((y>=256)?255:y);
 }
 
+void Download_Textures(){
+  int i;
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0.0f, 400, 0.0f, 400, -10000.0f, 10000.0f);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  
+  glColor3f(1,1,1);
+  glDisable(GL_BLEND);
+  glEnable(GL_TEXTURE_2D);
+  for(i=texture_db-1;i>=0;i--){
+    texture_st *t=&textures[i];
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    printf("Uploading texture #%d  (id=%d)\n",i,t->id);
+    glBindTexture(GL_TEXTURE_2D, t->id);
+    glBegin(GL_QUADS);
+      glTexCoord2f(0,0); glVertex2i(0,0);
+      glTexCoord2f(1,0); glVertex2i(64,0);
+      glTexCoord2f(1,1); glVertex2i(64,64);
+      glTexCoord2f(0,1); glVertex2i(0,64);
+    glEnd();
+    glutSwapBuffers();
+//    sleep(1);
+  }
+}
+
+
 /* Load maps and mix into a single RGB or RGBA texture */
 texture_st* load_texture(char *txt1,char *txt1m,float txt1a,
                          char *txt2,char *txt2m,float txt2a,

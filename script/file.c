@@ -870,10 +870,12 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       }
 #endif
 //===============================================================================
-//if(cmdp->code==42){
-//  scene_debug_ptr=current_scene;
-//  return;
-//}
+// 43:  load_maxscene maxscene_var "filename"
+      if(cmdp->code==43){
+        Download_Textures();
+        return;
+      }
+//===============================================================================
 
       scrSyntax("Internal error: Unimplemented command (check command code!)");
     }

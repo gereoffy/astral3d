@@ -178,6 +178,9 @@ V("load_maxscene",scrCLASS_global, 41,0, 2,2); P_NEW(1);
 // 42
 V("pointer_hack",scrCLASS_scene,42,0,0,0);
 
+// 43
+V("download_textures",scrCLASS_global,43,0,0,0);
+
 //===========================================================================
 #undef V
 #undef P_MAXSCENE
