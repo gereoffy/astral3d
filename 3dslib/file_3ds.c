@@ -57,50 +57,50 @@ typedef struct { /* 3DS chunk structure */
 typedef struct { /* Chunk reader list */
   word id;                       /* chunk id        */
   int  sub;                      /* has subchunks   */
-  int  (*func) (FILE *f);        /* reader function */
+  int  (*func) (afs_FILE *f);        /* reader function */
 } c_LISTKEY, c_LISTWORLD;
 
-static int read_NULL         (FILE *f); /* (skip chunk)            */
-static int read_RGBF         (FILE *f); /* RGB float               */
-static int read_RGBB         (FILE *f); /* RGB byte                */
-static int read_AMOUNTOF     (FILE *f); /* Amount of               */
-static int read_ASCIIZ       (FILE *f); /* ASCIIZ string           */
-static int read_TRIMESH      (FILE *f); /* Triangular mesh         */
-static int read_VERTLIST     (FILE *f); /* Vertex list             */
-static int read_FACELIST     (FILE *f); /* Face list               */
-static int read_FACEMAT      (FILE *f); /* Face material           */
-static int read_MAPLIST      (FILE *f); /* Mapping list            */
-static int read_TRMATRIX     (FILE *f); /* Transformation matrix   */
-static int read_LIGHT        (FILE *f); /* Light                   */
-static int read_SPOTLIGHT    (FILE *f); /* Spotlight               */
-static int read_CAMERA       (FILE *f); /* Camera                  */
-static int read_MATERIAL     (FILE *f); /* Material                */
-static int read_MATNAME      (FILE *f); /* Material name           */
-static int read_FRAMES       (FILE *f); /* Number of frames        */
-static int read_OBJNUMBER    (FILE *f); /* Object number           */
-static int read_TRACKOBJNAME (FILE *f); /* Track object name       */
-static int read_DUMMYNAME    (FILE *f); /* Dummy object name       */
-static int read_TRACKPIVOT   (FILE *f); /* Track pivot point       */
-static int read_TRACKPOS     (FILE *f); /* Track position          */
-static int read_TRACKCOLOR   (FILE *f); /* Track color             */
-static int read_TRACKROT     (FILE *f); /* Track rotation          */
-static int read_TRACKSCALE   (FILE *f); /* Track scale             */
-static int read_TRACKFOV     (FILE *f); /* Track fov               */
-static int read_TRACKROLL    (FILE *f); /* Track roll              */
-static int read_TRACKMORPH   (FILE *f); /* Track morph             */
-static int read_TRACKHIDE    (FILE *f); /* Track hide              */
-static int read_MATTYPE      (FILE *f); /* Material: type          */
-static int read_MATTWOSIDED  (FILE *f); /* Material: two sided     */
-static int read_MATSOFTEN    (FILE *f); /* Material: soften        */
-static int read_MATWIRE      (FILE *f); /* Material: wire          */
-static int read_MATTRANSADD  (FILE *f); /* Material: transparency  */
-static int read_MAPFLAGS     (FILE *f); /* Map flags               */
-static int read_MAPFILE      (FILE *f); /* Map file                */
-static int read_MAPUSCALE    (FILE *f); /* Map 1/U scale           */
-static int read_MAPVSCALE    (FILE *f); /* Map 1/V scale           */
-static int read_MAPUOFFSET   (FILE *f); /* Map U offset            */
-static int read_MAPVOFFSET   (FILE *f); /* Map V offset            */
-static int read_MAPROTANGLE  (FILE *f); /* Map rotation angle      */
+static int read_NULL         (afs_FILE *f); /* (skip chunk)            */
+static int read_RGBF         (afs_FILE *f); /* RGB float               */
+static int read_RGBB         (afs_FILE *f); /* RGB byte                */
+static int read_AMOUNTOF     (afs_FILE *f); /* Amount of               */
+static int read_ASCIIZ       (afs_FILE *f); /* ASCIIZ string           */
+static int read_TRIMESH      (afs_FILE *f); /* Triangular mesh         */
+static int read_VERTLIST     (afs_FILE *f); /* Vertex list             */
+static int read_FACELIST     (afs_FILE *f); /* Face list               */
+static int read_FACEMAT      (afs_FILE *f); /* Face material           */
+static int read_MAPLIST      (afs_FILE *f); /* Mapping list            */
+static int read_TRMATRIX     (afs_FILE *f); /* Transformation matrix   */
+static int read_LIGHT        (afs_FILE *f); /* Light                   */
+static int read_SPOTLIGHT    (afs_FILE *f); /* Spotlight               */
+static int read_CAMERA       (afs_FILE *f); /* Camera                  */
+static int read_MATERIAL     (afs_FILE *f); /* Material                */
+static int read_MATNAME      (afs_FILE *f); /* Material name           */
+static int read_FRAMES       (afs_FILE *f); /* Number of frames        */
+static int read_OBJNUMBER    (afs_FILE *f); /* Object number           */
+static int read_TRACKOBJNAME (afs_FILE *f); /* Track object name       */
+static int read_DUMMYNAME    (afs_FILE *f); /* Dummy object name       */
+static int read_TRACKPIVOT   (afs_FILE *f); /* Track pivot point       */
+static int read_TRACKPOS     (afs_FILE *f); /* Track position          */
+static int read_TRACKCOLOR   (afs_FILE *f); /* Track color             */
+static int read_TRACKROT     (afs_FILE *f); /* Track rotation          */
+static int read_TRACKSCALE   (afs_FILE *f); /* Track scale             */
+static int read_TRACKFOV     (afs_FILE *f); /* Track fov               */
+static int read_TRACKROLL    (afs_FILE *f); /* Track roll              */
+static int read_TRACKMORPH   (afs_FILE *f); /* Track morph             */
+static int read_TRACKHIDE    (afs_FILE *f); /* Track hide              */
+static int read_MATTYPE      (afs_FILE *f); /* Material: type          */
+static int read_MATTWOSIDED  (afs_FILE *f); /* Material: two sided     */
+static int read_MATSOFTEN    (afs_FILE *f); /* Material: soften        */
+static int read_MATWIRE      (afs_FILE *f); /* Material: wire          */
+static int read_MATTRANSADD  (afs_FILE *f); /* Material: transparency  */
+static int read_MAPFLAGS     (afs_FILE *f); /* Map flags               */
+static int read_MAPFILE      (afs_FILE *f); /* Map file                */
+static int read_MAPUSCALE    (afs_FILE *f); /* Map 1/U scale           */
+static int read_MAPVSCALE    (afs_FILE *f); /* Map 1/V scale           */
+static int read_MAPUOFFSET   (afs_FILE *f); /* Map U offset            */
+static int read_MAPVOFFSET   (afs_FILE *f); /* Map V offset            */
+static int read_MAPROTANGLE  (afs_FILE *f); /* Map rotation angle      */
 
 static c_LISTWORLD world_chunks[] = { /* World definition chunks */
   {CHUNK_RGBF,         0, read_RGBF},
@@ -322,7 +322,7 @@ static int add_key (t_TRACK *track, t_KEY *key, int frame)
   chunk readers (world)
 *****************************************************************************/
 
-static int read_NULL (FILE *f)
+static int read_NULL (afs_FILE *f)
 {
 /*
   read_NULL: "dummy" chunk reader.
@@ -331,7 +331,7 @@ static int read_NULL (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_RGBF (FILE *f)
+static int read_RGBF (afs_FILE *f)
 {
 /*
   read_RGBF: RGB float reader.
@@ -346,7 +346,7 @@ static int read_RGBF (FILE *f)
     case CHUNK_DIFFUSE:      rgb = &(mat->diffuse); break;
     case CHUNK_SPECULAR:     rgb = &(mat->specular); break;
   }
-  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if (rgb) {
     rgb->rgb[0] = c[0];
     rgb->rgb[1] = c[1];
@@ -355,7 +355,7 @@ static int read_RGBF (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_RGBB (FILE *f)
+static int read_RGBB (afs_FILE *f)
 {
 /*
   read_RGBB: RGB Byte reader.
@@ -370,7 +370,7 @@ static int read_RGBB (FILE *f)
     case CHUNK_DIFFUSE:      rgb = &(mat->diffuse); break;
     case CHUNK_SPECULAR:     rgb = &(mat->specular); break;
   }
-  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if (rgb) {
     rgb->rgb[0] = (float)c[0] / 255.0;
     rgb->rgb[1] = (float)c[1] / 255.0;
@@ -379,7 +379,7 @@ static int read_RGBB (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_AMOUNTOF (FILE *f)
+static int read_AMOUNTOF (afs_FILE *f)
 {
 /*
   read_AMOUNTOF: "amount of" reader.
@@ -396,12 +396,12 @@ static int read_AMOUNTOF (FILE *f)
     case CHUNK_REFBLUR:      fl = &(mat->refblur); break;
     case CHUNK_SELFILLUM:    fl = &(mat->self_illum);
   }
-  if (fread (&w, sizeof (w), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&w, sizeof (w), 1, f) != 1) return ast3d_err_badfile;
   if (fl) *fl = (float)w / 100.0 *128;
   return ast3d_err_ok;
 }
 
-static int read_ASCIIZ (FILE *f)
+static int read_ASCIIZ (afs_FILE *f)
 {
 /*
   read_ASCIIZ: ASCIIZ string reader.
@@ -409,13 +409,13 @@ static int read_ASCIIZ (FILE *f)
   char *s = c_string;
   int   c;
 
-  while ((c = fgetc (f)) != EOF && c != '\0') *s++ = (char)c;
+  while ((c = afs_fgetc (f)) != EOF && c != '\0') *s++ = (char)c;
   if (c == EOF) return ast3d_err_badfile;
   *s = '\0';
   return ast3d_err_ok;
 }
 
-static int read_TRIMESH (FILE *f)
+static int read_TRIMESH (afs_FILE *f)
 {
 /*
   read_TRIMESH: Triangular mesh reader.
@@ -439,7 +439,7 @@ static int read_TRIMESH (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_VERTLIST (FILE *f)
+static int read_VERTLIST (afs_FILE *f)
 {
 /*
   read_VERTLIST: Vertex list reader.
@@ -449,13 +449,13 @@ static int read_VERTLIST (FILE *f)
   float     c[3];
   word      nv;
 
-  if (fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
   if ((v = (c_VERTEX *)malloc (nv * sizeof (c_VERTEX))) == NULL)
     return ast3d_err_nomem;
   obj->vertices = v;
   obj->numverts = nv;
   while (nv-- > 0) {
-    if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
     vec_make (c[0], c[1], c[2], &v->vert);
     vec_swap (&v->vert);
     v->u = 0.0;
@@ -465,7 +465,7 @@ static int read_VERTLIST (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_FACELIST (FILE *f)
+static int read_FACELIST (afs_FILE *f)
 {
 /*
   read_FACELIST: Face list reader.
@@ -475,14 +475,14 @@ static int read_FACELIST (FILE *f)
   word      c[3];
   word      nv, flags;
 
-  if (fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
   if ((fc = (c_FACE *)malloc (nv * sizeof (c_FACE))) == NULL)
     return ast3d_err_nomem;
   obj->faces = fc;
   obj->numfaces = nv;
   while (nv-- > 0) {
-    if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
-    if (fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
     fc->a = c[0];
     fc->b = c[1];
     fc->c = c[2];
@@ -498,7 +498,7 @@ static int read_FACELIST (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_FACEMAT (FILE *f)
+static int read_FACEMAT (afs_FILE *f)
 {
 /*
   read_FACEMAT: Face material reader.
@@ -509,19 +509,19 @@ static int read_FACEMAT (FILE *f)
   word        n, nf;
 
   if (read_ASCIIZ (f)) return ast3d_err_badfile;
-  if (fread (&n, sizeof (n), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&n, sizeof (n), 1, f) != 1) return ast3d_err_badfile;
   ast3d_byname (c_string, &node);
   if (!node) return ast3d_err_undefined;
   mat = (c_MATERIAL *)node->object;
   while (n-- > 0) {
-    if (fread (&nf, sizeof (nf), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (&nf, sizeof (nf), 1, f) != 1) return ast3d_err_badfile;
     fc[nf].mat = mat->id;
     fc[nf].pmat = mat;
   }
   return ast3d_err_ok;
 }
 
-static int read_MAPLIST (FILE *f)
+static int read_MAPLIST (afs_FILE *f)
 {
 /*
   read_MAPLIST: Map list reader.
@@ -530,9 +530,9 @@ static int read_MAPLIST (FILE *f)
   float     c[2];
   word      nv;
 
-  if (fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
   while (nv-- > 0) {
-    if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
     v->u = c[0];
     v->v = c[1];
     v++;
@@ -540,7 +540,7 @@ static int read_MAPLIST (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRMATRIX (FILE *f)
+static int read_TRMATRIX (afs_FILE *f)
 {
 /*
   read_TRMATRIX: Transformation matrix reader.
@@ -555,9 +555,9 @@ static int read_TRMATRIX (FILE *f)
   mat_identity (mat);
   for (i = 0; i < 3; i++)
     for (j = 0; j < 3; j++)
-      if (fread (&mat[i][j], sizeof (float), 1, f) != 1)
+      if (afs_fread (&mat[i][j], sizeof (float), 1, f) != 1)
         return ast3d_err_badfile;
-  if (fread (pivot, sizeof (pivot), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (pivot, sizeof (pivot), 1, f) != 1) return ast3d_err_badfile;
   vec_make (pivot[0], pivot[1], pivot[2], &piv);
   vec_swap (&piv);
   mat_swap (mat);
@@ -570,7 +570,7 @@ static int read_TRMATRIX (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_LIGHT (FILE *f)
+static int read_LIGHT (afs_FILE *f)
 {
 /*
   read_LIGHT: Light reader.
@@ -580,7 +580,7 @@ static int read_LIGHT (FILE *f)
 
   if ((light = (c_LIGHT *)malloc (sizeof (c_LIGHT))) == NULL)
     return ast3d_err_nomem;
-  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if ((light->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
   light->id = c_id++;
   light->flags = ast3d_light_omni;
@@ -591,7 +591,7 @@ static int read_LIGHT (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_SPOTLIGHT (FILE *f)
+static int read_SPOTLIGHT (afs_FILE *f)
 {
 /*
   read_SPOTLIGHT: Spot light reader.
@@ -599,7 +599,7 @@ static int read_SPOTLIGHT (FILE *f)
   float   c[5];
   c_LIGHT *light = (c_LIGHT *)c_node;
 
-  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   light->target.x = c[0];
   light->target.y = c[1];
   light->target.z = c[2];
@@ -611,7 +611,7 @@ static int read_SPOTLIGHT (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_CAMERA (FILE *f)
+static int read_CAMERA (afs_FILE *f)
 {
 /*
   read_CAMERA: Camera reader.
@@ -621,7 +621,7 @@ static int read_CAMERA (FILE *f)
 
   if ((cam = (c_CAMERA *)malloc (sizeof (c_CAMERA))) == NULL)
     return ast3d_err_nomem;
-  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if ((cam->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
   cam->id = c_id++;
   cam->roll = c[6];
@@ -635,7 +635,7 @@ static int read_CAMERA (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MATERIAL (FILE *f)
+static int read_MATERIAL (afs_FILE *f)
 {
 /*
   read_MATERIAL: Material reader.
@@ -652,7 +652,7 @@ static int read_MATERIAL (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MATNAME (FILE *f)
+static int read_MATNAME (afs_FILE *f)
 {
 /*
   read_MATNAME: Material name reader.
@@ -664,7 +664,7 @@ static int read_MATNAME (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MATTYPE (FILE *f)
+static int read_MATTYPE (afs_FILE *f)
 {
 /*
   read_MATTYPE: Material type reader.
@@ -672,12 +672,12 @@ static int read_MATTYPE (FILE *f)
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
   word        type;
 
-  if (fread (&type, sizeof (type), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&type, sizeof (type), 1, f) != 1) return ast3d_err_badfile;
   mat->shading = type;
   return ast3d_err_ok;
 }
 
-static int read_MATTWOSIDED (FILE *f)
+static int read_MATTWOSIDED (afs_FILE *f)
 {
 /*
   read_MATTWOSIDED: Material two sided reader.
@@ -689,7 +689,7 @@ static int read_MATTWOSIDED (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MATSOFTEN (FILE *f)
+static int read_MATSOFTEN (afs_FILE *f)
 {
 /*
   read_MATSOFTEN: Material soften reader.
@@ -701,7 +701,7 @@ static int read_MATSOFTEN (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MATWIRE (FILE *f)
+static int read_MATWIRE (afs_FILE *f)
 {
 /*
   read_MATWIRE: Material wireframe reader.
@@ -713,7 +713,7 @@ static int read_MATWIRE (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MATTRANSADD (FILE *f)
+static int read_MATTRANSADD (afs_FILE *f)
 {
 /*
   read_MATTRANSADD: Material transparency add reader.
@@ -725,7 +725,7 @@ static int read_MATTRANSADD (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MAPFILE (FILE *f)
+static int read_MAPFILE (afs_FILE *f)
 {
 /*
   read_MAPFILE: MAP file reader.
@@ -744,7 +744,7 @@ static int read_MAPFILE (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MAPFLAGS (FILE *f)
+static int read_MAPFLAGS (afs_FILE *f)
 {
 /*
   read_MAPFLAGS: MAP flags reader.
@@ -753,7 +753,7 @@ static int read_MAPFLAGS (FILE *f)
   c_MAP      *map = NULL;
   word        flags;
 
-  if (fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
@@ -763,7 +763,7 @@ static int read_MAPFLAGS (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MAPUSCALE (FILE *f)
+static int read_MAPUSCALE (afs_FILE *f)
 {
 /*
   read_MAPUSCALE: MAP U scale reader.
@@ -772,7 +772,7 @@ static int read_MAPUSCALE (FILE *f)
   c_MAP      *map = NULL;
   float       U;
 
-  if (fread (&U, sizeof (U), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&U, sizeof (U), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
@@ -782,7 +782,7 @@ static int read_MAPUSCALE (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MAPVSCALE (FILE *f)
+static int read_MAPVSCALE (afs_FILE *f)
 {
 /*
   read_MAPUSCALE: MAP U scale reader.
@@ -791,7 +791,7 @@ static int read_MAPVSCALE (FILE *f)
   c_MAP      *map = NULL;
   float       V;
 
-  if (fread (&V, sizeof (V), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&V, sizeof (V), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
@@ -801,7 +801,7 @@ static int read_MAPVSCALE (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MAPUOFFSET (FILE *f)
+static int read_MAPUOFFSET (afs_FILE *f)
 {
 /*
   read_MAPUSCALE: MAP U offset reader.
@@ -810,7 +810,7 @@ static int read_MAPUOFFSET (FILE *f)
   c_MAP      *map = NULL;
   float       U;
 
-  if (fread (&U, sizeof (U), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&U, sizeof (U), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
@@ -820,7 +820,7 @@ static int read_MAPUOFFSET (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MAPVOFFSET (FILE *f)
+static int read_MAPVOFFSET (afs_FILE *f)
 {
 /*
   read_MAPUSCALE: MAP V offset reader.
@@ -829,7 +829,7 @@ static int read_MAPVOFFSET (FILE *f)
   c_MAP      *map = NULL;
   float       V;
 
-  if (fread (&V, sizeof (V), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&V, sizeof (V), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
@@ -839,7 +839,7 @@ static int read_MAPVOFFSET (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_MAPROTANGLE (FILE *f)
+static int read_MAPROTANGLE (afs_FILE *f)
 {
 /*
   read_MAPUSCALE: MAP rotation angle reader.
@@ -848,7 +848,7 @@ static int read_MAPROTANGLE (FILE *f)
   c_MAP      *map = NULL;
   float       angle;
 
-  if (fread (&angle, sizeof (angle), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&angle, sizeof (angle), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
@@ -862,32 +862,32 @@ static int read_MAPROTANGLE (FILE *f)
   chunk readers (keyframer)
 *****************************************************************************/
 
-static int read_FRAMES (FILE *f)
+static int read_FRAMES (afs_FILE *f)
 {
 /*
   read_FRAMES: Frames reader.
 */
   dword c[2];
 
-  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   ast3d_scene->f_start = c[0];
   ast3d_scene->f_end = c[1];
   return ast3d_err_ok;
 }
 
-static int read_OBJNUMBER (FILE *f)
+static int read_OBJNUMBER (afs_FILE *f)
 {
 /*
   read_OBJNUMBER: Object number reader. (3DS 4.0+)
 */
   word n;
 
-  if (fread (&n, sizeof (n), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&n, sizeof (n), 1, f) != 1) return ast3d_err_badfile;
   c_id = n;
   return ast3d_err_ok;
 }
 
-static int read_DUMMYNAME (FILE *f)
+static int read_DUMMYNAME (afs_FILE *f)
 {
 /*
   read_DUMMYNAME: Dummy object name reader.
@@ -899,7 +899,7 @@ static int read_DUMMYNAME (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKOBJNAME (FILE *f)
+static int read_TRACKOBJNAME (afs_FILE *f)
 {
 /*
   read_TRACKOBJNAME: Track object name reader.
@@ -946,8 +946,8 @@ static int read_TRACKOBJNAME (FILE *f)
     cam = (c_CAMERA *)node->object;
     light = (c_LIGHT *)node->object;
   }
-  if (fread (flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
-  if (fread (&parent, sizeof (parent), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&parent, sizeof (parent), 1, f) != 1) return ast3d_err_badfile;
   if (parent != -1) {
     for (pnode = ast3d_scene->keyframer; pnode; pnode = pnode->next)
       if (pnode->id == parent)
@@ -1002,7 +1002,7 @@ static int read_TRACKOBJNAME (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKPIVOT (FILE *f)
+static int read_TRACKPIVOT (afs_FILE *f)
 {
 /*
   read_TRACKPIVOT: Track pivot point reader.
@@ -1011,7 +1011,7 @@ static int read_TRACKPIVOT (FILE *f)
   float     pos[3];
   int       i;
 
-  if (fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
   vec_make (pos[0], pos[1], pos[2], &obj->pivot);
   vec_swap (&obj->pivot);
   for (i = 0; i < obj->numverts; i++)
@@ -1019,7 +1019,7 @@ static int read_TRACKPIVOT (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_KFLAGS (FILE *f, word *nf, t_KEY *key)
+static int read_KFLAGS (afs_FILE *f, word *nf, t_KEY *key)
 {
 /*
   read_KFLAGS: Key flags/spline reader.
@@ -1033,12 +1033,12 @@ static int read_KFLAGS (FILE *f, word *nf, t_KEY *key)
   key->bias = 0.0;
   key->easeto = 0.0;
   key->easefrom = 0.0;
-  if (fread (nf, sizeof (word), 1, f) != 1) return ast3d_err_badfile;
-  if (fread (&unknown, sizeof (word), 1, f) != 1) return ast3d_err_badfile;
-  if (fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (nf, sizeof (word), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&unknown, sizeof (word), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
   for (i = 0; i < 16; i++) {
     if (flags & (1 << i)) {
-      if (fread (&dat, sizeof (dat), 1, f) != 1) return ast3d_err_badfile;
+      if (afs_fread (&dat, sizeof (dat), 1, f) != 1) return ast3d_err_badfile;
       switch (i) {
         case 0: key->tens = dat; break;
         case 1: key->cont = dat; break;
@@ -1051,21 +1051,21 @@ static int read_KFLAGS (FILE *f, word *nf, t_KEY *key)
   return ast3d_err_ok;
 }
 
-static int read_TFLAGS (FILE *f, t_TRACK *track, word *n)
+static int read_TFLAGS (afs_FILE *f, t_TRACK *track, word *n)
 {
 /*
   read_TFLAGS: Track flags reader.
 */
   word flags[7];
 
-  if (fread (flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
   if ((flags[0] & 0x02) == 0x02) track->flags = ast3d_track_repeat;
   if ((flags[0] & 0x03) == 0x03) track->flags = ast3d_track_loop;
   *n = flags[5];
   return ast3d_err_ok;
 }
 
-static int read_TRACKPOS (FILE *f)
+static int read_TRACKPOS (afs_FILE *f)
 {
 /*
   read_TRACKPOS: Track position reader.
@@ -1081,7 +1081,7 @@ static int read_TRACKPOS (FILE *f)
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
       return ast3d_err_nomem;
     if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
-    if (fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
     vec_make (pos[0], pos[1], pos[2], &key->val._vect);
     vec_swap (&key->val._vect);
     add_key (track, key, nf);
@@ -1091,7 +1091,7 @@ static int read_TRACKPOS (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKCOLOR (FILE *f)
+static int read_TRACKCOLOR (afs_FILE *f)
 {
 /*
   read_TRACKCOLOR: Track color reader.
@@ -1107,7 +1107,7 @@ static int read_TRACKCOLOR (FILE *f)
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
       return ast3d_err_nomem;
     if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
-    if (fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
     vec_make (pos[0], pos[1], pos[2], &key->val._vect);
     vec_swap (&key->val._vect);
     add_key (track, key, nf);
@@ -1117,7 +1117,7 @@ static int read_TRACKCOLOR (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKROT (FILE *f)
+static int read_TRACKROT (afs_FILE *f)
 {
 /*
   read_TRACKROT: Track rotation reader.
@@ -1137,7 +1137,7 @@ static int read_TRACKROT (FILE *f)
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
       return ast3d_err_nomem;
     if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
-    if (fread (pos, sizeof(pos), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (pos, sizeof(pos), 1, f) != 1) return ast3d_err_badfile;
     qt_fromang (pos[0], pos[1], pos[2], pos[3], &q);
         // !!! FIX !!! I SAID ANGLE IS ABSOLUTE!!!!!!!!!
     if (keys == n-1) angle = pos[0]; else angle += pos[0];
@@ -1153,7 +1153,7 @@ static int read_TRACKROT (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKSCALE (FILE *f)
+static int read_TRACKSCALE (afs_FILE *f)
 {
 /*
   read_TRACKSCALE: Track scale reader.
@@ -1169,7 +1169,7 @@ static int read_TRACKSCALE (FILE *f)
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
       return ast3d_err_nomem;
     if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
-    if (fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
     vec_make (pos[0], pos[1], pos[2], &key->val._vect);
     vec_swap (&key->val._vect);
     add_key (track, key, nf);
@@ -1179,7 +1179,7 @@ static int read_TRACKSCALE (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKFOV (FILE *f)
+static int read_TRACKFOV (afs_FILE *f)
 {
 /*
   read_TRACKFOV: Track FOV reader.
@@ -1195,7 +1195,7 @@ static int read_TRACKFOV (FILE *f)
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
       return ast3d_err_nomem;
     if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
-    if (fread (&fov, sizeof (fov), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (&fov, sizeof (fov), 1, f) != 1) return ast3d_err_badfile;
     key->val._float = fov;
     add_key (track, key, nf);
   }
@@ -1204,7 +1204,7 @@ static int read_TRACKFOV (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKROLL (FILE *f)
+static int read_TRACKROLL (afs_FILE *f)
 {
 /*
   read_TRACKROLL: Track ROLL reader.
@@ -1220,7 +1220,7 @@ static int read_TRACKROLL (FILE *f)
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
       return ast3d_err_nomem;
     if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
-    if (fread(&roll, sizeof(roll), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread(&roll, sizeof(roll), 1, f) != 1) return ast3d_err_badfile;
     key->val._float = roll;
     add_key (track, key, nf);
   }
@@ -1229,7 +1229,7 @@ static int read_TRACKROLL (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKMORPH (FILE *f)
+static int read_TRACKMORPH (afs_FILE *f)
 {
 /*
   read_TRACKMORPH: Track morph reader.
@@ -1255,7 +1255,7 @@ static int read_TRACKMORPH (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRACKHIDE (FILE *f)
+static int read_TRACKHIDE (afs_FILE *f)
 {
 /*
   read_TRACKHIDE: Track hide reader.
@@ -1271,8 +1271,8 @@ static int read_TRACKHIDE (FILE *f)
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
       return ast3d_err_nomem;
-    if (fread (&nf, sizeof (nf), 1, f) != 1) return ast3d_err_badfile;
-    if (fread (unknown, sizeof (word), 2, f) != 2) return ast3d_err_badfile;
+    if (afs_fread (&nf, sizeof (nf), 1, f) != 1) return ast3d_err_badfile;
+    if (afs_fread (unknown, sizeof (word), 2, f) != 2) return ast3d_err_badfile;
     key->val._int = (hide ^= 1);
     add_key (track, key, nf);
   }
@@ -1280,14 +1280,14 @@ static int read_TRACKHIDE (FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_CHUNK (FILE *f, c_CHUNK *h)
+static int read_CHUNK (afs_FILE *f, c_CHUNK *h)
 {
 /*
   read_CHUNK: Chunk reader.
 */
-  if (fread (&h->chunk_id, sizeof (word), 1, f) != 1)
+  if (afs_fread (&h->chunk_id, sizeof (word), 1, f) != 1)
     return ast3d_err_badfile;
-  if (fread (&h->chunk_size, sizeof (dword), 1, f) != 1)
+  if (afs_fread (&h->chunk_size, sizeof (dword), 1, f) != 1)
     return ast3d_err_badfile;
   return ast3d_err_ok;
 }
@@ -1296,7 +1296,7 @@ static int read_CHUNK (FILE *f, c_CHUNK *h)
   chunk readers control
 *****************************************************************************/
 
-static int ChunkReaderWorld (FILE *f, long p, word parent)
+static int ChunkReaderWorld (afs_FILE *f, long p, word parent)
 {
 /*
   ChunkReaderWorld: Recursive chunk reader (world).
@@ -1330,7 +1330,7 @@ static int ChunkReaderWorld (FILE *f, long p, word parent)
   return ast3d_err_ok;
 }
 
-static int ChunkReaderKey (FILE *f, long p, word parent)
+static int ChunkReaderKey (afs_FILE *f, long p, word parent)
 {
 /*
   ChunkReaderKey: Recursive chunk reader (keyframer).
@@ -1367,7 +1367,7 @@ static int ChunkReaderKey (FILE *f, long p, word parent)
   world/motion load routines
 *****************************************************************************/
 
-int32 ast3d_load_mesh_3DS (FILE *f)
+int32 ast3d_load_mesh_3DS (afs_FILE *f)
 {
 /*
   ast3d_load_mesh_3DS: loads mesh data from 3ds file "filename"
@@ -1380,13 +1380,13 @@ int32 ast3d_load_mesh_3DS (FILE *f)
   fseek (f, 0, SEEK_END);
   length = ftell (f);
   fseek (f, 28L, SEEK_SET);
-  if (fread (&version, sizeof (byte), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&version, sizeof (byte), 1, f) != 1) return ast3d_err_badfile;
   if (version < 2) return ast3d_err_badver; /* 3DS 3.0+ supported */
   fseek (f, 0, SEEK_SET);
   return ChunkReaderWorld (f, length, 0);
 }
 
-int32 ast3d_load_motion_3DS (FILE *f)
+int32 ast3d_load_motion_3DS (afs_FILE *f)
 {
 /*
   ast3d_loadmotion: loads motion data from 3ds file "filename"
@@ -1399,7 +1399,7 @@ int32 ast3d_load_motion_3DS (FILE *f)
   fseek (f, 0, SEEK_END);
   length = ftell (f);
   fseek (f, 28L, SEEK_SET);
-  if (fread (&version, sizeof (byte), 1, f) != 1) return ast3d_err_badfile;
+  if (afs_fread (&version, sizeof (byte), 1, f) != 1) return ast3d_err_badfile;
   if (version < 2) return ast3d_err_badver; /* 3DS 3.0+ supported */
   fseek (f, 0, SEEK_SET);
   return ChunkReaderKey (f, length, 0);

@@ -20,9 +20,9 @@ typedef signed long    sdword;
 
 /* astral 3d fileformat drivers */
 
-int32 ast3d_load_mesh_3DS   (FILE *f);
-int32 ast3d_load_motion_3DS (FILE *f);
-int32 ast3d_load_mesh_AST   (FILE *f);
-int32 ast3d_load_motion_AST (FILE *f);
-int32 ast3d_save_AST        (FILE *f);
+int32 ast3d_load_mesh_3DS   (afs_FILE *f);
+int32 ast3d_load_motion_3DS (afs_FILE *f);
+int32 ast3d_load_mesh_AST   (afs_FILE *f);
+int32 ast3d_load_motion_AST (afs_FILE *f);
+int32 ast3d_save_AST        (afs_FILE *f);
 

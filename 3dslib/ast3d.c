@@ -19,9 +19,9 @@
 
 struct {
   char   *name;                   /* file extension        */
-  int32 (*load_mesh)   (FILE *f); /* loads mesh            */
-  int32 (*load_motion) (FILE *f); /* loads motion          */
-  int32 (*save_scene)  (FILE *f); /* saves the whole scene */
+  int32 (*load_mesh)   (afs_FILE *f); /* loads mesh            */
+  int32 (*load_motion) (afs_FILE *f); /* loads motion          */
+  int32 (*save_scene)  (afs_FILE *f); /* saves the whole scene */
 } ast3d_drivers[] = {
   {"3DS", ast3d_load_mesh_3DS, ast3d_load_motion_3DS, NULL},
 //  {"AST", ast3d_load_mesh_AST, ast3d_load_motion_AST, ast3d_save_AST}
@@ -654,9 +654,9 @@ int32 ast3d_load_world (char *filename, c_SCENE *scene)
 /*
   ast3d_load_world: loads mesh data from file "filename" into scene "scene".
 */
-  int32   (*loader)(FILE *f) = NULL;
+  int32   (*loader)(afs_FILE *f) = NULL;
   c_SCENE *old_scene = ast3d_scene;
-  FILE    *f;
+  afs_FILE    *f;
   char    *s;
   int32    i, error;
 
@@ -673,10 +673,10 @@ int32 ast3d_load_world (char *filename, c_SCENE *scene)
   scene->wtail = NULL;
   scene->keyframer = NULL;
   scene->ktail = NULL;
-  if ((f = fopen (filename, "rb")) == NULL) return ast3d_err_nofile;
+  if ((f = afs_fopen (filename, "rb")) == NULL) return ast3d_err_nofile;
   ast3d_setactive_scene (scene);
   error = loader (f);
-  fclose (f);
+  afs_fclose (f);
   if (error) {
     ast3d_setactive_scene (old_scene);
     ast3d_free_world (scene);
@@ -694,9 +694,9 @@ int32 ast3d_load_motion (char *filename, c_SCENE *scene)
   ast3d_load_motion: loads motion data from file "filename"
                     into scene "scene".
 */
-  int32    (*loader)(FILE *f) = NULL;
+  int32    (*loader)(afs_FILE *f) = NULL;
   c_SCENE  *old_scene = ast3d_scene;
-  FILE     *f;
+  afs_FILE     *f;
   char     *s;
   int32     i, error;
 
@@ -707,10 +707,10 @@ int32 ast3d_load_motion (char *filename, c_SCENE *scene)
       loader = ast3d_drivers[i].load_motion;
   }
   if (!loader) return ast3d_err_badformat;
-  if ((f = fopen (filename, "rb")) == NULL) return ast3d_err_nofile;
+  if ((f = afs_fopen (filename, "rb")) == NULL) return ast3d_err_nofile;
   ast3d_setactive_scene (scene);
   error = loader (f);
-  fclose (f);
+  afs_fclose (f);
   if (error) {
     ast3d_setactive_scene (old_scene);
     ast3d_free_motion (scene);
@@ -740,9 +740,9 @@ int32 ast3d_save_scene (char *filename, c_SCENE *scene)
 /*
   ast3d_save_scene: saves scene "scene" to filename "filename".
 */
-  int32    (*loader)(FILE *f) = NULL;
+  int32    (*loader)(afs_FILE *f) = NULL;
   c_SCENE  *old_scene = ast3d_scene;
-  FILE     *f;
+  afs_FILE     *f;
   char     *s;
   int32     i, error;
 
@@ -753,10 +753,10 @@ int32 ast3d_save_scene (char *filename, c_SCENE *scene)
       loader = ast3d_drivers[i].save_scene;
   }
   if (!loader) return ast3d_err_badformat;
-  if ((f = fopen (filename, "wb")) == NULL) return ast3d_err_undefined;
+  if ((f = afs_fopen (filename, "wb")) == NULL) return ast3d_err_undefined;
   ast3d_setactive_scene (scene);
   error = loader (f);
-  fclose (f);
+  afs_fclose (f);
   ast3d_setactive_scene (old_scene);
   if (error) return error;
   return ast3d_err_ok;
