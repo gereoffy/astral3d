@@ -8,6 +8,8 @@ int nodeclass_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chun
 //    printf("  %*sChunk %04X (%d)\n",2*level,"",chunk_id,chunk_size);
 
 switch(chunk_id){
+  case 0x0960:
+    format_chunk_data(f,&chunk_size,"  Parent node: %i  flags: %x\n");break;
   case 0x0962: printf("  Name: '%s'\n",string_reader(f,&chunk_size)); break;
   case 0x096A:
     format_chunk_data(f,&chunk_size,"  TMatrix.pos: %f %f %f\n");break;

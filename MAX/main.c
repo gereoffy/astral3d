@@ -41,6 +41,7 @@ int nodeno=0;
 #include "noderdr.c"
 #include "materrdr.c"
 #include "pblock.c"
+#include "meshrdr.c"
 
 void init_classreaders(){
   // Track/Key reader:
@@ -68,12 +69,16 @@ void init_classreaders(){
   register_classreader("Bitmap",1,NULL,material_chunk_reader,NULL);
   // ParamBlock:
   register_classreader("ParamBlock",0,paramblock_init,paramblock_chunk_reader,paramblock_uninit);
+  // Editable Mesh
+  register_classreader("Editable Mesh",0,NULL,mesh_chunk_reader,NULL);
   
 }
 
 //========================================================================//
 //               node reader
 //========================================================================//
+
+//#include "hierarch.c"
 
 void node_chunk_reader(FILE *f,node_st *node,int level){
 unsigned short int chunk_id=0;
@@ -93,13 +98,19 @@ if(recurse_flag){
 #ifdef PRINT_CHUNKS
   printf("  %*sChunk %04X R\n",2*level,"",chunk_id);
 #endif
-  while(ftell(f)<endpos) node_chunk_reader(f,node,level+1);
+//  if(chunk_id==0x2300)
+//    while(ftell(f)<endpos) hierarchy_chunk_reader(f,node,level+1);
+//  else
+    while(ftell(f)<endpos) node_chunk_reader(f,node,level+1);
   return;
 }
 
 if(node->classid<classdb) nodeclass=&classtab[node->classid];
 
 switch(chunk_id){
+//  case 0x2300:
+//    Chunk 0100 (4)
+
   case 0x2034:
   case 0x2035: {
     // References:

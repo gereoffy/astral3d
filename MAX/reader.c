@@ -82,6 +82,7 @@ void format_chunk_data(FILE *f,int *chunk_size,char *s){
                   case 'b': printf("%d",byte_reader(f,chunk_size));break;
                   case 's': printf("%s",string_reader(f,chunk_size));break;
                   case 'S': printf("%s",string8_reader(f,chunk_size));break;
+                  case '*': dump_chunk_data(f,chunk_size);break;
                 }
                 continue;
               }
