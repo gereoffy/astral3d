@@ -1,0 +1,4 @@
+
+rm -f render
+gcc -Wall -g Render.c agl/agl.o -o render -L/usr/X11/lib -I/usr/X11/include -lGL -lGLU -lglut -lX11 -lXext -lXi -lXmu -lm
+

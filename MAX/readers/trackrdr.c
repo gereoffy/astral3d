@@ -152,6 +152,7 @@ switch(chunk_id){
     switch(subtype&15){  // val_quat
       case 4:
       case 5:
+//        track->val_quat.w=float_reader(f,&chunk_size);
         track->val_quat.x=float_reader(f,&chunk_size);
         track->val_quat.y=float_reader(f,&chunk_size);
         track->val_quat.z=float_reader(f,&chunk_size);

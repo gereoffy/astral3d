@@ -38,21 +38,27 @@ char* init_PRS(node_st *node){
 char* update_LookAt(node_st *node){
   Class_LookAt *lat=node->data;
   Point3 to;
-  to.x=*lat->to[X][W];
-  to.y=*lat->to[Y][W];
-  to.z=*lat->to[Z][W];
+  Matrix *tomat=(lat->to);
+  to.x=(*tomat)[X][W];
+  to.y=(*tomat)[Y][W];
+  to.z=(*tomat)[Z][W];
   // create mat from lat->from, to, lat->roll, lat->scale
+  mat_from_lookat(lat->mat,lat->from,&to,*lat->roll,lat->scale,lat->scaleaxis,lat->axis);
   printf("updating LookAt\n");
+  printf("  from: %8.5f  %8.5f  %8.5f\n",lat->from->x,lat->from->y,lat->from->z);
+  printf("  to:   %8.5f  %8.5f  %8.5f\n",to.x,to.y,to.z);
+  printf("  roll: %8.5f\n",*lat->roll);
+  mat_print(lat->mat);
   return NULL;
 }
 
 char* init_LookAt(node_st *node){
-  Class_LookAt *lat=malloc(sizeof(Class_LookAt));
+  Class_LookAt *lat=node->data;
   node_st *to_node;
-  node->data=lat;
   node->update=update_LookAt;
   to_node=dep_node_by_ref(node,0);
   if(!(to_node)) return "LookAt: missing to_node";
+  if(classtype_by_node(to_node)!=CLASSTYPE_NODE) return "LookAt: target must be type 'Node'";
   { Class_Node *n=to_node->data;
     lat->to=&n->mat;
   }
@@ -68,16 +74,26 @@ char* init_LookAt(node_st *node){
 
 char* update_Node(node_st *node){
   Class_Node *n=node->data;
-  mat_mul(n->mat,n->tm_mat,*n->orient_mat);
-  if(n->parent_mat) mat_mul2(n->mat,*n->parent_mat);
   printf("updating Node '%s'\n",n->name);
+  printf("tm_mat:\n");mat_print(n->tm_mat);
+  if(n->orient_mat){
+    printf("orient:\n");mat_print(*n->orient_mat);
+    mat_mul(n->mat,n->tm_mat,*n->orient_mat);
+    printf("tm*orient:\n");mat_print(n->mat);
+  } else mat_copy(n->mat,n->tm_mat);
+  if(n->parent_mat){
+    printf("parent_mat:\n");mat_print(*n->parent_mat);
+    mat_mul2(n->mat,*n->parent_mat);
+    printf("mat:\n");mat_print(n->mat);
+  }
   return NULL;
 }
 
 char* init_Node(node_st *node){
+  Matrix tempmat;
   Class_Node *n=node->data;
   node_st *orient=dep_node_by_ref(node,2);
-//  node_st *object=dep_node_by_ref(node,4);
+  node_st *object=dep_node_by_ref(node,4);
   node_st *parent=node_by_id(n->parent);
   if(classtype_by_node(parent)==CLASSTYPE_NODE){
     Class_Node *pn=parent->data;
@@ -88,8 +104,14 @@ char* init_Node(node_st *node){
     Orientation *o=orient->data;
     n->orient_mat=&o->mat;
   } else n->orient_mat=NULL;
-  mat_from_tm(n->tm_mat,&n->tm);
+//  mat_from_tm(n->tm_mat,&n->tm);
+  mat_from_tm(tempmat,&n->tm);mat_inverse(n->tm_mat,tempmat);
+//  printf("TM_mat:\n");mat_print(n->tm_mat);
   node->update=update_Node;
+  n->mesh=NULL;
+  if(classtype_by_node(object)==CLASSTYPE_MESH){
+    n->mesh=object->data;
+  }
   return NULL;
 }
 

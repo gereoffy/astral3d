@@ -70,19 +70,6 @@ typedef struct {
   Scale scale;
 } TMatrix;
 
-typedef struct {
-  char *name;
-  int parent;          // erre is kene dependelni!
-  unsigned int flags;
-  unsigned char wirecolor[4];
-  TMatrix tm; // pivot
-  // Calculated:
-  Matrix tm_mat;  // mat_from_tm(tm)
-  Matrix *orient_mat;  // PRS / LookAt mat-janak cime
-  Matrix *parent_mat;  // NULL vagy a parent mat-janak cime
-  Matrix mat; // calculated transformation matrix (tm*PRS*hierarchy)
-} Class_Node;
-
 
 typedef struct {
   Matrix mat;
@@ -103,6 +90,7 @@ typedef struct {
   float *roll;      // P2
   Point3 *scale;    // P3
   Quat *scaleaxis;
+  int axis; // +0x100=flip  0=X 1=Y 2=Z
 } Class_LookAt;
 
 typedef struct {
@@ -240,6 +228,22 @@ typedef struct {
 
 
 typedef struct {
+  char *name;
+  int parent;          // erre is kene dependelni!
+  unsigned int flags;
+  unsigned char wirecolor[4];
+  TMatrix tm; // pivot
+  // Calculated:
+  Matrix tm_mat;  // mat_from_tm(tm)
+  Matrix *orient_mat;  // PRS / LookAt mat-janak cime
+  Matrix *parent_mat;  // NULL vagy a parent mat-janak cime
+  Matrix mat; // calculated transformation matrix (tm*PRS*hierarchy)
+  Class_EditableMesh *mesh; // points to object mesh (editable/object/derived)
+//  Matrix invmat; // inverse mat
+} Class_Node;
+
+
+typedef struct {
   node_st *Tracks;
   node_st *ParamBlocks;
   node_st *Shapes;
@@ -253,12 +257,17 @@ typedef struct {
 #define CLASSTYPE_TRACK 1
 #define CLASSTYPE_PARAMBLOCK 2
 #define CLASSTYPE_ORIENTATION 3
+
 #define CLASSTYPE_SHAPE 4
 #define CLASSTYPE_OBJECT 5
 #define CLASSTYPE_MODIFIER 6
 #define CLASSTYPE_MODOBJ 7
-#define CLASSTYPE_NODE 8
+#define CLASSTYPE_MESH 8
+
+#define CLASSTYPE_NODE 9
+
 #define CLASSTYPE_MAP 20
 #define CLASSTYPE_MATERIAL 21
+
 
 

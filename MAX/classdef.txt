@@ -1,3 +1,17 @@
+CLASS "Look At"
+  CHUNK 7230 "%*"
+  CHUNK 7231 "%*"
+  CHUNK 0100 "%*"
+
+CLASS "Target"
+  REF 0 "Camera frustum parameters"
+    PARAM 0 "FOV"
+    PARAM 1 "???"
+    PARAM 2 "Clip.near"
+    PARAM 3 "Clip.far"
+    PARAM 4 "Env.near"
+    PARAM 5 "Env.far"
+
 CLASS "Editable Mesh"
   CHUNK 4020 "%*"
   CHUNK 4024 "%*"

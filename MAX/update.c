@@ -1,17 +1,18 @@
 
+int force_changed=1;
+
 void update_track(node_st *node,int frame){
   Track *track=node->data;
   node->state=STATE_UPDATED;
-  if(track->numkeys==0) return; // nincs keyframe
+  if(track->numkeys==0 && force_changed==0) return; // nincs keyframe
 // ide jon a keyframer hivasa
   node->state=STATE_CHANGED;
 }
 
-int force_changed=0;
-
 int update_node(node_st *node){
   int i;
   int chg=force_changed; // force_changed = 0 (play) vagy 1 (init)
+//  printf("update_node called with ptr %08X\n",(int)((void*)node));
   node->state=STATE_UPDATED; // vegtelen ciklus elkerulese miatt
   for(i=0;i<node->refdb;i++)
     if(node->reflist[i]&0x80000000){
@@ -24,10 +25,12 @@ int update_node(node_st *node){
       }
     }
   if(chg){ 
-    char *err=node->update(node);
-    if(err){ printf("Error updating node, message: %s\n",err);return 0;}
+    if(node->update){
+      char *err=node->update(node);
+      if(err){ printf("Error updating node, message: %s\n",err);return 0;}
+    }
     node->state=STATE_CHANGED;
-  } else printf("node not changed\n");
+  } //else printf("node not changed\n");
 
   return 1;
 }
@@ -47,5 +50,6 @@ node_st *node;
   node=scene.Nodes; while(node){ 
     if(node->state==STATE_UNKNOWN) update_node(node);
     node=node->next;}
-  
+
+  force_changed=0;
 }

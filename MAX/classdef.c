@@ -9,7 +9,7 @@ char sor[256];
 int classid=0;
 chelp_st* chelp=NULL;
 int refno=0;
-FILE *f=fopen("classdef.txt","rt");
+FILE *f=fopen("/demo/MAX/reader2/classdef.txt","rt");
   if(!f) return;
   while(fgets(sor,250,f)){
     int len=strlen(sor);
