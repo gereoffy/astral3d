@@ -104,7 +104,7 @@ void recurse_lightmap_uv(c_FACE *list,int x1,int y1,int xs,int ys){
   }
 }
 
-void make_lightmap_uv(c_OBJECT *obj){
+void make_lightmap_uv(c_OBJECT *obj,int xsize,int ysize){
 int i;
 float Amin=(obj->A)/2048.0;
   for(i=0;i<obj->numfaces;i++){
@@ -112,16 +112,18 @@ float Amin=(obj->A)/2048.0;
     if(obj->faces[i].A<Amin) obj->faces[i].A=Amin;  // save small faces!
   }
   obj->faces[obj->numfaces-1].next=NULL;
-/*
-  if(obj->numfaces<64){ obj->lm_xs=128; obj->lm_ys=64; } else
-  if(obj->numfaces<128){ obj->lm_xs=256; obj->lm_ys=128; } else
-  if(obj->numfaces<512){ obj->lm_xs=256; obj->lm_ys=256; } else
-  if(obj->numfaces<1024){ obj->lm_xs=512; obj->lm_ys=256; } else
-                        { obj->lm_xs=512; obj->lm_ys=512; }
-*/
-                        { obj->lm_xs=obj->lm_ys=256; }
+  if(xsize==0 || ysize==0){
+    if(obj->numfaces<64){ obj->lm_xs=128; obj->lm_ys=64; } else
+    if(obj->numfaces<128){ obj->lm_xs=256; obj->lm_ys=128; } else
+    if(obj->numfaces<512){ obj->lm_xs=256; obj->lm_ys=256; } else
+    if(obj->numfaces<1024){ obj->lm_xs=512; obj->lm_ys=256; } else
+                          { obj->lm_xs=512; obj->lm_ys=512; }
+//                          { obj->lm_xs=obj->lm_ys=256; }
+  } else {
+    obj->lm_xs=xsize;obj->lm_ys=ysize;
+  }
 
 //  obj->lm_xs=256; obj->lm_ys=128; // !!!!!!!!
-  recurse_lightmap_uv(&obj->faces[0],0,0,obj->lm_xs,obj->lm_ys);
+  recurse_lightmap_uv(&obj->faces[0],2,2,obj->lm_xs-4,obj->lm_ys-2);
 }
 

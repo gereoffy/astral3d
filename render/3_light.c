@@ -67,6 +67,20 @@
     if(matflags&ast3d_mat_specularmap) specular=1;
 
 //    obj->flags&ast3d_obj_allvisible;  // HACK
+
+    if(obj->lightmap_id>0){
+      for (i = 0; i < obj->numverts; i++)
+        if(obj->flags&ast3d_obj_allvisible || obj->vert_visible[i]){
+          obj->vertices[i].refl_rgb[0]=
+          obj->vertices[i].refl_rgb[1]=
+          obj->vertices[i].refl_rgb[2]=
+          obj->vertices[i].rgb[0]=
+          obj->vertices[i].rgb[1]=
+          obj->vertices[i].rgb[2]=255;
+          obj->vertices[i].rgb[3]=src_alpha;
+        }
+
+    } else
   
     for (i = 0; i < obj->numverts; i++){
       if(obj->flags&ast3d_obj_allvisible || obj->vert_visible[i]){
@@ -214,7 +228,7 @@ if(l->flags&ast3d_light_attenuation){
 
 	    }
           }
-#if 0          
+#if 1
           obj->vertices[i].rgb[0]=clip_255(r);
           obj->vertices[i].rgb[1]=clip_255(g);
           obj->vertices[i].rgb[2]=clip_255(b);

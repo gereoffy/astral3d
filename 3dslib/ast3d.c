@@ -55,7 +55,7 @@ static void calc_normals (){
       smoothing_group((c_OBJECT *)node->object);
       calc_objnormals ((c_OBJECT *)node->object);
 #ifdef LIGHTMAP_UV
-      make_lightmap_uv((c_OBJECT *)node->object);
+//      make_lightmap_uv((c_OBJECT *)node->object);
 #endif
     }
 }

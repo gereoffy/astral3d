@@ -327,6 +327,8 @@ typedef struct _c_LIGHT { /* light struct */
   float MatAmb[3],MatDiff[3],MatSpec[3];
   float CosFalloff,CosHotspot,SpotExp;
   int ambient;
+  float inner_range,outer_range;
+  int attenuate;
 //  float specular_limit,specular_coef,specular_mult;
 } c_LIGHT;
 
@@ -423,6 +425,7 @@ typedef struct _c_OBJECT { /* object struct */
   int lm_xs,lm_ys;                  /* lightmap size */
   float A;                          /* teljes felulet */
   int lightmap_id;
+  int lightmap_xsize,lightmap_ysize;
 } c_OBJECT;
 
 typedef struct _w_NODE { /* world node */
@@ -787,6 +790,9 @@ void qt_slerp (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out);
   void qt_frommat (c_MATRIX mat, c_QUAT *out)
   converts a rotation matrix "mat" to quaternion, giving result in "out".
 */
+
+void make_lightmap_uv(c_OBJECT *obj,int xsize,int ysize);
+
 
 /*****************************************************************************
   library functions (spline routines)

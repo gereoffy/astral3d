@@ -576,7 +576,34 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         return;
       }
 //===============================================================================
-      if(cmdp->code==22) return; // unimplemented
+      if(cmdp->code==22) return; // unimplemented (fdtunnel_select)
+//===============================================================================
+// 23:  lightmap [xsize ysize]
+      if(cmdp->code==23){
+        current_object->flags|=ast3d_obj_lmapmake;
+        make_lightmap_uv(current_object,pval[1],(pval[2]>0)?pval[2]:pval[1]);
+        return;
+      }
+//===============================================================================
+// 24:  render_lightmaps [frame]
+      if(cmdp->code==24){
+        scene=fx->scene; ast3d_setactive_scene(scene);
+        scene->cam->aspectratio=640.0F/480.0F;
+        ast3d_setactive_camera(scene->cam);
+        ast3d_setframe(pval[1]); // fx->frame
+        ast3d_blend=1.0f; // !!!!!
+        render_lightmaps();
+        return;
+      }
+//===============================================================================
+// 25:  corona_sprite <pic>
+      if(cmdp->code==25){
+        lightmap=pval[1];
+        return;
+      }
+//===============================================================================
+
+
 //      return;
     }
   }

@@ -95,7 +95,7 @@
       n.z=nA.z-(uA-u)*nxadd.z;
 //      V_COPY(p,pA) V_COPY(n,nA)
       while(u<=uend){
-//        if(u<0 || v<0 || u>=obj->lm_xs || v>=obj->lm_ys){ printf("FATAL! u=%d  v=%d\n",u,v); exit(1); }
+        if(u<0 || v<0 || u>=obj->lm_xs || v>=obj->lm_ys){ printf("FATAL! u=%d  v=%d\n",u,v); exit(1); }
         // calc some colors from p&n to rgb[]
 #include "lightvtx.c"
         V_ADD(p,pxadd) V_ADD(n,nxadd)
@@ -126,7 +126,7 @@
   // upload texture
   printf("Lightmap generation done\n");
 	glGenTextures(1, &t_id);
-#if 1
+#if 0
   { char name[128];
     FILE *f;
     sprintf(name,"lmap_%d.raw",t_id);

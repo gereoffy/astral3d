@@ -49,8 +49,6 @@ int lightno;
 #include "light.c"
 #include "vertlits.c"
 
-static int lmap_flag=1;
-
 void draw3dsframe(void){
     int i;
     int rendered_objects=0;
@@ -61,7 +59,6 @@ void draw3dsframe(void){
     unsigned char refl_rgb[3];
     int specular=0;
     unsigned char src_alpha=255;
-    c_OBJECT *first_obj=NULL;
     
     ast3d_update();        // keyframing & transformations
 
@@ -90,7 +87,6 @@ PROF_END(prof_3d_setuplight);
           mat_mul (scene->cam->matrix, obj->matrix, objmat);
           mat_normalize (objmat, normat);
           ++rendered_objects;
-          if(!first_obj) first_obj=obj;
 
           if(obj->flags&ast3d_obj_particle){
             if(obj->particle.np>0)
@@ -128,10 +124,6 @@ PROF_START(prof_3d_material);
 #include "2_mater.c"
 PROF_END(prof_3d_material);
 
-if(obj->flags&ast3d_obj_lmapmake){
-#include "lmapmake.c"
-}
-
 PROF_START(prof_3d_lighting);
 #include "3_light.c"
 PROF_END(prof_3d_lighting);
@@ -163,7 +155,6 @@ PROF_END(prof_3d_specmap);
 
 glDisable(GL_CULL_FACE);
 
-
 PROF_END(prof_3d_draw);
 
 }}}
@@ -177,39 +168,6 @@ PROF_START(prof_3d_lightcorona);
   PutLightCoronas();
 PROF_END(prof_3d_lightcorona);
 
-#if 0
-//------------------------------------------------------
-{ int i;
-//  printf("drawing lightmap for %d faces\n",obj->numfaces);
-  aglTexture(0);
-  aglZbuffer(0);
-  aglBlend(0);
-
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(0.0f, 640, 0.0f, 480, -10000.0f, 10000.0f);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  
-  for(i=0;i<first_obj->numfaces;i++){
-    c_FACE *f=&first_obj->faces[i];
-    glBegin(GL_TRIANGLES);
-//      printf("%d;%d %d;%d %d;%d\n",(int)f->lu1,(int)f->lv1,
-//                                   (int)f->lu2,(int)f->lv2,
-//                                   (int)f->lu3,(int)f->lv3);
-      glColor3f(1,0,0); glVertex3f(f->lu1,f->lv1,-500);
-      glColor3f(0,1,0); glVertex3f(f->lu2,f->lv2,-500);
-      glColor3f(0,0,1); glVertex3f(f->lu3,f->lv3,-500);
-    glEnd();
-  }
-  
-  if(lmap_flag){
-    first_obj->flags|=ast3d_obj_lmapmake;
-    lmap_flag=0;
-  }
 }
-//------------------------------------------------------
-#endif
 
-
-}
+#include "renderlm.c"

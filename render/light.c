@@ -68,12 +68,15 @@ static void SetupLightMode(void){
         lit = (c_LIGHT*)node->object;
         lights[lightno]=lit;
         mat_mulvec(scene->cam->matrix,&lit->pos,&lit->ppos);  /* Transformation */
+        
+//        printf("Light #%d color %f %f %f\n",lightno,lit->color.rgb[0],lit->color.rgb[1],lit->color.rgb[2]);
 
 #ifdef NO_LIGHTING
         if(lit->attenuation[0]==1.0 &&
            lit->attenuation[1]==0.0 &&
            lit->attenuation[2]==0.0 &&
-           (!(lit->flags&ast3d_light_spot))
+           (!(lit->flags&ast3d_light_spot)) &&
+           (!(lit->attenuate))
         ) lit->flags&=~ast3d_light_attenuation; else
           lit->flags|=ast3d_light_attenuation;
 #else

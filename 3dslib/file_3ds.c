@@ -46,6 +46,10 @@ enum ast3d_3ds_chunks_ { /* Chunk ID */
   CHUNK_CAMERA       = 0x4700,  CHUNK_HIERARCHY    = 0x4F00,
   CHUNK_VIEWPORT     = 0x7001,
   CHUNK_MATERIAL     = 0xAFFF, 
+  
+  CHUNK_INNER_RANGE  = 0x4659,
+  CHUNK_OUTER_RANGE  = 0x465A,
+  CHUNK_LIGHT_ATTENUATE = 0x4625,
 
   CHUNK_MATNAME      = 0xA000, CHUNK_AMBIENT      = 0xA010,
   CHUNK_DIFFUSE      = 0xA020, CHUNK_SPECULAR     = 0xA030,
@@ -148,6 +152,9 @@ static int read_MAPROTANGLE  (afs_FILE *f); /* Map rotation angle      */
 static int read_TXTINFO (afs_FILE *f);
 static int read_FOGPARAMS (afs_FILE *f);
 static int read_ENABLE (afs_FILE *f);
+static int read_INNER_RANGE(afs_FILE *f);
+static int read_OUTER_RANGE(afs_FILE *f);
+static int read_LIGHT_ATTEN(afs_FILE *f);
 
 static c_MAP* get_map_pointer(c_MATERIAL *mat);
 
@@ -228,7 +235,11 @@ static c_LISTWORLD world_chunks[] = { /* World definition chunks */
   {CHUNK_TRANSADD,     0, read_MATTRANSADD},
   {CHUNK_WIREON,       0, read_MATWIRE},
   {CHUNK_SOFTEN,       0, read_MATSOFTEN},
-  {CHUNK_MATTYPE,      0, read_MATTYPE}
+  {CHUNK_MATTYPE,      0, read_MATTYPE},
+  {CHUNK_INNER_RANGE,  0, read_INNER_RANGE},
+  {CHUNK_OUTER_RANGE,  0, read_OUTER_RANGE},
+  {CHUNK_LIGHT_ATTENUATE,  0, read_LIGHT_ATTEN}
+
 };
 
 static c_LISTKEY key_chunks[] = { /* Keyframer chunks */
@@ -444,8 +455,7 @@ static int read_NULL (afs_FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_RGBF (afs_FILE *f)
-{
+static int read_RGBF (afs_FILE *f){
 /*
   read_RGBF: RGB float reader.
 */
@@ -464,6 +474,7 @@ static int read_RGBF (afs_FILE *f)
     rgb->rgb[0] = c[0];
     rgb->rgb[1] = c[1];
     rgb->rgb[2] = c[2];
+    printf("Load.color %f %f %f\n",c[0],c[1],c[2]);
   }
   return ast3d_err_ok;
 }
@@ -559,6 +570,7 @@ static int read_TRIMESH (afs_FILE *f)
   obj->explode_speed=obj->explode_frame=0.0;
 //  obj->additivetexture=0;
   obj->pmat = Default_MATERIAL;
+  obj->lightmap_id=0;
 
   if(strncmp(obj->name,"PARTICLE",8)==0) obj->flags|=ast3d_obj_particle;
   obj->particle.np=obj->particle.maxnp=0;
@@ -802,7 +814,39 @@ static int read_SPOTLIGHT (afs_FILE *f)
   light->falloff = c[4];
   light->flags = ast3d_light_spot;
   light->roll = 0.0;
+  light->attenuate=0;
   vec_swap (&light->target);
+  return ast3d_err_ok;
+}
+
+static int read_INNER_RANGE(afs_FILE *f){
+  float   c;
+  c_LIGHT *light = (c_LIGHT *)c_node;
+  if (afs_fread (&c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  light->inner_range=c;
+  printf("Light inner range: %f\n",c);
+  return ast3d_err_ok;
+}
+
+static int read_OUTER_RANGE(afs_FILE *f){
+  float   c;
+  c_LIGHT *light = (c_LIGHT *)c_node;
+  if (afs_fread (&c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  light->outer_range=c;
+  printf("Light outer range: %f\n",c);
+  return ast3d_err_ok;
+}
+
+static int read_LIGHT_ATTEN(afs_FILE *f){
+  c_LIGHT *light = (c_LIGHT *)c_node;
+  light->attenuate=1;
+  printf("Light attenuation\n");
+
+  // 1/(a0+d*a1+d*d*a2)
+//  light->attenuation[0]=light->inner_range;
+//  light->attenuation[1]=light->outer_range;
+//  light->attenuation[2]=0.0;
+
   return ast3d_err_ok;
 }
 

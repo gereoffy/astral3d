@@ -92,8 +92,8 @@ int32 ast3d_getkey_rgb (t_TRACK *track, float frame, c_RGB *out){
     err = spline_getkey_vect (track->last,track->alpha, &vect);
 
   out->rgb[0]=vect.x;
-  out->rgb[1]=vect.y;
-  out->rgb[2]=vect.z;
+  out->rgb[1]=vect.z;
+  out->rgb[2]=vect.y;
   return err;
 }
 

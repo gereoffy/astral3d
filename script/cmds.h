@@ -101,6 +101,15 @@ V("mount",scrCLASS_global,21,0,2,2);
 // 22:
 V("fdtunnel_select",scrCLASS_fx,22,0,1,1); P_CONST(1,0);
 
+// 23:
+V("lightmap",scrCLASS_object,23,0,0,2); P_CONST(1,0); P_CONST(2,0);
+// 24:
+V("render_lightmaps",scrCLASS_scene,24,0,0,1); P_CONST(1,0);
+
+// 25:
+V("corona_sprite",scrCLASS_global,25,0,1,1); P_PIC(1);
+
+
 //===========================================================================
 #undef V
 #undef P_INT

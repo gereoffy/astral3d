@@ -40,3 +40,5 @@ extern void particle_init(c_OBJECT *obj,int texture,int np);
 extern void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt);
 extern void particle_preplay(c_OBJECT *obj,float dt,int times);
 
+extern void render_lightmaps(void);
+
