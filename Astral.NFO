@@ -18,26 +18,26 @@
                                                               €›        ‹
                                                                ﬂ ‹    ‹
                                                                    ﬂ
-                     [astral info file˙version 3.2]
+                     [astral info file˙version 3.81]
 
 
 
    [members now]
 
    A'rpi..............coder............................arpi@banki1.banki.hu
-   AbcuG..............coder...............................abcug@hotmail.com
-   Strepto............coder...............................not@available.yet
+   Abcug..............coder...............................abcug@freemail.hu
+   Strepto............coder........................balazs.szoradi@essnet.se
+   Lettique...........coder...........................L.Migas@wsisiz.edu.pl
 
    Immortal rat.......graphician............................ir@scene-hu.com
-   Partikle...........graphician.............................jugezo@pcuf.fi
+   Magicboy...........graphician..................Koninkx@lmotion.tmfweb.nl
+   Partikle...........graphician................jukka.rajaniemi@kolumbus.fi
+
+   Wad................tracer.................................wad@mailbox.hu
    
-   Wad................tracer.........................wad_astral@hotmail.com
-   
-   Beatman............musician...........................bmaster@elender.hu
-   Phuture Kemist.....musician............................not@available.yet
+   Phuture Kemist.....musician...................Zoltan.Fekete@hu.bosch.com
    TowerX.............musician,organizer.............maxim@silicondreams.hu
 
-   W E   S T I L L   N E E D   T R A C E R S  &  G R A P H I C I A N S !!!!
 
    [history]
 
@@ -54,8 +54,8 @@
    will  be  a  real  kick-ass  one  ;)
    after two month of convincing finally  shaman  decided  joining astral.
    Edo left contract and became a member of astral. Strepto (was a coder of
-   an old team) started his scene-life again and became an astral-trooper :)
-   before antiq '98, and arpi joined  at the party (also a coder). Ren left
+   an old team) started his scene-life again and became an astral-trooper
+   before antiq '98 and arpi joined  at the party (also a coder). Ren left
    our team, because he was  tired  of  scene.  Immortal rat in november
    settled to continue his great  scene activity with us. Magic was kicked
    out in november, because he was totally inactive. There is a new member
@@ -85,11 +85,39 @@
    "Beta" won the demo competition. After Conference3000 we wanted to make a
    hyper-mega demo with nice storyline for The Party but...u know - lack of 
    time. Our coders decided to make a "fast" accelated demo for Tp...
-   We got the 3rd place at TheParty. It's good enough for first time.
+   Our goal was to reach one the first three places and we made it. Alpha2
+   became 3rd! Not too bad for our first foreign party contrib:)
+   Magicboy from Holland joined two weeks after The Party. He`s a fanatic!!:)
+   After TP99 we were a bit inactive, and lazy so much that our new project:
+   "System Apoc" was delayed. (we wanted te realease it at Ambience2000)
+   Finally we have finished "System Apoc" and sent it to our pal - Tomcat
+   who was already at Mekka2000. Thanks for your help man!:)
+   Unfortunately Apoc wasn`t too popular at Mekka and became only 12th...
+   We were very disappointed because this demo, and we decided to make a
+   kick-ass production, a great demo to show the world our real abilities!
+   Alfa3 is planned to be released this summer. So watch out:)
+   Finaly a scene-party (Flag2000) was organized again in Hugary. We didn`t
+   want to go there without any demo so we decided to make one. And what is
+   this demo about? You should see it yourself! Anyway we "love" Haujobb:)
+   A week before Flag a new member joined our team - Lettique from Poland.
+   He`s a talented and ambicious coder, Towerx invited him to join the team
+   after he won Horizon2000 with his very nice demo called Time Machine.
+   The party was very succesful for our group, nice places in gfx and music
+   compos, and maybe the best Astral demo yet - Haugyjobb:)
+      Unfortunately our demo at FLAG wasn't shown properly. The projector
+   didn't like 640x480, but worked in 1024x768... (btw it was a really
+   good one) but our code wasn't prepared for such highres, it was slow
+   and... so not perfect.  Btw we couldn't really finish at the party,
+   because the loud music and a bug in the particle system code, so we've
+   decided to finish it, and show the final version at the our favourite
+   party Assembly! The democrew didn`t sleep too much before the party. It
+   was a fantastic teamwork (maybe our first real teamwork:)
+   Meanwhile Partikle who was an astral member once decided to rejoin
+   our team.
 
    [future plans]
-   To win power demo competition at every party :)
-   ...but we need good 2D & 3D graphicians to achieve this.
+   It`s still the same...To win power demo competition at every party:)
+   
 
    [releases]
 
@@ -100,9 +128,11 @@
    [ast-rad.zip............................"radikal" 1st demo at contest'99]
    [ast-radf.zip................................"radikal" the final version]
    [ast-unfl.zip............"unnatural feelings" 3rd 64k intro at jumper'99]
-   [ast-alpf.zip........................."alpha" 1st powerdemo at ragest'99]
+   [ast-alph.zip........................."alpha" 1st powerdemo at ragest'99]
    [ast-beta.zip....................."beta" 1st powerdemo at conference3000]
-   [ast-a2.zip.................."alpha-II" 3rd accelated demo at theparty99]
+   [ast-a2.zip.................."alfa-II" 3rd accelated demo at the party99]
+   [ast-apoc.zip............."system apoc" 12th accelated demo at mekka2000]
+   
 
    % music %
    [ast-fiel.zip..."fields of sadness" 6th mch music at jumper'97 by towerx]
@@ -114,7 +144,7 @@
    [ast-gamm.zip..........."gamma complex" mch music for antiq'98 by towerx]
    [ast-4ths.zip........"i live in 4th..." mch music for antiq'98 by robson]
    [ast-tear.zip......."crystal tears" 10th 4ch music at antiq'98 by towerx]
-   [ast-mome.zip......."those moments" 3rd mch music at jumper'98 by towerx]
+   [ast-mome.zip......."those moments" 2nd mch music at jumper'98 by towerx]
    [ast-loop.zip......."loopworld" 2nd rebirth music at jumper'98 by sprite]
    [ast-mix3.zip................"3rd compuhits mix" scene-mix mp3 by towerx]
    [ast-disc.zip........"the discovery" 8th mch music at jumper98 by towerx]
@@ -124,6 +154,13 @@
    [ast-sunk.zip........"sunken forest" 10th mch music at antiq99 by towerx]
    [ast-brfc.zip......"breaks in focus" 3rd mch music at ragest99 by towerx]
    [ast-fulm.zip..."full moon..." 6th mch music at conference3000 by towerx]
+   [ast-diff.zip..........."diffusion" 5th mp3 music at mekka2000 by towerx]
+   [ast-nrg.zip......"nrg`99" 19th mp3 music at mekka2000 by phuture kemist]
+   [ast-pain.zip...."painful afternoon" 3rd mch music at flag2000 by towerx]
+   [fank.....zip...."Fankadeli dnb mix" 1st mp3 music at flag2000 by towerx]
+   [ast-wint.zip..."winter..." 10th mch music at flag2000 by phuture kemist]
+   [ast-cong.zip......"congame" 6th mch music at flag2000 by phuture kemist]
+
 
    % gfx %
    [ast-nigh.zip................"nightfall" 3rd gfx at jumper'97 by inferno]
@@ -134,6 +171,8 @@
    [ast-jaat.zip............."jÑÑtynyt" 9th pixelgfx at antiq'98 by inferno]
    [ast-doom.zip..."doom - nuclear fission" 2nd gfx at jumper'98 by inf+edo]
    [ast-exec.zip......................"exec2" 10th gfx at contest'99 by edo]
+   [ast-time.zip.............."father time" 5th gfx at flag2000 by magicboy]
+ 
 
    % other releases %
    [ast-mpha.zip......."the mirror... phases" phases of mirror.. by inferno]
@@ -145,6 +184,9 @@
    [c98aint.zip...................................cache'98 autumn inv. demo]
    [c98res.zip.......................................cache98 autumn results]
    [ast-pase.zip......................3ds engine source in bp7.0 by strepto]
+   [thefalnx.zip...................LiNUX port of TheFA (demo by Reptile/PR)]
+   [thefulnx.zip...................LiNUX port of TheFU (demo by Reptile/PR)]
+
 
    let's download them!
 
@@ -161,27 +203,25 @@
    [phone]
 
    alias...................phone...............................real˙name
-   A'rpi                   +36/1/3381-405               (èrp†d Gereîffy)
-   Beatman                 +36/1/3589-754                 (Dienes G†bor)
-   Phuture Kemist          +36/76/325-841                (Zolt†n Fekete)
-   Strepto                 +36/1 /240-99-53             (Bal†zs Sz¢r†di)
+   A'rpi                   +36/1/2660-648, 20/3262749   (Arpad Gereoffy)
+   Phuture Kemist          +36/76/325-841                (Zoltan Fekete)
+   Strepto                 +36/1 /240-99-53             (Balazs Szoradi)
    Towerx                  +36/76/494-074              (Maxim Kuznyecov)
+   Wad                     +36/1/319-9557                 (Andras Wirth)
+   Abcug                   +36/1/259-1624
 
    snail.mail....................................hungary 1039, budapest
                                                        kir†lyok £tja 2.
                                              (Sz¢r†di Bal†zs - strepto)
 
    irc...................................usually on #scene & #demoscene
-                                                #pixel #trax #coders.hu
-
+                                       #pixel #trax #coders.hu #astral2
 
    [greetings]
 
       Astroidea˙Black rainbow˙Bomb˙Chrysalis˙Contract˙Digital Lights
    Dilemma˙Exceed˙Fresh˙Greenroom˙Haujobb˙Inquisition˙Level-d˙Kamelite
          Mandula˙Micropyle˙Psytech˙Quad˙Rhyme˙Tokyo Dawn Records
-                   #demoscene  #pixel  #coders  #trax
+                  #demoscene  #pixel  #coders.hu  #trax
 
-                                                  25th of december 1999
-
-
+                                                    4th of august 2000

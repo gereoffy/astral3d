@@ -1,0 +1,48 @@
+Independent Astral Engine Release 2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This is the latest (and possibly last) version of the Astral Demo Engine.
+It works with all astral powerdemos (from alpha to haugyjobb).
+
+What's better?
+- many bugs (mostly card/driver incompatibilities) fixed
+- some speed optimization (faster than party releases)
+- windows version compiled with mingw32 (gcc) instead of Watcom C 11
+- support color depth/resolution change
+
+Usage:
+  LINUX:  ./demo-lnx.elf [options] [scriptname]
+  WINDOZE:  demo-win.exe [options] [scriptname]
+
+Options:
+  Color depth:  (default: current desktop depth)
+  -16      force 16bpp  [WIN only]
+  -24      force 24bpp  [WIN only]
+  -32      force 32bpp  [WIN only]
+
+  Resolution:   (under linux you MUST specify res. in fullscreen too!!!)
+  -640     force 640x480 mode
+  -800     force 800x600 mode
+  -1024    force 1024x768 mode
+  -1280    force 1280x1024 mode
+  
+  -fullscreen  or  -window  to chose display mode
+
+  -nosound   disable music
+
+Scriptname:  (default: astral.scr)
+  Use scripts from this package for the demos, instead the original
+  scripts shipped with them! It will NOT work with original scripts!!!
+  You must copy & rename to astral.scr, or specify script path/name
+  at the commandline!
+  You find new script for every astral powerdemo in this package.
+
+Where can I find OpenGL drivers for linux?
+  See LiNUX-GL.FAQ in this package!
+  
+Contact:
+  http://astral.scene.hu        (web site)
+  ftp://astral.scene.hu/astral  (ftp site)
+  astral@astral.scene.hu        (group mail-list)
+  arpi@thot.banki.hu            (my email)
+
+A'rpi/ASTRAL  (system coder)

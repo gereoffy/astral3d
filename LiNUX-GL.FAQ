@@ -1,0 +1,81 @@
+Where can I find OpenGL drivers for linux?
+==========================================
+
+Most important URLs:
+  http://www.xfree86.org           (XFree86 download)
+  http://www.mesa3d.org            (Software (or Glide) OpenGL for linux)
+  http://utah-glx.sourceforge.net  (HW accel. 3D driver for XFree86 3.3.6)
+  http://dri.sourceforge.net       (HW accel. 3D driver for XFree86 4.0.1)
+
+Card dependent:
+  http://www.matrox.com
+  http://www.3dfx.com
+  http://www.nvidia.com
+
+It depends on X version and your 3D card:
+
+Matrox G200/G400:
+=================
+
+XFree86 3.3.6 + Utah-GLX:  fastest, supports both 16bpp & 32bpp
+
+  This is the best combination for linux!
+  Download and compile the CVS version of utah-glx driver.
+
+XFree86 4.0.1 + DRI:  fast, 16bpp only, sometimes unstable
+
+  The _latest_ CVS version of DRI works fine with our engine.
+  The music is noisy because of high CPU load of driver :(
+  You must have latest kernel with AGP support! (2.2.16+patch or 2.4-test8)
+  Note: you can download 2D driver with Dualhead support from Matrox's site!
+
+3Dfx Voodoo cards (2/3/5/Bansee):
+=================================
+
+XFree86 3.3.6 + Mesa 3.x + Glide 2:  very fast, 16 bpp fullscreen only
+
+  This is the second best choice after G400 for linux.
+  Compile Mesa with 3dfx support. You must have Glide 2.x installed.
+  You must have libGL.so at /usr/X11/lib, maybe you must link to Mesa:
+    cd /usr/X11/lib
+    ln -s libMesaGL.so libGL.so
+    ln -s libMesaGLU.so libGLU.so
+    ldconfig
+
+XFree86 4.x + DRI:  very fast, 16 bpp only (fullscreen or windowed)
+
+  Go to 3dfx site, and download precompiled X4 binaries and drivers,
+  it works fine for me. (Download & install Glide 3.x too!)
+  You can also download & compile latest DRI CVS too.
+
+nVidia cards (TNT/TNT2/GeForce...):
+===================================
+
+XFree 3.3.6 + Utah-GLX: very very SLOW, supports 16/32bpp
+
+  You'd better upgrading to X 4.0.1!
+
+XFree 4.0.x + nVidia's binary-only driver: fast, 16bpp only, very unstable
+
+  Go to www.nvidia.com and download their latest (0.94 or 0.95) linux driver.
+  You must compile & insmod their kernel module too!
+
+Other cards:
+============
+
+I have't tested other cards, but Utah-GLX and X4-DRI supports these too:
+
+XFree 3.3.6 + Utah GLX:
+    Intel i810
+    ATI Rage Pro (mach64)
+    S3 Virge :)
+    SiS 6326
+
+XFree86 4.x + DRI:
+    Intel i810
+    ATI Rage Pro (mach64)
+    Gamma (???)
+
+Please send me experiences with these cards to add this FAQ!
+
+A'rpi/ASTRAL

@@ -964,7 +964,7 @@ fade blend 0 1 2
 play 3s
 0: blend=0
 
-play -490f
+play -490f
 
 0:
 scene hotel

@@ -1,0 +1,1354 @@
+;==============================================================================;
+;                     Astral - HAU(GY)JOBB
+;                      the strange remix
+;==============================================================================;
+; Note: this is the longest script I ever wrote... --A'rpi/ASTRAL
+;==============================================================================;
+
+;pattern_correction=-20  ; mp3 delay
+
+;---------- FADE IN Loading... PIC -------------
+loadpic loading loading.jpg
+8:
+picture loading
+pic_ty2=0.98
+time=0
+fade blend 0 1 1
+play 1s
+
+;============================ LOADIG ==========================================
+1:
+
+;--------- SCROLL TEXTS --------------
+loadpic icetext text.jpg text.jpg
+loadpic vertext vertext.jpg
+
+
+;--------- WATER ---------------------
+loadpic fdw_tex back.jpg
+loadpic fdw_tex2 hjb3 ;2.jpg
+
+;--------- BLOB PICTURES -------------
+loadpic blobtxt1 a1.jpg
+loadpic blobtxt2 a2.jpg
+loadpic blobtxt3 a3.jpg
+loadRGBA noize hjb.raw hjbneg.raw ; Over the PICTURE BLOBS
+
+;--------- PARTICLE SYSTEM -----------
+loadpic particle_txt particle.jpg
+loadpic glow glow2.jpg
+loadpic credits2 cred5003
+loadpic csontvaz koponya1tx.jpg       ; skull
+;loadpic kez kez3 kez3                 ; hands
+loadpic kez hand4 hand4b              ; hands
+
+load_scene particle1 scenes/partic3.3ds
+scene particle1
+object Object03
+lightmap 512
+render_lightmaps
+light 0
+corona_scale 4
+light 1
+corona_scale 4
+light 2
+corona_scale 4
+light 3
+corona_scale 4
+particle PARTICLE1 particle_txt 1500 500
+part_energy=2
+particle_preplay PARTICLE1 0.02 300
+particle_clone PARTICLE2 PARTICLE1
+particle_clone PARTICLE3 PARTICLE1
+particle_clone PARTICLE4 PARTICLE1
+
+;--------- TORUS KNOT ----------------
+load_maxscene knot scenes/knot3.max
+loadpic knot_t1 jo20
+loadpic knot_t2 felho5c
+loadpic greetingspic greetings.jpg
+loadpic greetspic greets.jpg
+
+;--------- HJB WIRE TUNNEL -----------
+loadpic t1 particlee.jpg  ; used by torusknot too
+loadpic t2 felho3.jpg
+hjbtunnel_init 3785642
+
+loadRGBA madar madbird2 madbird2a
+
+;--------- NURBS TUNNEL WITH FALLING MAN --------------
+;vtxoptim_uvcheck=1
+vtxoptim_threshold=-1 ; disable vertexoptim
+load_scene manusz scenes/manusz.3ds
+;object "Figure 1"
+;transparency=0
+
+vtxoptim_threshold=0
+;vtxoptim_uvcheck=0
+loadpic manusztxt felho5       ; tunnel's texture
+bsptunnel_init 735272
+
+;---------------- FUNNY FROGS ------------------------
+loadpic avemaria avemaria.jpg avemariaa.raw
+loadpic avebg avebg          ; background fdtunnel texture
+loadpic haustr hau-str.jpg   ; "HAU-STRANGE" & "HAU-FROG" texts
+
+default_obj_flags=4096
+load_scene beka scenes/frog4.3ds
+default_obj_flags=0
+
+loadRGBA swirltxt grandpa3 grandp3a
+
+;--------------- UNDERWATER SCENE ---------------------------
+load_picanim akarmi caust 32
+
+loadpic halparticle_txt bubble
+loadMASK fishpic fish fisha
+
+load_scene vizes scenes/ss66978.3ds
+scene vizes
+fixUV Sphere01
+
+object Sphere01
+projected_map_anim akarmi 0.01;1
+projmap_amount=0.6
+fade projmap_uoffs 0 300 2000
+fade projmap_voffs 0 100 2000
+fade projmap_animphase 0 20000 1000
+
+object viz
+projected_map_anim akarmi 0.01
+projmap_amount=0.5
+fade projmap_uoffs 0 300 2000
+fade projmap_voffs 0 100 2000
+fade projmap_animphase 0 20000 1000
+
+object fish02
+projected_map_anim akarmi 0.02
+projmap_amount=0.7
+fade projmap_uoffs 0 300 2000
+fade projmap_voffs 0 100 2000
+fade projmap_animphase 0 20000 1000
+
+object Quada0
+zbuffer=2
+object Quada1
+zbuffer=2
+object Quada2
+zbuffer=2
+object Quada3
+zbuffer=2
+
+object Quadb0
+zbuffer=2
+object Quadb1
+zbuffer=2
+object Quadb2
+zbuffer=2
+object Quadb3
+zbuffer=2
+
+object Quadc0
+zbuffer=2
+object Quadc1
+zbuffer=2
+object Quadc2
+zbuffer=2
+object Quadc3
+zbuffer=2
+
+object Quadd0
+zbuffer=2
+object Quadd1
+zbuffer=2
+object Quadd2
+zbuffer=2
+object Quadd3
+zbuffer=2
+
+object Quade0
+zbuffer=2
+object Quade1
+zbuffer=2
+
+object Quadf0
+zbuffer=2
+object Quadf1
+zbuffer=2
+object Quadf2
+zbuffer=2
+object Quadf3
+zbuffer=2
+
+particle3 PARTICLE1 halparticle_txt 70
+part_sizelimit=30
+part_eject_r=10
+part_eject_vy=60
+part_energy=1.5
+part_colordecrement=0.999
+part_agrav=0
+
+part_dieratio=0.0005
+
+part_maxy=150
+part_ridtri=0
+
+particle_preplay PARTICLE1 0.05 600
+
+particle_clone PARTICLE2 PARTICLE1
+particle_clone PARTICLE3 PARTICLE1
+particle_clone PARTICLE4 PARTICLE1
+particle_clone PARTICLE5 PARTICLE1
+particle_clone PARTICLE6 PARTICLE1
+particle_clone PARTICLE7 PARTICLE1
+particle_clone PARTICLE8 PARTICLE1
+particle_clone PARTICLE9 PARTICLE1
+
+znear=2
+frustum_culling=0
+
+;------------- NOISE part ------------------
+loadRGBA noizeneg hjbneg.raw hjbneg.raw
+loadpic nova nova        ; blinking lights
+loadpic sintxt hal       ; sinus fractal
+loadpic bolygo bolygo3   ; fdtunnel texture
+loadpic skull1 skull.jpg ; skull (front)
+loadpic skull2 kop1.jpg  ; skull (side)
+
+init_gears
+
+loadpic girly girly      ; girl pic (blob background)
+loadpic blob2txt blob    ; multi-layered blob texture
+
+;------------ VILLAM PART -------------------
+load_scene scifi scenes/scifi4.3ds
+scene scifi
+
+fixUV
+
+light 0
+light_enabled=0
+light 1
+light_enabled=0
+
+object Object
+lightmap 512
+render_lightmaps
+
+light 0
+light_enabled=1
+light 1
+light_enabled=1
+
+;light 2
+;light_enabled=0
+;light 3
+;light_enabled=0
+;light 4
+;light_enabled=0
+;light 5
+;light_enabled=0
+;light 6
+;light_enabled=0
+
+object Object21
+zbuffer=2
+object Object22
+zbuffer=2
+object Object23
+zbuffer=2
+object Object24
+zbuffer=2
+object Object25
+zbuffer=2
+
+;-------------- ENDPART (ripples & HJB logo) ------------
+
+default_obj_flags=4096
+default_mat_flags=16384
+load_scene endpartscene scenes/emberke5.3ds
+default_obj_flags=0
+default_mat_flags=0
+
+loadpic endpart_fdw 2.jpg  ; ripples texture
+
+;============================================================================
+0: blend=0
+1: blend=0
+7: blend=0
+9: blend=0
+;============================================================================
+;=========================== START ==========================================
+;============================================================================
+start_music haugyjobb.mp3; 500
+time=0
+8:
+fade blend 1 0 2
+
+;============================================================================
+;============================================================================
+;============================================================================
+
+1:
+fdwater fdw_tex2 caust00.raw caust20.raw
+fps=10
+
+fdwater_amp=0.001
+fdwater_bright=0.000001 ;03
+fdwater_scale=0.5
+
+fdwater_u_speed1=0.01
+fdwater_v_speed1=0.007752
+
+fdwater_u_speed2=0.01838
+fdwater_v_speed2=0.002773
+
+fdwater_u_scale=0.95
+fdwater_v_scale=-0.95
+
+2:
+picture fdw_tex
+blend=0.3
+
+play -454p
+
+0: blend=0
+1: blend=0
+2: blend=0
+3: blend=0
+
+; 12 sec
+;===================== BLOBs ====================
+
+8:
+noise noize 0 0 0
+noise_xscale=13
+noise_yscale=13
+rndfade noise_xoffs 0 1 0.005
+rndfade noise_yoffs 0 1 0.005
+rndfade noise_angle 0 6.28 0.005
+
+fade blend 1 0 2
+
+1:
+blob blobtxt1
+fps=3
+blob_rx=3500
+blob_ry=3500
+blob_rz=-3500
+;blob_zpos=2000
+blob_uscale=0.4
+blob_vscale=-0.4
+blob_zpos=-8
+sinfade vlimit 0 10000 120 120000 250000; 60000
+sinfade blob_zpos 0 10000 120 -4 -8
+
+2:
+blob blobtxt2
+fps=3
+blob_rx=3500
+blob_ry=3500
+blob_rz=-3500
+;blob_zpos=2000
+blob_uscale=0.4
+blob_vscale=-0.4
+blob_zpos=-8
+sinfade vlimit 120 10120 120 120000 250000; 60000
+sinfade blob_zpos 120 10120 120 -4 -8
+
+3:
+blob blobtxt3
+fps=3
+blob_rx=3500
+blob_ry=3500
+blob_rz=-3500
+;blob_zpos=2000
+blob_uscale=0.4
+blob_vscale=-0.4
+blob_zpos=-8
+sinfade vlimit 240 10240 120 120000 250000; 60000
+sinfade blob_zpos 240 10240 120 -4 -8
+
+play 2s
+
+;------------------ SCROLL TEXTS -----------------
+4:
+addpicture icetext 100 500 1540 360 0 0.05 1 0.10
+fade pic_x1 -3000 1000 10
+fade pic_x2 0 3000 10
+blend=0.5
+
+5:
+addpicture icetext 100 480 1540 400 0 0.05 1 0.10
+fade pic_x1 -1500 1000 10
+fade pic_x2 -500 2000 10
+blend=0.8
+
+6:
+addpicture icetext 100 120 1540 -20 0 0 1 0.05
+fade pic_x1 1000 -3000 10
+fade pic_x2 3000 -0000 10
+blend=0.5
+
+7:
+addpicture icetext 100 100 1540 20 0 0 1 0.05
+fade pic_x1 1000 -1500 10
+fade pic_x2 2000 -500 10
+blend=0.8
+;----------------------------------------------------
+
+;play -918p
+
+play -900p
+4:
+colorbox 0 480 640 0 0 0 0
+fade blend 0 1 0.5
+
+play 0.5s
+killfade blend
+
+1: blend=0
+2: blend=0
+3: blend=0
+4: blend=0
+5: blend=0
+6: blend=0
+7: blend=0
+8: blend=0
+
+;=================  PARTICLE  ==========================================;
+
+1:
+scene particle1
+corona_sprite glow
+fps=12
+
+pattern_correction=6  ; mp3 delay
+
+play -974p
+camera Camera03
+play -1032p
+camera Camera01
+8: addpicture credits2 340 80 620 0 0 0.05 1 0.18
+play -1090p
+camera Camera02
+8: addpicture credits2 340 80 620 0 0 0.20 1 0.33
+play -1148p
+camera Camera01
+8: addpicture credits2 340 80 620 0 0 0.36 1 0.49
+play -1206p
+camera Camera03
+8: addpicture credits2 340 80 620 0 0 0.51 1 0.64
+play -1264p
+2: blend=0
+camera Camera01
+8: addpicture credits2 340 80 620 0 0 0.67 1 0.80
+play -1322p
+camera Camera02
+8: addpicture credits2 340 80 620 0 0 0.83 1 0.96
+play -1380p
+camera Camera01
+8: blend=0
+play -1438p ; !!!
+camera Camera03
+play -1496p ; !!!
+camera Camera01
+;play -1554p
+;camera Camera03
+play -1612p
+camera Camera02
+
+pattern_correction=0  ; mp3 delay
+
+object Object03
+obj_hidden=1
+frame=297
+fps=8
+
+0: picture csontvaz 200 520 440 120
+
+;7: picture kez 360 160 640 -90 0.05
+;8: picture kez 0 160 280 -90 1 0 0.05 1
+7: picture kez 0 150 280 0
+8: picture kez 640 150 360 0
+
+7: fade pic_y1 0 150 4
+7: fade pic_y2 -150 0 4
+8: fade pic_y1 0 150 4
+8: fade pic_y2 -150 0 4
+
+play -320f
+fade fps * 0 1
+
+play -1806p
+9: colorbox 0 480 640 0 0 0 0
+9: fade blend 0 1 0.5
+play 0.5s
+9: killfade blend
+
+
+0: blend=0
+1: blend=0
+2: blend=0
+7: blend=0
+8: blend=0
+9: blend=0
+;====================  KNOT  =======================================;
+
+;------- greetings logo moving
+8:
+addpicture greetingspic 100 500 640 360
+sinfade pic_x1 0 1700 20 20 120
+sinfade pic_y1 750 2700 20 20 480
+sinfade pic_x2 390 1300 20 20 660
+sinfade pic_y2 50 1400 20 20 360
+
+;------- very long greetings scroll
+3:
+addpicture greetspic 0 1480 260 0 0 0 0.335 0.98
+fade pic_y1 0 5000 10
+fade pic_y2 -1500 3500 10
+blend=0.8
+
+4:
+addpicture greetspic 0 1480 240 0 0.335 0 0.65 0.98
+fade pic_y1 -1500 3500 10
+fade pic_y2 -3000 2000 10
+blend=0.8
+
+5:
+addpicture greetspic 0 1480 260 0 0.65 0 1 0.98
+fade pic_y1 -3000 2000 10
+fade pic_y2 -4500 500 10
+blend=0.8
+
+;------------- trous knot
+1:
+maxscene knot knot_t1 knot_t2 t1
+fps=1000
+knot1_alpha=0
+knot2_alpha=0
+play 56p
+knot1_alpha=0.3
+knot2_alpha=0
+play 56p
+knot1_alpha=0
+knot2_alpha=0.3
+play 56p
+knot1_alpha=0.3
+knot2_alpha=0.3
+play 56p
+knot1_alpha=0
+knot2_alpha=0
+play 56p
+knot1_alpha=0.3
+knot2_alpha=0
+play 56p
+knot1_alpha=0
+knot2_alpha=0.3
+
+; play -2245p
+play -2240p
+frame=7000
+play 0.15s
+frame=13000
+play 0.15s
+frame=7000
+play 0.15s
+frame=13000
+play 0.1s
+frame=7000
+play 0.1s
+frame=13000
+play 0.1s
+frame=7000
+play 0.1s
+frame=13000
+play 0.1s
+frame=7000
+play 0.1s
+frame=13000
+play 0.1s
+frame=7000
+;play 0.1s
+;frame=13000
+;play 0.1s
+
+play -2304p
+
+3: blend=0
+4: blend=0
+5: blend=0
+8: blend=0
+
+;====================  HJB TUNNEL  =======================================;
+
+1:
+hjbtunnel t1 t2 3 2
+fps=0.7
+hjbtunnel_morph_amp=1
+hjbtunnel_morph_speed=0
+
+;---------- SCROLLs -----------------
+4:
+addpicture vertext 400 0 640 -1000 0.642 0 0.818 1
+fade pic_y1 0 1500 10
+fade pic_y2 -1000 500 10
+blend=0.3
+
+5:
+addpicture vertext 440 0 600 -1000 0.642 0 0.818 1
+fade pic_y1 -1000 2500 10
+fade pic_y2 -2000 1500 10
+blend=0.5
+
+6:
+addpicture icetext 100 120 1540 -20 0 0.125 1 0.165
+fade pic_x1 1000 -3000 10
+fade pic_x2 3000 -0000 10
+blend=0.5
+
+7:
+addpicture icetext 100 100 1540 20 0 0.125 1 0.165
+fade pic_x1 1000 -1500 10
+fade pic_x2 2000 -500 10
+blend=0.8
+
+1:
+play -2695p
+
+; durvulas
+
+;hjbtunnel_morph_amp=10
+hjbtunnel_morph_speed=2
+rndfade hjbtunnel_morph_amp 2 6 0.1
+
+play -2757p
+killfade hjbtunnel_morph_amp
+hjbtunnel_morph_amp=1.2
+hjbtunnel_morph_speed=1
+
+play 2s
+
+2:
+picture madar
+sinfade pic_x1 0 180 10 -640 640
+sinfade pic_x2 0 180 10 -640 1280
+
+play 10s
+
+1: blend=0
+2: blend=0
+4: blend=0
+5: blend=0
+6: blend=0
+7: blend=0
+
+;=================== NURBS TUNNEL =================================
+
+;----- the tunnel
+1:
+bsptunnel manusztxt
+fps=1.5
+
+;----- falling man
+2:
+scene manusz
+object "Figure 1"
+transparency=0
+
+fps=30
+
+;------ VERTICAL SCROLLS
+4:
+addpicture vertext 0 480 130 0 0.36 0 0.46 1
+fade pic_y1 0 2000 10
+fade pic_y2 -1500 500 10
+blend=0.5
+
+5:
+addpicture vertext 20 480 80 0 0.36 0 0.46 1
+fade pic_y1 -1000 2000 10
+fade pic_y2 -2000 1000 10
+blend=0.7
+
+;------ HORIZ. SCROLLS
+6:
+addpicture icetext 100 120 1540 -20 0 0.23 1 0.29
+fade pic_x1 1000 -3000 10
+fade pic_x2 3000 -0000 10
+blend=0.5
+
+7:
+addpicture icetext 100 100 1540 20 0 0.23 1 0.29
+fade pic_x1 1000 -1500 10
+fade pic_x2 2000 -500 10
+blend=0.8
+
+play 12s
+
+1: blend=0 
+2: blend=0 
+4: blend=0 
+5: blend=0 
+6: blend=0 
+7: blend=0 
+
+;======================== FROGS PART ===================
+
+;------ background tunnel
+1:
+fdtunnel avebg avebg
+fdtunnel_rad_amp=500
+blend=0.3
+
+;------ overlay pic
+4:
+picture avemaria 0 480 640 0 0.05 0.05 1 1
+fade pic_x1 100 -120 12
+fade pic_x2 680 640 12
+
+;------ 3ds players
+5:
+scene beka
+object FROG
+zbuffer=0
+fps=20
+znear=1
+frame=20
+blend=0.9
+
+6:
+clone_fx 5
+camera Camera02
+frame=15
+blend=0.8
+
+7:
+clone_fx 5
+camera Camera03
+frame=10
+blend=0.7
+
+8:
+clone_fx 5
+camera Camera04
+frame=5
+blend=0.6
+
+9:
+clone_fx 5
+camera Camera05
+frame=0
+blend=0.5
+
+;--------- scrolling texts
+10:
+addpicture haustr 100 500 1540 360 0 0.2 1 0.4
+fade pic_x1 -3000 1000 12
+fade pic_x2 0 3000 12
+blend=0.5
+
+11:
+addpicture haustr 100 480 1540 400 0 0.2 1 0.4
+fade pic_x1 -1500 1000 12
+fade pic_x2 -500 2000 12
+blend=0.8
+
+12:
+addpicture haustr 100 120 1540 -20 0 0 1 0.2
+fade pic_x1 1000 -3000 12
+fade pic_x2 3000 -0000 12
+blend=0.5
+
+13:
+addpicture haustr 100 100 1540 20 0 0 1 0.2
+fade pic_x1 1000 -1500 12
+fade pic_x2 2000 -500 12
+blend=0.8
+
+play 12s
+
+;1: blend=0
+;4: blend=0
+; frogs:
+5: blend=0
+6: blend=0
+7: blend=0
+8: blend=0
+9: blend=0
+; scroll:
+10: blend=0
+10: killfade pic_x1
+10: killfade pic_x2
+11: blend=0
+11: killfade pic_x1
+11: killfade pic_x2
+12: blend=0
+12: killfade pic_x1
+12: killfade pic_x2
+13: blend=0
+13: killfade pic_x1
+13: killfade pic_x2
+
+;================== TWIST & RIPPLE =======================================;
+; move overlay to right slowly:
+4: killfade pic_x1
+4: fade pic_x1 * 100 12
+4: killfade pic_x2
+4: fade pic_x2 * 680 12
+
+5:
+swirl swirltxt 10
+swirl_txscale 0.4
+swirl_scale=15
+lens_power=1
+
+fps=1
+frame=11
+
+fade swirl_x -25 -6 0.8  ; move from left to right
+fade twist_inner 3 0 12
+fade twist_outer 8 0 12
+
+play 6s
+
+fade wave_freq 5 100 10
+fade wave_phase 0 -2000 100
+fade wave_amp 0 0.05 1
+
+play 5s
+fade blend 1 0 1
+1: fade blend * 0 1       ; fadeout fdtunnel
+
+4: fade blend 1 0 4       ; fadeout overlay
+
+; move overlay to right faster:
+4: killfade pic_x1
+4: fade pic_x1 * 640 4
+4: killfade pic_x2
+4: fade pic_x2 * 1000 4
+
+play 1s
+
+1: killfade blend
+
+;==================== UNDERWATER SCENE ======================================;
+
+;  FOG
+3:
+colorbox 0 480 640 0 0.7 0.9
+blend=0.2
+
+;  3DS SCENE
+1:
+scene vizes
+fps=14
+
+play 4s
+
+;  SCROLL OVERLAY PIC
+;2: addpicture fishpic 200 480 640 0
+2: addpicture fishpic 390 329 640 0
+
+2: fade pic_y1 0 329 2
+2: fade pic_y2 -329 0 2
+play 4s
+2: fade pic_x1 390 640 2
+2: fade pic_x2 640 890 2
+
+play -5510p
+
+3: blend=0
+2: blend=0
+1: blend=0
+
+;**************************************************************************;
+;**************************************************************************;
+;*************  IT'S TIME TO NOISE  ***************************************;
+;**************************************************************************;
+;**************************************************************************;
+
+
+0:
+fdtunnel bolygo bolygo ;blobtxt1
+fdtunnel_rad_amp=500
+blend=0
+
+1: blend=0
+
+2: 
+sinusparticle2 sintxt 300 5
+sinpart_scale=300
+sinpart_size=800
+sinpart_speed=0.005
+sinpart_sinspeed=0.1;03
+blend=0
+fps=25
+
+3:
+splinesurface 0.01 20
+spline_n=12
+spline_size=100
+fps=100
+wire_blend=2
+;;;rndfade wire_blend 0 2 0.1
+blend=0
+
+4:
+sinusparticle nova 1000 20
+fps=60
+sinpart_size=300
+sinpart_speed=0.005
+sinpart_sinspeed=0.1;03
+blend=0
+
+5:
+addfdwater skull1 caust00.raw caust20.raw
+;addfdwater skull1 water.raw water2.raw
+fps=10
+fdwater_amp=0.001
+fdwater_u_speed1=0.01
+fdwater_v_speed1=0.007752
+fdwater_u_speed2=0.01838
+fdwater_v_speed2=0.002773
+fdwater_bright=0
+blend=0
+
+6:
+addfdwater skull2 caust00.raw caust20.raw
+;addfdwater skull2 water.raw water2.raw
+fps=10
+fdwater_amp=0.001
+fdwater_u_speed1=0.01
+fdwater_v_speed1=0.007752
+fdwater_u_speed2=0.01838
+fdwater_v_speed2=0.002773
+fdwater_bright=0
+blend=0
+
+7:
+sinusparticle2 sintxt 100 20
+sinpart_scale=600
+sinpart_size=1000
+sinpart_speed=0.009
+sinpart_sinspeed=0.1;03
+blend=0
+fps=35
+
+8:
+;addnoise noizeneg 1 1 1
+noise noizeneg 0.1 0.2 0.3
+;noise_xscale=3
+;noise_yscale=3
+rndfade noise_xscale 2 5 0.1
+rndfade noise_yscale 2 5 0.1
+rndfade noise_xoffs 0 1 0.005
+rndfade noise_yoffs 0 1 0.005
+rndfade noise_angle 0 6.28 0.005
+blend=0
+
+
+9:
+addnoise nova 1 1 1
+noise_xscale=1
+noise_yscale=1
+noise_xoffs=0
+noise_yoffs=0
+rndfade noise_angle 0 0.2 0.005
+blend=0
+
+
+;play -5515p
+
+; 1.5s = 360
+; 1 s  = 240
+; 60 s  = 14400
+8: sinfade blend 0 14400 60 0.5 1
+9: fade blend 1 0 0.5
+0: blend=1
+
+play 56p
+9: fade blend 1 0 0.5
+0: rndfade blend 0.8 1 0.01
+3: fade blend 1 0 1
+3: rndfade frame 70 320 1.45 ;0.3 ;15
+
+play 56p
+9: fade blend 1 0 0.5
+0: killfade blend
+0: rndfade blend 0.6 1 0.01
+3: killfade blend
+3: blend=1; fade blend 0 1 0.1
+
+1:
+gears
+fps=30
+fade gears_z -200 -1 14
+fade gears_x 30 -10 14
+fade gears_y 30 -10 14
+gears_speed=1.6
+gears_rotx=1
+gears_roty=1.71735
+gears_rotz=1.352
+;blend=0
+
+play 56p
+9: fade blend 1 0 0.5
+
+12:
+picture icetext 100 180 1540 -20 0 0.46 1 0.515
+pic_r=0
+pic_g=0
+pic_b=0
+fade pic_x1 1000 -4000 4
+fade pic_x2 4000 -0000 4
+blend=0.5
+
+13:
+picture icetext 100 140 1540 20 0 0.46 1 0.515
+pic_r=0
+pic_g=0
+pic_b=0
+fade pic_x1 1000 -2500 4
+fade pic_x2 3000 -500 4
+blend=0.8
+
+
+
+play 56p
+9: fade blend 1 0 0.5
+
+play 56p
+9: fade blend 1 0 0.5
+5: fade blend 1 0 2
+
+play 56p
+9: fade blend 1 0 0.5
+
+play 56p
+9: fade blend 1 0 0.5
+5: fade blend 1 0 2
+3: blend=0
+4: fps=30
+4: fade blend 0 1 5
+
+
+12:
+picture icetext 100 500 1540 320 0 0.41 0.75 0.45
+pic_r=0
+pic_g=0
+pic_b=0
+fade pic_x1 -3000 1000 4
+fade pic_x2 0 3000 4
+blend=0.5
+
+13:
+picture icetext 100 480 1540 360 0 0.41 0.75 0.45
+pic_r=0
+pic_g=0
+pic_b=0
+fade pic_x1 -1500 1000 4
+fade pic_x2 -500 2000 4
+blend=0.8
+
+
+play 56p
+9: fade blend 1 0 0.5
+
+play 56p
+9: fade blend 1 0 0.5
+4: fps=60
+4: frame=100
+;4: rndfade sinpart_sinspeed 0.003 0.008 0.01
+5: fade blend 1 0 2
+
+play 56p
+9: fade blend 1 0 0.5
+;4: rndfade frame 0.008 0.018 0.362 ;01
+4: rndfade frame 100 350 0.362 ;01
+;4: frame=100
+
+play 56p
+9: fade blend 1 0 0.5
+4: frame=100
+5: fade blend 1 0 2
+
+1: blend=0  ; gears off
+
+play 56p
+9: fade blend 1 0 0.5
+5: killfade blend
+5: blend=0
+6: fade blend 1 0 2
+4: frame=100
+;4: killfade frame
+;4: rndfade sinpart_sinspeed 0.003 0.008 0.01
+
+play 56p
+9: fade blend 1 0 0.5
+4: frame=100
+6: killfade blend
+6: blend=0
+5: fade blend 1 0 2
+
+play 56p
+9: fade blend 1 0 0.5
+5: killfade blend
+5: blend=0
+6: fade blend 1 0 2
+6: fdwater_u_scale=-0.95
+4: rndfade sinpart_sinspeed 0.003 0.008 0.01
+
+play 56p
+9: fade blend 1 0 0.5
+6: killfade blend
+6: blend=0
+5: fade blend 1 0 4
+
+play 56p
+9: fade blend 1 0 0.5
+4: blend=0
+2: blend=1
+
+play 56p
+9: fade blend 1 0 0.5
+
+play 56p
+9: fade blend 1 0 0.5
+7: blend=1
+
+play 56p
+9: fade blend 1 0 0.5
+
+play 56p
+9: fade blend 1 0 0.5
+8: killfade noise_xscale
+8: fade noise_xscale * 0.2 5
+8: killfade noise_yscale
+8: fade noise_yscale * 0.2 5
+
+;rndfade noise_xoffs 0 1 0.005
+;rndfade noise_yoffs 0 1 0.005
+;rndfade noise_angle 0 6.28 0.005
+
+play 56p
+9: fade blend 1 0 0.5
+;8: killfade noise_xoffs
+;8: rndfade noise_xoffs -0.02 +0.02 0.1
+;8: killfade noise_yoffs
+;8: rndfade noise_yoffs -0.02 +0.02 0.1
+
+play 56p
+9: fade blend 1 0 0.5
+8: killfade noise_angle
+8: rndfade noise_angle -0.2 0.2 0.1
+
+play 56p
+9: fade blend 1 0 0.5
+
+play 56p
+9: fade blend 1 0 0.5
+8: rndfade noise_angle 0 6.28 0.1
+8: fade noise_xscale * 4 1.2
+8: fade noise_yscale * 4 1.2
+0: killfade blend
+0: blend=0
+1: picture girly
+1: blend=0.7
+2: blend=0
+7: blend=0
+
+;8: killfade blend
+;8: blend=0
+
+play 56p
+9: fade blend 1 0 0.5
+8: rndfade noise_xscale 1 5 0.01
+8: rndfade noise_yscale 1 5 0.01
+
+;================ MULTILAYERED TRANSPARENT BLOBS =======================
+
+12:
+blob blob2txt
+fps=3
+blob_uscale=0.5
+blob_vscale=-0.5
+13: clone_fx 12
+14: clone_fx 12
+15: clone_fx 12
+16: clone_fx 12
+
+12:
+vlimit=320000
+blob_zpos=-10
+blob_rx=5800
+blob_ry=5800
+blob_rz=5800
+13:
+vlimit=270000
+blob_zpos=-9.0
+blob_rx=5400
+blob_ry=5400
+blob_rz=5400
+14:
+vlimit=250000
+blob_zpos=-8
+blob_rx=5100
+blob_ry=5100
+blob_rz=5100
+15:
+vlimit=250000
+blob_zpos=-6.5
+blob_rx=3600
+blob_ry=3600
+blob_rz=3600
+16:
+vlimit=220000
+blob_zpos=-6
+blob_rx=3000
+blob_ry=3000
+blob_rz=3000
+
+12: blend=0.6
+13: blend=0.55
+14: blend=0.5
+15: blend=0.5
+16: blend=0.5
+
+play 56p
+9: fade blend 1 0 0.5
+
+play 56p
+9: fade blend 1 0 0.5
+
+play 56p
+9: fade blend 1 0 0.5
+
+; disable blob
+12: blend=0
+13: blend=0
+14: blend=0
+15: blend=0
+16: blend=0
+
+;=================== VILLAM ==========================
+
+1:
+scene scifi
+fps=15
+
+play -7216p  ; villam 1
+
+;------- Replace objects
+object fej01
+obj_hidden=1
+object test01
+obj_hidden=1
+
+object fej
+obj_hidden=0
+object test2
+obj_hidden=0
+
+18:
+addcolorbox 0 480 640 0 1 1 1
+rndfade blend 0.8 1.2 0.003
+play 0.4s
+killfade blend
+fade blend 1 0 1.5
+
+play -7369p  ; villam 2
+
+1: fade fps * 0 1 ;.5
+
+18:
+addcolorbox 0 480 640 0 1 1 1
+play 0.4s
+rndfade blend 0.8 1.2 0.003
+killfade blend
+fade blend 1 0 1.5
+
+19:
+colorbox 0 480 640 0 0 0 0
+fade blend 0 1 5
+
+play 2s
+18: killfade blend
+18: rndfade blend 0 0.4 0.05
+
+play 4s
+
+;---------- Kill them all! --------------
+0: killfade blend
+0: blend=0
+1: killfade blend
+1: blend=0
+2: killfade blend
+2: blend=0
+3: killfade blend
+3: blend=0
+4: killfade blend
+4: blend=0
+5: killfade blend
+5: blend=0
+6: killfade blend
+6: blend=0
+7: killfade blend
+7: blend=0
+8: killfade blend
+8: blend=0
+9: killfade blend
+9: blend=0
+10: killfade blend
+10: blend=0
+11: killfade blend
+11: blend=0
+12: killfade blend
+12: blend=0
+13: killfade blend
+13: blend=0
+14: killfade blend
+14: blend=0
+15: killfade blend
+15: blend=0
+16: killfade blend
+16: blend=0
+17: killfade blend
+17: blend=0
+18: killfade blend
+18: blend=0
+19: killfade blend
+19: blend=0
+
+;====================== ENDPART ============================
+
+1:
+fdripples endpart_fdw 0.5 0.5 1
+fdwater_scale=40    ; csillapitas
+fdwater_amp=0.15    ; melyseg
+fdwater_bright=0.3  ; specular hilight
+fdwater_u_speed1=-1 ; speed
+fdwater_u_speed2=-1 ; speed
+fdwater_v_speed1=60 ; frequenz
+fdwater_v_speed2=60 ; frequenz
+fps=3
+
+2:
+scene endpartscene
+object Ellipse01
+env_positional=1
+object Ellipse02
+env_positional=1
+object Line01
+env_positional=1
+object Line02
+env_positional=1
+fps=25
+
+3:
+colorbox 0 480 640 0 0 0 0
+fade blend 1 0 1
+
+play  ; play it forever...
+
