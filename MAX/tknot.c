@@ -1,4 +1,5 @@
 
+// TorusKnot Object Generator
 
 #ifndef PI
 #define PI M_PI
@@ -10,6 +11,28 @@
 
 #define BASE_KNOT       0
 #define BASE_CIRCLE     1
+
+// Parameter map indices
+#define PB_TORUSKNOT_RADIUS		0
+#define PB_TORUSKNOT_RADIUS2		1
+#define PB_TORUSKNOT_ROTATION		2
+#define PB_TORUSKNOT_TWIST		3
+#define PB_TORUSKNOT_SEGMENTS		4
+#define PB_TORUSKNOT_SIDES		5
+#define PB_TORUSKNOT_SMOOTH		6
+#define PB_TORUSKNOT_P	7
+#define PB_TORUSKNOT_Q	8
+#define PB_TORUSKNOT_E    9
+#define PB_TORUSKNOT_LUMPS    10
+#define PB_TORUSKNOT_LUMP_HEIGHT    11
+#define PB_TORUSKNOT_BASE_CURVE     12
+#define PB_TORUSKNOT_GENUV          13
+#define PB_TORUSKNOT_UTILE          14
+#define PB_TORUSKNOT_VTILE          15
+#define PB_TORUSKNOT_UOFF           16
+#define PB_TORUSKNOT_VOFF           17
+#define PB_TORUSKNOT_WARP_HEIGHT    18
+#define PB_TORUSKNOT_WARP_FREQ      19
 
 
 void torusKnot(Point3 *p,float t,float P,float Q,float Radius1){
@@ -198,5 +221,38 @@ char* update_TorusKnot(node_st *objnode){
 	}
 }
 return NULL;
+}
+
+
+char* init_TorusKnot(node_st *node){
+  Class_TorusKnot *knot=malloc(sizeof(Class_TorusKnot));
+  node_st *pblock=dep_node_by_ref(node,0);
+  if(!pblock) return "TorusKnot: missing ParamBlock!";
+  node->data=knot;
+  node->update=update_TorusKnot;
+  init_mesh(&knot->mesh);
+  knot->radius=getparam_float(pblock,PB_TORUSKNOT_RADIUS);
+  knot->radius2=getparam_float(pblock,PB_TORUSKNOT_RADIUS2);
+  knot->Rotation=getparam_float(pblock,PB_TORUSKNOT_ROTATION);
+  knot->radius=getparam_float(pblock,PB_TORUSKNOT_RADIUS);
+  knot->Twist=getparam_float(pblock,PB_TORUSKNOT_TWIST);
+  knot->segs=getparam_int(pblock,PB_TORUSKNOT_SEGMENTS);
+  knot->sides=getparam_int(pblock,PB_TORUSKNOT_SIDES);
+  knot->smooth=getparam_int(pblock,PB_TORUSKNOT_SMOOTH);
+  knot->P=getparam_float(pblock,PB_TORUSKNOT_P);
+  knot->Q=getparam_float(pblock,PB_TORUSKNOT_Q);
+  knot->E=getparam_float(pblock,PB_TORUSKNOT_E);
+  knot->P=getparam_float(pblock,PB_TORUSKNOT_P);
+  knot->Lumps=getparam_float(pblock,PB_TORUSKNOT_LUMPS);
+  knot->LumpHeight=getparam_float(pblock,PB_TORUSKNOT_LUMP_HEIGHT);
+  knot->BaseCurve=getparam_int(pblock,PB_TORUSKNOT_BASE_CURVE);
+  knot->genUV=getparam_int(pblock,PB_TORUSKNOT_GENUV);
+  knot->uTile=getparam_float(pblock,PB_TORUSKNOT_UTILE);
+  knot->vTile=getparam_float(pblock,PB_TORUSKNOT_VTILE);
+  knot->uOff=getparam_float(pblock,PB_TORUSKNOT_UOFF);
+  knot->vOff=getparam_float(pblock,PB_TORUSKNOT_VOFF);
+  knot->WarpHeight=getparam_float(pblock,PB_TORUSKNOT_WARP_HEIGHT);
+  knot->WarpFreq=getparam_float(pblock,PB_TORUSKNOT_WARP_FREQ);
+  return NULL;
 }
 

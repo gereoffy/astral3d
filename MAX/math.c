@@ -1,3 +1,8 @@
+/*
+          Various MATH routines from various "artists"...
+*/
+
+
 // from CLAX, mod by A'rpi
 void mat_from_prs(Matrix out,Point3 *pos,Quat *rot,Point3 *scale,Quat *scaleaxis){
 /*
@@ -92,6 +97,28 @@ void mat_inverse(Matrix out,Matrix mat){  // by Strepto
   
 }
 
+void mat_inverse_rot(Matrix out,Matrix mat){  // by Strepto
+/*  mat_inverse: create inverse rotation matrix. */
+  float Det;
+
+  out[X][X]=mat[Y][Y]*mat[Z][Z]-mat[Y][Z]*mat[Z][Y];       //matrix 1. oszlopa
+  out[Y][X]=mat[Y][Z]*mat[Z][X]-mat[Y][X]*mat[Z][Z]; 
+  out[Z][X]=mat[Y][X]*mat[Z][Y]-mat[Z][X]*mat[Y][Y]; 
+
+  Det=1/(out[X][X]*mat[X][X]+out[Y][X]*mat[X][Y]+out[Z][X]*mat[X][Z]);
+
+  out[X][X]*=Det;out[Y][X]*=Det;out[Z][X]*=Det;
+
+  out[X][Y]=(mat[Z][Y]*mat[X][Z]-mat[X][Y]*mat[Z][Z])*Det; //matrix 2. oszlopa
+  out[Y][Y]=(mat[X][X]*mat[Z][Z]-mat[X][Z]*mat[Z][X])*Det;
+  out[Z][Y]=(mat[X][Y]*mat[Z][X]-mat[X][X]*mat[Z][Y])*Det;
+
+  out[X][Z]=(mat[X][Y]*mat[Y][Z]-mat[Y][Y]*mat[X][Z])*Det; //matrix 3. oszlopa
+  out[Y][Z]=(mat[Y][X]*mat[X][Z]-mat[X][X]*mat[Y][Z])*Det;
+  out[Z][Z]=(mat[X][X]*mat[Y][Y]-mat[Y][X]*mat[X][Y])*Det;
+
+}
+
 
 
 INLINE void mat_mulvec(Point3 *out,Point3 *b,Matrix a){  // from CLAX
@@ -166,11 +193,16 @@ INLINE void mat_mul2(Matrix a,Matrix b){  // from CLAX
 }
 
 //void quat_from_euler(Quat *quat,float roll,float pitch,float yaw){
-void quat_from_euler(Quat *quat,float yaw,float pitch,float roll){
+void quat_from_euler(Quat *quat,float roll,float pitch,float yaw){
+//void quat_from_euler(Quat *quat,float yaw,float pitch,float roll){
 // from WEB "Gamasutra - Rotating Objects Using Quaternions"
 
 //EulerToQuat(float roll, float pitch, float yaw, QUAT * quat)
         float cr, cp, cy, sr, sp, sy, cpcy, spsy;
+
+//yaw=-yaw;
+//roll=-roll;
+//pitch=-pitch;
 
 // calculate trig identities
         cr = cos(roll/2);
@@ -186,8 +218,8 @@ void quat_from_euler(Quat *quat,float yaw,float pitch,float roll){
 
         quat->w = cr * cpcy + sr * spsy;
         quat->x = sr * cpcy - cr * spsy;
-        quat->y = cr * sp * cy + sr * cp * sy;
-        quat->z = cr * cp * sy - sr * sp * cy;
+        quat->z = cr * sp * cy + sr * cp * sy;
+        quat->y = cr * cp * sy - sr * sp * cy;
 
 }
 
@@ -267,65 +299,6 @@ INLINE void vec_normalize(Point3 *a){  // by A'rpi
   if (len){ len=1.0F/sqrt(len); a->x*=len; a->y*=len; a->z*=len; };
 }
 
-
-// by A'rpi, 4 days... :(
-// based on gluLookAt from MESA, and mat_rotateZ from CLAX
-void mat_from_lookat(Matrix out,Point3 *pos,Point3 *target,float roll,Point3 *scale,Quat *scaleaxis,int axisflag){
- Point3 x,y,z;
- float sinz, cosz;
-
-   /* Z vector */
-   z.x=pos->x-target->x;
-   z.y=pos->y-target->y;
-   z.z=pos->z-target->z;
-   vec_normalize(&z);
-   
-   /* Y vector (UP-vector) */
-   y.x=y.y=y.z=0;
-   switch(axisflag){
-     case 0x000: y.x=1;break;
-     case 0x100: y.x=-1;break;
-     case 0x001: y.y=1;break;
-     case 0x101: y.y=-1;break;
-     case 0x002: y.z=1;break;
-     case 0x102: y.z=-1;break;
-     default: y.z=1;
-   }
-//   printf("UP-vector: %d %d %d  (axis=%d)\n",(int)y.x,(int)y.y,(int)y.z,axisflag);
-//   y.x=0; y.y=0; y.z=1;
-
-   /* X vector = Y=(0,0,1) cross Z */
-   x.x =  y.y*z.z - y.z*z.y;
-   x.y = -y.x*z.z + y.z*z.x;
-   x.z =  y.x*z.y - y.y*z.x;
-//   x.x = -z.y; x.y =  z.x; x.z =  0;
-   vec_normalize(&x);
-
-   /* Recompute Y = Z cross X */
-   y.x =  z.y*x.z - z.z*x.y;
-   y.y = -z.x*x.z + z.z*x.x;
-   y.z =  z.x*x.y - z.y*x.x;
-//   printf("y.len=%f\n",vec_length(&y));
-//   vec_normalize(&y);    // imho ez felesleges (mert 1*1=1 ugyebar...)
-
-   // Apply roll angle
-   sinz = sin (roll);
-   cosz = cos (roll);
-   out[X][X]=cosz*x.x+sinz*y.x;
-   out[X][Y]=cosz*x.y+sinz*y.y;
-   out[X][Z]=cosz*x.z+sinz*y.z;
-   out[Y][X]=-sinz*x.x+cosz*y.x;
-   out[Y][Y]=-sinz*x.y+cosz*y.y;
-   out[Y][Z]=-sinz*x.z+cosz*y.z;
-   out[Z][X]=z.x;
-   out[Z][Y]=z.y;
-   out[Z][Z]=z.z;
-   
-   out[X][W]=pos->x;
-   out[Y][W]=pos->y;
-   out[Z][W]=pos->z;
-
-}
 
 
 float spline_ease (float t, float a, float b){
@@ -415,5 +388,87 @@ INLINE void vec_cross(Point3 *out,Point3 *a,Point3 *b){
   out->x = a->y*b->z - a->z*b->y;
   out->y = a->z*b->x - a->x*b->z;
   out->z = a->x*b->y - a->y*b->x;
+}
+
+
+// by A'rpi, 4 days... :(
+// based on gluLookAt from MESA, and mat_rotateZ from CLAX
+void mat_from_lookat(Matrix out2,Point3 *pos,Point3 *target,float roll,Point3 *scale,Quat *scaleaxis,int axisflag){
+ Point3 x,y,z;
+ float sinz, cosz;
+ Matrix out;
+
+   /* Z vector */
+   z.x=pos->x-target->x;
+   z.y=pos->y-target->y;
+   z.z=pos->z-target->z;
+   vec_normalize(&z);
+   
+   /* Y vector (UP-vector) */
+   y.x=y.y=y.z=0;
+   switch(axisflag){
+     case 0x000: y.x=1;break;
+     case 0x100: y.x=-1;break;
+     case 0x001: y.y=1;break;
+     case 0x101: y.y=-1;break;
+     case 0x002: y.z=1;break;
+     case 0x102: y.z=-1;break;
+     default: y.z=1;
+   }
+//   printf("UP-vector: %d %d %d  (axis=%d)\n",(int)y.x,(int)y.y,(int)y.z,axisflag);
+//   y.x=0; y.y=0; y.z=1;
+
+   /* X vector = Y=(0,0,1) cross Z */
+   x.x =  y.y*z.z - y.z*z.y;
+   x.y = -y.x*z.z + y.z*z.x;
+   x.z =  y.x*z.y - y.y*z.x;
+//   x.x = -z.y; x.y =  z.x; x.z =  0;
+   vec_normalize(&x);
+
+   /* Recompute Y = Z cross X */
+   y.x =  z.y*x.z - z.z*x.y;
+   y.y = -z.x*x.z + z.z*x.x;
+   y.z =  z.x*x.y - z.y*x.x;
+//   printf("y.len=%f\n",vec_length(&y));
+//   vec_normalize(&y);    // imho ez felesleges (mert 1*1=1 ugyebar...)
+
+   // Apply roll angle
+   sinz = sin (roll);
+   cosz = cos (roll);
+   out[X][X]=cosz*x.x+sinz*y.x;
+   out[X][Y]=cosz*x.y+sinz*y.y;
+   out[X][Z]=cosz*x.z+sinz*y.z;
+   out[Y][X]=-sinz*x.x+cosz*y.x;
+   out[Y][Y]=-sinz*x.y+cosz*y.y;
+   out[Y][Z]=-sinz*x.z+cosz*y.z;
+   out[Z][X]=z.x;
+   out[Z][Y]=z.y;
+   out[Z][Z]=z.z;
+
+//   out[X][W]=out[Y][W]=out[Z][W]=0;
+   mat_inverse_rot(out2,out);
+   
+   out2[X][W]=pos->x;
+   out2[Y][W]=pos->y;
+   out2[Z][W]=pos->z;
+   
+}
+
+
+// by A'rpi          !! Scale NOT yet implemented !!         optimize!!!
+void mat_from_euler(Matrix out,Point3 *pos,float x,float y,float z,Point3 *scale,Quat *scaleaxis){
+  Matrix m1,m2,m3;
+  Matrix tmp;
+
+  mat_rotateX(m1,-x);
+  mat_rotateY(m2,-y);
+  mat_rotateZ(m3,-z);
+
+  mat_mul(tmp,m2,m1);
+  mat_mul(out,m3,tmp);
+
+  out[X][W]=pos->x;
+  out[Y][W]=pos->y;
+  out[Z][W]=pos->z;
 }
 

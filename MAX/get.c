@@ -62,30 +62,50 @@ INLINE int classsubtype_by_node(node_st *node){
 
 //  float
 float* getkey_float(node_st *node){
-  Track *track=node->data;
-  if(!node || !track) return NULL;
-  return &(track->val_vect.x);
+  if(!node || !node->data) return NULL;
+  if(classtype_by_node(node)==CLASSTYPE_TRACK){
+    Track *track=node->data;
+    return &(track->val_vect.x);
+  }
+  printf("Getkey_float: invalid classtype\n");
+  return NULL;
 }
 
 //  int
 int* getkey_int(node_st *node){
-  Track *track=node->data;
-  if(!node || !track) return NULL;
-  return &(track->val_int);
+  if(!node || !node->data) return NULL;
+  if(classtype_by_node(node)==CLASSTYPE_TRACK){
+    Track *track=node->data;
+    return &(track->val_int);
+  }
+  printf("Getkey_int: invalid classtype\n");
+  return NULL;
 }
 
 //  color/vect
 Point3* getkey_vect(node_st *node){
-  Track *track=node->data;
-  if(!node || !track) return NULL;
-  return &(track->val_vect);
+  if(!node || !node->data) return NULL;
+  switch(classtype_by_node(node)){
+  case CLASSTYPE_TRACK: {
+    Track *track=node->data;
+    return &(track->val_vect); }
+  case CLASSTYPE_VECTOR_XYZ: {
+    Class_VectorXYZ *posxyz=node->data;
+    return &(posxyz->vect); }
+  }
+  printf("Getkey_vect: invalid classtype\n");
+  return NULL;
 }
 
 //  quat
 Quat* getkey_quat(node_st *node){
-  Track *track=node->data;
-  if(!node || !track) return NULL;
-  return &(track->val_quat);
+  if(!node || !node->data) return NULL;
+  if(classtype_by_node(node)==CLASSTYPE_TRACK){
+    Track *track=node->data;
+    return &(track->val_quat);
+  }
+  printf("Getkey_quat: invalid classtype\n");
+  return NULL;
 }
 
 //  int/boolean
@@ -99,8 +119,6 @@ int* getparam_int(node_st *node,int pno){
     case 0x0201:
     case 0x0204:
       return getkey_int(pb->data[pno]);
-//      printf("!!! Warning! type 'int' can't be keyframed!\n");
-//      return NULL; //getkey_int(pb->data[pno]);
   }
   return NULL;
 }

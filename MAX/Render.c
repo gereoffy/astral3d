@@ -1,4 +1,4 @@
-#define FPS 520
+#define FPS 800
 
 #define INLINE inline
 
@@ -36,7 +36,7 @@ node_st *node_by_name(node_st* node,char* name){
 
 void draw_scene(){
   node_st *node;
-  Matrix objmat;
+//  Matrix objmat;
   Matrix cammat;
   Matrix trmat;
   Class_Node *camnode=NULL;
@@ -45,7 +45,10 @@ void draw_scene(){
   
   if(max3d_camera){
     camnode=max3d_camera->data;
-    mat_inverse_cam(cammat,camnode->mat);
+    mat_inverse(cammat,camnode->objmat);
+//    mat_inverse(cammat,camnode->mat);
+//    mat_inverse_cam(cammat,camnode->mat);
+//    mat_copy(cammat,camnode->mat);
   }
 
   aglInit();
@@ -68,12 +71,12 @@ void draw_scene(){
     pos0.x=pos0.y=pos0.z=0;
 
 //    mat_mul(trmat,n->mat,cammat);
-    mat_mul(objmat,n->mat,n->tm_mat);
+//    mat_mul(objmat,n->mat,n->tm_mat);
 
-    if(camnode)
-      mat_mul(trmat,cammat,objmat);
-    else
-      mat_copy(trmat,objmat);
+    if(camnode){
+      mat_mul(trmat,cammat,n->objmat);
+    } else
+      mat_copy(trmat,n->objmat);
     
     mat_mulvec(&pos,&pos0,trmat);
 //    printf("Node '%s':  %8.3f  %8.3f  %8.3f\n",n->name,pos.x,pos.y,pos.z);
@@ -82,7 +85,7 @@ void draw_scene(){
       Class_EditableMesh *mesh=n->mesh;
       int i;
 #if 0
-        if(mesh->numtfaces>0) aglTexture(coins_id);
+        if(mesh->numtfaces>0) aglTexture(coins_id); else aglTexture(0);
         glBegin(GL_TRIANGLES);
         for(i=0;i<mesh->numfaces;i++){
           Face* f=&mesh->faces[i];
@@ -186,7 +189,7 @@ int main(int argc,char* argv[]){
     afs_init("",AFS_TYPE_FILES);
 
     // Load Scene:
-    of=OLE2_Open(fopen((argc>1)?argv[1]:"knot2.max","rb"));
+    of=OLE2_Open(fopen((argc>1)?argv[1]:"teszt7b.max","rb"));
     if(!of){ printf("File not found!\n");exit(1);}
     f1=afs_open_OLE2(of,"ClassDirectory3");
     if(!f1) f1=afs_open_OLE2(of,"ClassDirectory2");

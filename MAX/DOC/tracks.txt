@@ -1,0 +1,28 @@
+Track chunks:
+=============
+Value:
+2501 Float/Color value
+2503 Position value
+2504 Rotation value
+2505 Scale value
+
+
+Key chunks:
+===========
+2511 Lin Float
+2512
+2513 Lin Pos
+2514 Lin Rot
+2515 Lin Scale
+
+2516 Bez Float
+2517
+2518 Smooth Rot
+2519 Bez Scale
+
+2520 TCB Float
+2521 TCB Pos
+2522 TCB Rot
+2523 TCB Scale
+
+2524 Bez Pos

@@ -61,22 +61,6 @@ void track_init(node_st *node){
   node->data=tr;
 }
 
-void recalc_quaternions(Track *track){
-  TCB_Rot_Key* keys=track->keys;
-  int i;
-  Quat temp;
-  
-  return;
-  
-  if(track->keytype!=0x2522) return; // not TCB Rot track
-  if(track->numkeys<2) return;
-  for(i=1;i<track->numkeys;i++){
-    keys[i].angle+=keys[i-1].angle;
-    quat_mul(&temp,&keys[i].value,&keys[i-1].value);
-    quat_copy(&keys[i].value,&temp);
-  }
-}
-
 void track_uninit(node_st *node){
   Track *track=node->data;
   int subtype=classtab[node->classid].subtype;
@@ -106,9 +90,22 @@ void track_uninit(node_st *node){
       case 0x2511: {
         PRINT_KEY(Linear_Float_Key) PRINT_FLOAT(value)
         break; }
+      case 0x2513: {
+        PRINT_KEY(Linear_Pos_Key) PRINT_POINT3(value)
+        break; }
+      case 0x2514: {
+        PRINT_KEY(Linear_Rot_Key) PRINT_QUAT(value)
+        break; }
+      case 0x2515: {
+        PRINT_KEY(Linear_Scale_Key) PRINT_POINT3(value.amount)
+        break; }
       case 0x2516: {
         PRINT_KEY(Bezier_Float_Key) PRINT_FLOAT(value)
         printf(" (%f,%f)",k->in_tan,k->out_tan);
+        break; }
+      case 0x2518: {
+        PRINT_KEY(Smooth_Rot_Key) PRINT_QUAT(value)
+        printf("\n      D1: ");PRINT_QUAT(in_tan) printf(" D2: ");PRINT_QUAT(out_tan)
         break; }
       case 0x2519: {
         PRINT_KEY(Bezier_Scale_Key) PRINT_POINT3(value.amount)
@@ -229,12 +226,19 @@ switch(chunk_id){
 #define READKEYS(tipus) read_keys(track,f,&chunk_size,sizeof(tipus));track->keytype=chunk_id;
 
   case 0x2511: READKEYS(Linear_Float_Key);break;
+  case 0x2513: READKEYS(Linear_Pos_Key);break;
+  case 0x2514: READKEYS(Linear_Rot_Key);break;
+  case 0x2515: READKEYS(Linear_Scale_Key);break;
+
   case 0x2516: READKEYS(Bezier_Float_Key);break;
+  case 0x2518: READKEYS(Smooth_Rot_Key);break;
   case 0x2519: READKEYS(Bezier_Scale_Key);break;
+  
   case 0x2520: READKEYS(TCB_Float_Key);break;
   case 0x2521: READKEYS(TCB_Pos_Key);break;
-  case 0x2522: READKEYS(TCB_Rot_Key);recalc_quaternions(track); break;
+  case 0x2522: READKEYS(TCB_Rot_Key);break;
   case 0x2523: READKEYS(TCB_Scale_Key);break;
+  
   case 0x2524: READKEYS(Bezier_Pos_Key);break;
 
 //  case 0x2519: // bezier scale

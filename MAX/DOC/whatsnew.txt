@@ -94,7 +94,8 @@ MAX3D v0.8   2000.04.14.  by A'rpi
   az egyes modulokat, hogy mind hibatlan legyen.
   (azaz ne legyen csomo minden elbaszva egy korai tevedes (pl. rossz
   PRS matrix) miatt)
-- ha nincs kamera akkor az origobol nez 0,0,-1 fele (azaz nincs szorazs
+  A lenyege hogy minden ujabb tesztnel csak 1 uj hibatenyezot vigyunk be.
+- ha nincs kamera akkor az origobol nez 0,0,-1 fele (azaz nincs szorzas
   cammat-al) tehat worldspace-t mutat camspace helyett
 - Keyframer bugfix: nem kezelte azt az esetet amikor frame<firstkey.frame
 - tesztelesek 1.:  (lasd. sorrend.txt)
@@ -106,8 +107,70 @@ MAX3D v0.8   2000.04.14.  by A'rpi
      - pivot.pos -> PRS/rot ok
      - pivot.rot -> PRS/rot ok
      - pivot.scale -> PRS ok
+  hierarchy:
+     - inherited pos ok
+     - inherited rot ok
+     - inherited pos with parent.pivot.pos!=0 ok
+     - inherited rot with parent.pivot.pos!=0 ok
+     - inherited rot with parent.pivot.rot!=0 ok
+     - inherited scale ok
+     Megjegyzes: a Node.tm-et nem szabad orokolni! az mindig csak az
+       adott Node-ra vonatkozik, a gyerekekre nem!!! Tehat ami oroklodik
+       az a mat=parent.mat*orient es amivel szamolni kell az a mat*tm
+- teszteles 2.  PRS camera
+    - PRS camera (position & rotation) ok
+    - keyframed (pos+rot) PRS camera ok
+
+  igy jo:  cammat = inverse(camnode->mat)
+    tehat normalisan invertalni kell a camera Node matrixot, nem csak
+    a positiont, hanem a rotationt is!!! (tehat a mat_inverse_cam() NEM JO!)
+    
+    - PRS camera with pivot.pos ok
+    - PRS camera with pivot.rot ok
+
+  vigyazat! a pivot-ot a cameranal is figyelembe kell venni!
+    tehat cammat = inverse(camnode->mat * camnode->tm)
+
+- Class_Node strukturaba:  Matrix objmat
+  gyakorlatilag objmat=mat*tm_mat
+  tehat nem kirajzolaskor kell szorozgatni, es a camera matrix is 
+  egyszerubben szamolhato igy:  cammat = inverse(camnode->objmat)
+  A kirajzolashoz szukseges trmat = node->objmat*inverse(camnode->objmat)
+
+- LookAt-es camera fixalva... eleg gaz, mert most 2-szer invertalja a
+  matrixot. ki kene ezt valahogy vedeni...
+  Esetleg kene egy flag a Node-ba, ahol a bitek megadjak melyik mezoket
+  kell kiszamolni (cameranal nem kell a mat, ha nincs gyerek akkor se
+  kell a mat, objectnel nem kell az inverz, targetnel nem kell az objmat
+  de kell a pos...)  Bar ez nem megoldas, mert a pivot miatt ugyis kell
+  a mat.
+  !!! Meg mindig csak az axis=Z flip=OFF esetre muxik jol. :-(
+
+- Rajottem miert bugzik a birdshow-ban a madar laba (belevag a talajba).
+  Ott hasznaljak az INHERIT FLAGS-et, es az Y rotation ki van
+  kapcsolva. Mi meg nem implementaltuk ezt se a regi se az uj engineben...
+
+- Euler XYZ kijavitva, mostmar muxik jol. Ez most nem quat-ot hanem egybol
+  matrix-ot szamol. Meg kell optimalizalni rajta!!!
+
+MAX3D v0.81  2000.04.15.  by A'rpi
+=========================
+- Keyframer atteve keyframe alkonyvtarba. Atirtam hogy makrok es template-k
+  epitsek fel, ne copy&paste&modify legyen az egesz.
+  - TCB Rot-nal nem volt spline_ease
+  - TCB Scale nem volt megirva
+- Keyframer: uj controllerek:
+  - Linear Pos
+  - Linear Rot
+  - Linear Scale
+  - Smooth Rot (ez meg nincs szamolva, csak betoltve)
+- Specialis controllerek:
+  - Position XYZ
+  - ScaleXYZ
+  Mindkettohoz az uj Class_VectorXYZ tipust hasznalja. Az egesz a get.c-ben
+  van lekezelve, igy barmihez hasznalhato (PRS,LookAt,PBlock)
 
 
+################################################################################
 RULEZ, a modifierek forrasa megvan a MAXSDK3-ban! (twist,taper,bend,skew etc...)
 RULEZ az FFD modifier, nagyon durva objecteket lehet vele csinalni egyszeruen!
-

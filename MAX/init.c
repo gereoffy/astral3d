@@ -16,78 +16,42 @@ void init_ParamBlock(node_st *node){  // beallitja a keyframe pointereket
 
 char* update_PRS(node_st *node){
   Class_PRS *prs=node->data;
-  mat_from_prs(prs->mat,prs->pos,prs->rot,prs->scale,prs->scaleaxis);
+//  printf("POS: %f %f %f\n",prs->pos->x,prs->pos->y,prs->pos->z);
+//  printf("SCALE: %f %f %f\n",prs->scale->x,prs->scale->y,prs->scale->z);
+  if(prs->euler)
+    mat_from_euler(prs->mat,prs->pos,
+      *(prs->euler->x),*(prs->euler->y),*(prs->euler->z),
+      prs->scale,prs->scaleaxis);
+  else
+    mat_from_prs(prs->mat,prs->pos,prs->rot,prs->scale,prs->scaleaxis);
 //  printf("updating PRS\n");
 //  printf("  Quat: w: %8.5f  x: %8.5f y: %8.5f z: %8.5f\n",prs->rot->w,prs->rot->x,prs->rot->y,prs->rot->z);
 //  mat_print(prs->mat);
   return NULL;
 }
 
-// Parameter map indices
-#define PB_TORUSKNOT_RADIUS		0
-#define PB_TORUSKNOT_RADIUS2		1
-#define PB_TORUSKNOT_ROTATION		2
-#define PB_TORUSKNOT_TWIST		3
-#define PB_TORUSKNOT_SEGMENTS		4
-#define PB_TORUSKNOT_SIDES		5
-#define PB_TORUSKNOT_SMOOTH		6
-#define PB_TORUSKNOT_P	7
-#define PB_TORUSKNOT_Q	8
-#define PB_TORUSKNOT_E    9
-#define PB_TORUSKNOT_LUMPS    10
-#define PB_TORUSKNOT_LUMP_HEIGHT    11
-#define PB_TORUSKNOT_BASE_CURVE     12
-#define PB_TORUSKNOT_GENUV          13
-#define PB_TORUSKNOT_UTILE          14
-#define PB_TORUSKNOT_VTILE          15
-#define PB_TORUSKNOT_UOFF           16
-#define PB_TORUSKNOT_VOFF           17
-#define PB_TORUSKNOT_WARP_HEIGHT    18
-#define PB_TORUSKNOT_WARP_FREQ      19
-
-
-char* init_TorusKnot(node_st *node){
-  Class_TorusKnot *knot=malloc(sizeof(Class_TorusKnot));
-  node_st *pblock=dep_node_by_ref(node,0);
-  if(!pblock) return "TorusKnot: missing ParamBlock!";
-  node->data=knot;
-  node->update=update_TorusKnot;
-  init_mesh(&knot->mesh);
-  knot->radius=getparam_float(pblock,PB_TORUSKNOT_RADIUS);
-  knot->radius2=getparam_float(pblock,PB_TORUSKNOT_RADIUS2);
-  knot->Rotation=getparam_float(pblock,PB_TORUSKNOT_ROTATION);
-  knot->radius=getparam_float(pblock,PB_TORUSKNOT_RADIUS);
-  knot->Twist=getparam_float(pblock,PB_TORUSKNOT_TWIST);
-  knot->segs=getparam_int(pblock,PB_TORUSKNOT_SEGMENTS);
-  knot->sides=getparam_int(pblock,PB_TORUSKNOT_SIDES);
-  knot->smooth=getparam_int(pblock,PB_TORUSKNOT_SMOOTH);
-  knot->P=getparam_float(pblock,PB_TORUSKNOT_P);
-  knot->Q=getparam_float(pblock,PB_TORUSKNOT_Q);
-  knot->E=getparam_float(pblock,PB_TORUSKNOT_E);
-  knot->P=getparam_float(pblock,PB_TORUSKNOT_P);
-  knot->Lumps=getparam_float(pblock,PB_TORUSKNOT_LUMPS);
-  knot->LumpHeight=getparam_float(pblock,PB_TORUSKNOT_LUMP_HEIGHT);
-  knot->BaseCurve=getparam_int(pblock,PB_TORUSKNOT_BASE_CURVE);
-  knot->genUV=getparam_int(pblock,PB_TORUSKNOT_GENUV);
-  knot->uTile=getparam_float(pblock,PB_TORUSKNOT_UTILE);
-  knot->vTile=getparam_float(pblock,PB_TORUSKNOT_VTILE);
-  knot->uOff=getparam_float(pblock,PB_TORUSKNOT_UOFF);
-  knot->vOff=getparam_float(pblock,PB_TORUSKNOT_VOFF);
-  knot->WarpHeight=getparam_float(pblock,PB_TORUSKNOT_WARP_HEIGHT);
-  knot->WarpFreq=getparam_float(pblock,PB_TORUSKNOT_WARP_FREQ);
-  return NULL;
-}
-
 char* init_PRS(node_st *node){
   Class_PRS *prs=malloc(sizeof(Class_PRS));
+  node_st *posnode=dep_node_by_ref(node,0);
+  node_st *rotnode=dep_node_by_ref(node,1);
+  node_st *scalenode=dep_node_by_ref(node,2);
   node->data=prs;
   node->update=update_PRS; // updates TM if one of the deps changed
-  prs->pos=getkey_vect(dep_node_by_ref(node,0));
-  prs->rot=getkey_quat(dep_node_by_ref(node,1));
-  prs->scale=getkey_vect(dep_node_by_ref(node,2));
-  prs->scaleaxis=getkey_quat(dep_node_by_ref(node,2));
+  // POS:
+  prs->pos=getkey_vect(posnode);
+  // ROT:
+  if(classtype_by_node(rotnode)==CLASSTYPE_EULER_XYZ){
+    prs->euler=rotnode->data;
+    prs->rot=NULL;
+  } else {
+    prs->rot=getkey_quat(rotnode);
+    prs->euler=NULL;
+  }
+  // SCALE:
+  prs->scale=getkey_vect(scalenode);
+  prs->scaleaxis=getkey_quat(scalenode);
   if(!(prs->pos)) return "PRS: missing pos key";
-  if(!(prs->rot)) return "PRS: missing rot key";
+  if(!(prs->rot) && !(prs->euler)) return "PRS: missing rot key";
   if(!(prs->scale)) return "PRS: missing scale key";
   return NULL;
 }
@@ -149,6 +113,7 @@ char* update_Node(node_st *node){
       mat_identity(n->mat);
     }
   }
+  mat_mul(n->objmat,n->mat,n->tm_mat);
   return NULL;
 }
 
@@ -188,8 +153,11 @@ char* init_Node(node_st *node){
 
 char* update_EulerXYZ(node_st *node){
   Class_EulerXYZ *euler=node->data;
-  printf("updating Euler XYZ\n");
+//  printf("updating Euler XYZ\n");
+//  printf("  X: %8.5f  Y: %8.5f  Z: %8.5f\n",*(euler->x),*(euler->y),*(euler->z));
   quat_from_euler(&euler->quat,*(euler->x),*(euler->y),*(euler->z));
+//  printf("  Quat: W: %8.5f  X: %8.5f Y: %8.5f Z: %8.5f\n",
+//    euler->quat.w,euler->quat.x,euler->quat.y,euler->quat.z);
   return NULL;
 }
 
@@ -204,6 +172,28 @@ char* init_EulerXYZ(node_st *node){
   if(!euler->z) return "EulerXYZ: no Z key";
   return NULL;
 }
+
+
+char* update_VectorXYZ(node_st *node){
+  Class_VectorXYZ *posxyz=node->data;
+  posxyz->vect.x = *(posxyz->x);
+  posxyz->vect.y = *(posxyz->y);
+  posxyz->vect.z = *(posxyz->z);
+  return NULL;
+}
+
+char* init_VectorXYZ(node_st *node){
+  Class_VectorXYZ *posxyz=malloc(sizeof(Class_VectorXYZ));
+  node->data=posxyz; node->update=update_VectorXYZ;
+  posxyz->x=getkey_float(dep_node_by_ref(node,0));
+  posxyz->y=getkey_float(dep_node_by_ref(node,1));
+  posxyz->z=getkey_float(dep_node_by_ref(node,2));
+  if(!posxyz->x) return "VectorXYZ: no X key";
+  if(!posxyz->y) return "VectorXYZ: no Y key";
+  if(!posxyz->z) return "VectorXYZ: no Z key";
+  return NULL;
+}
+
 
 //========================= MAIN ================================
 
@@ -235,11 +225,9 @@ int i;
         break;
       }
       case CLASSTYPE_NODE: err=init_Node(node); break;
-      default:
-        if(strcmp(node_cl->name,"Euler XYZ")==0){
-          err=init_EulerXYZ(node);
-          break;
-        }
+      case CLASSTYPE_EULER_XYZ: err=init_EulerXYZ(node); break;
+      case CLASSTYPE_VECTOR_XYZ: err=init_VectorXYZ(node); break;
+      
     }
     if(err) printf("Error: %s\n",err);
   }

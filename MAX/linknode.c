@@ -18,6 +18,7 @@ node_st* link_nodes(int ctype){
   return list;
 }
 
+#if 0
 void list_nodes(node_st *list){
   while(list){
     Class_Node *n=list->data;
@@ -44,6 +45,7 @@ void list_nodes(node_st *list){
     list=list->next;
   }
 }
+#endif
 
 
 

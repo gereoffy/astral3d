@@ -24,13 +24,18 @@ void init_classreaders(){
   register_classreader("Bezier Position",CLASSTYPE_TRACK,0x13,track_init,track_chunk_reader,track_uninit);
   register_classreader("TCB Position",   CLASSTYPE_TRACK,0x23,track_init,track_chunk_reader,track_uninit);
   register_classreader("Linear Rotation",CLASSTYPE_TRACK,0x04,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Bezier Rotation",CLASSTYPE_TRACK,0x14,track_init,track_chunk_reader,track_uninit);
-  register_classreader("TCB Rotation",CLASSTYPE_TRACK,0x24,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Smooth Rotation",CLASSTYPE_TRACK,0x14,track_init,track_chunk_reader,track_uninit);
+  register_classreader("TCB Rotation",   CLASSTYPE_TRACK,0x24,track_init,track_chunk_reader,track_uninit);
   register_classreader("Linear Scale",CLASSTYPE_TRACK,0x05,track_init,track_chunk_reader,track_uninit);
   register_classreader("Bezier Scale",CLASSTYPE_TRACK,0x15,track_init,track_chunk_reader,track_uninit);
   register_classreader("TCB Scale",CLASSTYPE_TRACK,0x25,track_init,track_chunk_reader,track_uninit);
-  // Text:
-  register_classreader("Text",CLASSTYPE_SHAPE,0,NULL,text_chunk_reader,NULL);
+  // Complex controllers:
+  register_classreader("Euler XYZ",CLASSTYPE_EULER_XYZ,1,NULL,NULL,NULL);
+  register_classreader("Position XYZ",CLASSTYPE_VECTOR_XYZ,1,NULL,NULL,NULL);
+  register_classreader("ScaleXYZ",CLASSTYPE_VECTOR_XYZ,2,NULL,NULL,NULL);
+  // Orientation:
+  register_classreader("Position/Rotation/Scale",CLASSTYPE_ORIENTATION,1,NULL,NULL,NULL);
+  register_classreader("Look At",CLASSTYPE_ORIENTATION,2,lookat_init,lookat_chunk_reader,lookat_uninit);
   // Node:
   register_classreader("Node",CLASSTYPE_NODE,0,nodeclass_init,nodeclass_chunk_reader,nodeclass_uninit);
   // Map/Material:
@@ -38,13 +43,12 @@ void init_classreaders(){
   register_classreader("Bitmap",CLASSTYPE_MAP,1,NULL,material_chunk_reader,NULL);
   // ParamBlock:
   register_classreader("ParamBlock",CLASSTYPE_PARAMBLOCK,0,paramblock_init,paramblock_chunk_reader,paramblock_uninit);
-  // Editable Mesh / Object
+  // Mesh/Objects:
   register_classreader("Editable Mesh",CLASSTYPE_MESH,0,mesh_init,mesh_chunk_reader,mesh_uninit);
   register_classreader("Torus Knot",CLASSTYPE_MESH,1,NULL,NULL,NULL);
-  // Orientation
-  register_classreader("Position/Rotation/Scale",CLASSTYPE_ORIENTATION,1,NULL,NULL,NULL);
-  register_classreader("Look At",CLASSTYPE_ORIENTATION,2,lookat_init,lookat_chunk_reader,lookat_uninit);
-  // etc
+  // Shapes:
+  register_classreader("Text",CLASSTYPE_SHAPE,0,NULL,text_chunk_reader,NULL);
+  // etc.
 //  register_classreader("Scene",CLASSTYPE_SCENE,0,NULL,scene_chunk_reader,NULL);
-  
+
 }

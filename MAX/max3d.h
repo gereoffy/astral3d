@@ -76,11 +76,26 @@ typedef struct {
 } Orientation;
 
 typedef struct {
+  Quat quat;
+  float *x;
+  float *y;
+  float *z;
+} Class_EulerXYZ;
+
+typedef struct {
+  Point3 vect;
+  float *x;
+  float *y;
+  float *z;
+} Class_VectorXYZ;
+
+typedef struct {
   Matrix mat;
   Point3 *pos;      // P0
   Quat *rot;        // P1
   Point3 *scale;    // P2
   Quat *scaleaxis;
+  Class_EulerXYZ *euler;
 } Class_PRS;
 
 typedef struct {
@@ -92,13 +107,6 @@ typedef struct {
   Quat *scaleaxis;
   int axis; // +0x100=flip  0=X 1=Y 2=Z
 } Class_LookAt;
-
-typedef struct {
-  Quat quat;
-  float *x;
-  float *y;
-  float *z;
-} Class_EulerXYZ;
 
 
 typedef struct {
@@ -186,15 +194,18 @@ typedef struct {
   float value;
 } Float_Key;
 
+// 2511
 typedef struct {
   float value;
 } Linear_Float_Key;
 
+// 2516
 typedef struct {
   float value;
   float in_tan,out_tan;
 } Bezier_Float_Key;
 
+// 2520
 typedef struct {
   float value;
   TCBparams tcb;
@@ -207,20 +218,43 @@ typedef struct {
   Point3 value;
 } Pos_Key;
 
+// 2513
 typedef struct {
   Point3 value;
-  TCBparams tcb;
-  Point3 deriv1,deriv2;
-} TCB_Pos_Key;
+} Linear_Pos_Key;
 
+// 2524
 typedef struct {
   Point3 value;
   Point3 in_tan,out_tan;
   int tmp1,tmp2,tmp3;      // 0     ????????
 } Bezier_Pos_Key;
 
+// 2521
+typedef struct {
+  Point3 value;
+  TCBparams tcb;
+  Point3 deriv1,deriv2;
+} TCB_Pos_Key;
+
 //====================== Rot Key ====================
 
+typedef struct {
+  Quat value;
+} Rot_Key;
+
+// 2514
+typedef struct {
+  Quat value;
+} Linear_Rot_Key;
+
+// 2518
+typedef struct {
+  Quat value;
+  Quat in_tan,out_tan;
+} Smooth_Rot_Key;   // Bezier???
+
+// 2522
 typedef struct {
   Quat value; //int y1,y2,y3,y4; // ? quaternion
   TCBparams tcb;
@@ -235,16 +269,23 @@ typedef struct {
   Scale value;
 } Scale_Key;
 
+// 2515
+typedef struct {
+  Scale value;
+} Linear_Scale_Key;
+
+// 2519
+typedef struct {
+  Scale value;
+  Scale in_tan,out_tan;
+} Bezier_Scale_Key;
+
+// 2523
 typedef struct {
   Scale value;
   TCBparams tcb;
   Scale deriv1,deriv2;
 } TCB_Scale_Key;
-
-typedef struct {
-  Scale value;
-  Scale in_tan,out_tan;
-} Bezier_Scale_Key;
 
 //================================== Node ===================================
 
@@ -259,6 +300,7 @@ typedef struct {
   Matrix *orient_mat;  // PRS / LookAt mat-janak cime
   Matrix *parent_mat;  // NULL vagy a parent mat-janak cime
   Matrix mat; // calculated transformation matrix (tm*PRS*hierarchy)
+  Matrix objmat; // mat*tm
   Class_EditableMesh *mesh; // points to object mesh (editable/object/derived)
 //  Matrix invmat; // inverse mat
 } Class_Node;
@@ -293,5 +335,7 @@ typedef struct {
 #define CLASSTYPE_MAP 20
 #define CLASSTYPE_MATERIAL 21
 
+#define CLASSTYPE_EULER_XYZ 100
+#define CLASSTYPE_VECTOR_XYZ 101
 
 
