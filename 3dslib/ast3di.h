@@ -23,7 +23,7 @@ typedef signed long    sdword;
 
 int32 ast3d_load_mesh_3DS   (afs_FILE *f);
 int32 ast3d_load_motion_3DS (afs_FILE *f);
-int32 ast3d_load_mesh_AST   (afs_FILE *f);
-int32 ast3d_load_motion_AST (afs_FILE *f);
-int32 ast3d_save_AST        (afs_FILE *f);
+//int32 ast3d_load_mesh_AST   (afs_FILE *f);
+//int32 ast3d_load_motion_AST (afs_FILE *f);
+//int32 ast3d_save_AST        (afs_FILE *f);
 

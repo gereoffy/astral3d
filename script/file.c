@@ -1,7 +1,4 @@
 
-#define SCRIPT_MAXSIZE 65536
-#define SOR_MAXSIZE 8192
-
 char *script=NULL;
 int script_size=0;
 int script_pos=0;

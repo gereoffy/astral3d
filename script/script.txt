@@ -1,5 +1,5 @@
 ==============================================================================
-Astral Script System 3.0  - belsô használatra!   (C) 1900.1.1. by A'rpi/Astral
+Astral Script System 3.1 - belsô használatra!   (C) 1900.1.12. by A'rpi/Astral
 ==============================================================================
 1. Globális parancsok, változók.
    az aktuális effekttôl, scene-tôl függetlenül használható
@@ -36,10 +36,10 @@ INFO:
     load_scene scene1 xyz.3ds
     ; be van töltve. dejó.
 
-- write <szöveg>    és   writeln <szöveg>
+- write "szöveg"    és   writeln "szöveg"
   Kiírja az üzenetablakba a <szöveg>-et. A writeln soremelést is csinál!
   A legegyszerûbb script:
-     writeln Hello world! :)
+     writeln "Hello world!" :)
      end
 
   Vagy ahol pl. hasznos:
@@ -73,7 +73,7 @@ LOAD:
   ezután csak a <változó>-val hivatkozhatunk rá (nem a file-névvel)!
   Pl.:  load_scene part1 proba.3ds
   A változó neve tetszôleges lehet, de nem lehet parancsnév vagy korábban
-  definált változónév. Ebbôl követekzik hogy minden .3ds-t másik változóba
+  definált változónév. Ebbôl következik hogy minden .3ds-t másik változóba
   kell betölteni, akkor is ha a régire már nincs szükség!
 
 - loadpic <változó> <név>           

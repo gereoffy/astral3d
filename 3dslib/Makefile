@@ -98,4 +98,4 @@ spline.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/stddef.h
 spline.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/stdarg.h
 spline.o: /usr/include/bits/types.h /usr/include/libio.h
 spline.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h ast3d.h
-spline.o: ast3di.h ../afs/afs.h vector.h
+spline.o: ast3di.h ../afs/afs.h vector.h spl_quat.c

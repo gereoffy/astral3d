@@ -26,8 +26,6 @@
             obj->faces[i].pb->visible=
             obj->faces[i].pc->visible=
             obj->faces[i].visible=1;
-            continue;
-          }
-          obj->faces[i].visible=0;
+          } else obj->faces[i].visible=0;
         } // for
 

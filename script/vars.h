@@ -94,14 +94,12 @@ VAR_LIGHT(scrTYPE_float,"light_enabled",enabled);
 #define VAR_OBJ(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_object,0,(void*)(&obj->realname))
 
 VAR_OBJ(scrTYPE_float,"bumpdepth",bumpdepth);
-//VAR_OBJ(scrTYPE_int  ,"additivetexture",additivetexture);
 VAR_OBJ(scrTYPE_int  ,"zbuffer",enable_zbuffer);
 
 // Vertex lights
 VAR_OBJ(scrTYPE_float,"vertexlights",vertexlights);
 VAR_OBJ(scrTYPE_float,"explode_frame",explode_frame);
 VAR_OBJ(scrTYPE_float,"explode_speed",explode_speed);
-//VAR_OBJ(scrTYPE_float,"transparency",transparency);
 
 // particle system
 VAR_OBJ(scrTYPE_int  ,"part_num",particle.np);

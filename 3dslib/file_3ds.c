@@ -537,7 +537,7 @@ static int read_TRIMESH (afs_FILE *f)
   obj->enable_zbuffer=1;
   obj->vertexlights=0.0;
   obj->explode_speed=obj->explode_frame=0.0;
-  obj->additivetexture=0;
+//  obj->additivetexture=0;
   obj->pmat = Default_MATERIAL;
 
   if(strncmp(obj->name,"PARTICLE",8)==0) obj->flags|=ast3d_obj_particle;
@@ -1354,7 +1354,7 @@ static int read_TRACKROT (afs_FILE *f)
   float angle = 0;
 
   track = alloc_track();
-  qt_identity (&old);
+  qt_identity (&old); qt_identity (&q);
   if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   keys = n;
   while (n-- > 0) {
@@ -1362,20 +1362,19 @@ static int read_TRACKROT (afs_FILE *f)
       return ast3d_err_nomem;
     if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
     if (afs_fread (pos, sizeof(pos), 1, f) != 1) return ast3d_err_badfile;
-    qt_fromang (pos[0], pos[1], pos[2], pos[3], &q);
-        // !!! FIX !!! I SAID ANGLE IS ABSOLUTE!!!!!!!!!
-//    if (keys == n-1) angle = pos[0]; else angle += pos[0];
-    angle += pos[0];
-    qt_make (angle, pos[1], pos[2], pos[3], &key->val._quat);
-    qt_swap (&key->val._quat);
-    qt_swap (&q);
-    qt_mul (&q, &old, &old);
-    qt_copy (&old, &key->qa);
+    angle=pos[0]; // !!!!!!!!!
+    { float len=pos[1]*pos[1]+pos[2]*pos[2]+pos[3]*pos[3];
+      if(len>0) len=1.0F/sqrt(len);      // normalize axis vector
+#ifdef ast3d_SWAP_YZ
+      qt_make (angle, len*pos[1], len*pos[3], len*pos[2], &key->val._quat);
+#else
+      qt_make (angle, len*pos[1], len*pos[2], len*pos[3], &key->val._quat);
+#endif
+    }
     add_key (track, key, nf);
   }
-  spline_initrot (track);
+  spline_initrot (track); // egyeb parameterek (pl. key->qa) kiszamitasa
   ast3d_set_track (ast3d_key_rotate, c_id, track);
-//  printf("Hello %d\n",5);
   return ast3d_err_ok;
 }
 

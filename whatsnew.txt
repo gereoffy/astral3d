@@ -370,7 +370,7 @@ v3.4  00/01/01-05  by  A'rpi    - uj scriptrendszer, 3dslib, agl
   megallt a kep, de a code futott tovabb. (hirtelen negativ
   lett a time es a frame, igy az ast3d_setframe nem muxott, es
   a play eventje sem teljesult tobbet) 
-  (2^31)/1000000 = 35.8 percenkent tulcsordult!!!!
+  (2^31)/1000000/60 = 35.8 percenkent tulcsordult!!!!
 - render:
   - felesleges dolgok kiolve (.OLD fileok, #if 0...#endif, vertex array)
   - textureid es blend beallitas kiszedve 2_mater.c-bol 
@@ -394,6 +394,30 @@ v3.4  00/01/01-05  by  A'rpi    - uj scriptrendszer, 3dslib, agl
                legkisebb Z es legnagyobb Z atlaga
       -> meg mindig a 3 Z atlaga a legjobb, de ez se mindig.
 
+v3.5  00/01/07-12  by  A'rpi    - quaternions SUXXXXXXXXXXXXXXXXXXXXXXXXXX!!!!!
+- quaternionos cucc kulon fileba -> spl_quat.c
+- key->qa szamolasa atteve file_3ds.c-bol spl_quat.c-be
+  a file_3ds.c csak beteszi az angle/axis koordinatakat a key->val._quat[]-ba
+- kijavitottam a quaternion interpolalos bugot:
+  BUG: particle systemes sceneben az oszlopok kozul 2 keresztbe fordult,
+  pedig mindvegig ugyanaz a tengely korul voltak forgatva. Oka: az a 2
+  oszlop egy lepesben 180 foknal nagyobb szoggel volt elforgatva...
+  Nemi javitgatas utan meg a mirror scene bugzott, a tukorkep forditva
+  forgott mint kene... utana meg birdshow kezdett erdekes lenni... sux.
+  FIX: Kicsit nagyon szivas volt, mert 2 sort kellett volna kitorolni,
+  csak hogy rajojjek, ujra kellett vagy 3x irni az egeszet...
+  Meg nincs agyontesztelve, de particle, birdshow es mirror scene is jol
+  muxik, meg a 3 demo is.
+  Mindenesetre az a 2 sor valoszinu nem veletlen volt ott... szal okozhat ez
+  a javitas mashol bugot :(
+Amugy ez az egesz quaternion egy nagy baromsag, csak azert muszaj ezt
+hasznaljuk mert a 3ds angle/axis formaban kezeli a forgatast, nem pedig
+euler szogekkel (ahogy lightwave, stb teszi). A 2 kozott meg persze nem
+lehet normalisan konvertalni...
+Ami meg problema lesz/lehet: ha 360 fok tobbszorosevel forgatsz ugyanaz a
+tengely korul, akkor a 2 quaternion altal bezart szog 0 lesz, es ezert
+nem fog forogni sehogy (mert nem tudja az iranyt kiszamolni).
+
 
 
 
@@ -407,7 +431,7 @@ TERVEK a 4.0-ba:
 - gyorstekeres scriptrendszerbe
 - commandline opciok: window/fullscreen, felbontas, mipmap on/off, fps
 - textura caching (betolti a texturakat a kartyaba)
-
+- bbox helyett bounding sphere (gyorsabb sokkal, es egyszerubb, nincs gond forgatassal stb)
 
 KELL MEG:
 - profiling: meg mindig "elveszik" neha ido a 'draw' reszben. pl chevy, szoba
@@ -423,7 +447,8 @@ KELL MEG:
 - morph transzformaciot attenni render.c-be! meg a pre-trans cull-t is!
 - keyframer bug: LOOP-ot nem tamogat (spline.c tudja de ami hivja az nem igazan)
   lehet hogy megis tamogatja! le kene mar tesztelni...
-  
+- 2 keypointos morph miert szall el?
+
 EGYEB:
 - bug: chevy szelvedojen nincs specular!  -- specularmap-al van!!!!!
 - Morfnal pretrans face cull  -- megbeszeltuk hogy nem lehet, mert az

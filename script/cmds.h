@@ -8,6 +8,7 @@
 #define P_CONST(i,dv) cmd->ptype[i]=scrTYPE_const; cmd->defval[i]=dv;
 #define P_NEW(i) cmd->ptype[i]=scrTYPE_newvar;
 //===========================================================================
+// Usage:  V("command",class,code,type,min.params,max.params);
 
 // 1:  time value
 V("time",scrCLASS_global, 1,0, 0,1); P_CONST(1,0.0);

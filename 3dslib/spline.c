@@ -250,85 +250,6 @@ static void CompDerivTwo (t_KEY *key)
 #endif
 }
 
-static void CompAB (t_KEY *prev, t_KEY *cur, t_KEY *next)
-{
-/*
-  CompAB: Compute derivatives for rotation keys.
-*/
-  c_QUAT qprev, qnext, q;
-  c_QUAT qp, qm, qa, qb, qae, qbe;
-  c_QUAT QA, QB, QC;        /* key quaternions */
-  c_QUAT QAA, QAB, QAC;     /* key angle/axis representation */
-  float  tm, cm, cp, bm, bp, tmcm, tmcp, ksm, ksp, kdm, kdp;
-  float  dt, fp, fn, c;
-
-  qt_copy (&cur->val._quat, &QAB);
-  qt_copy (&cur->qa, &QB);
-  if (prev) {
-    qt_copy (&prev->val._quat, &QAA);
-    qt_copy (&prev->qa, &QA);
-  }
-  if (next) {
-    qt_copy (&next->val._quat, &QAC);
-    qt_copy (&next->qa, &QC);
-  }
-  if (prev != NULL) {
-    if (fabs (QAB.w - QAA.w) > 2*M_PI - EPSILON) {
-      qt_copy (&QAB, &q);
-      q.w = 0.0;
-      qt_log (&q, &qm);
-     } else {
-      qt_copy (&QA, &qprev);
-      if (qt_dotunit (&qprev, &QB) < 0.0) qt_negate (&qprev, &qprev);
-      qt_lndif (&qprev, &QB, &qm);
-    }
-  }
-  if (next != NULL) {
-    if (fabs (QAC.w - QAB.w) > 2*M_PI - EPSILON) {
-      qt_copy (&QAC, &q);
-      q.w = 0.0;
-      qt_log (&q, &qp);
-    } else {
-      qt_copy (&QC, &qnext);
-      if (qt_dotunit (&qnext, &QB) < 0.0) qt_negate (&qnext, &qnext);
-      qt_lndif (&QB, &qnext, &qp);
-    }
-  }
-  if (prev == NULL) qt_copy (&qp, &qm);
-  if (next == NULL) qt_copy (&qm, &qp);
-  fp = fn = 1.0;
-  cm = 1.0 - cur->cont;
-  if (prev && next) {
-    dt = 0.5 * (next->frame - prev->frame);
-    fp = (cur->frame - prev->frame) / dt;
-    fn = (next->frame - cur->frame) / dt;
-    c = fabs( cur->cont );
-    fp = fp + c - c * fp;
-    fn = fn + c - c * fn;
-  }
-  tm = 0.5 * (1.0 - cur->tens);
-  cp = 2.0 - cm;
-  bm = 1.0 - cur->bias;
-  bp = 2.0 - bm;
-  tmcm = tm * cm;
-  tmcp = tm * cp;
-  ksm  = 1.0 - tmcm * bp * fp;
-  ksp  = -tmcp * bm * fp;
-  kdm  = tmcp * bp * fn;
-  kdp  = tmcm * bm * fn - 1.0;
-  qa.x = 0.5 * (kdm * qm.x + kdp * qp.x);
-  qb.x = 0.5 * (ksm * qm.x + ksp * qp.x);
-  qa.y = 0.5 * (kdm * qm.y + kdp * qp.y);
-  qb.y = 0.5 * (ksm * qm.y + ksp * qp.y);
-  qa.z = 0.5 * (kdm * qm.z + kdp * qp.z);
-  qb.z = 0.5 * (ksm * qm.z + ksp * qp.z);
-  qa.w = 0.5 * (kdm * qm.w + kdp * qp.w);
-  qb.w = 0.5 * (ksm * qm.w + ksp * qp.w);
-  qt_exp (&qa, &qae);
-  qt_exp (&qb, &qbe);
-  qt_mul (&QB, &qae, &cur->ds);
-  qt_mul (&QB, &qbe, &cur->dd);
-}
 
 float spline_ease (float t, float a, float b)
 {
@@ -380,34 +301,6 @@ int32 spline_init (t_TRACK *track)
   return ast3d_err_ok;
 }
 
-int32 spline_initrot (t_TRACK *track)
-{
-/*
-  spline_initrot: compute spline derivations for rotation track.
-*/
-  t_KEY *curr;
-  t_KEY *keys = track->keys;
-  t_KEY *last = track->last;
-
-  if (!keys) return ast3d_err_nullptr;
-  if (!keys->next) return ast3d_err_spline;
-
-  if (keys->next->next) { /* 3 or more keys */
-    for (curr = keys->next; curr->next; curr = curr->next)
-      CompAB (curr->prev, curr, curr->next);
-/*    if (track->flags & ast3d_track_loop) {
-      CompAB (last->prev, keys, keys->next);
-      CompAB (keys->prev, last, keys->next);
-    } else { */
-      CompAB (NULL, keys, keys->next);
-      CompAB (keys, last, NULL);
-//    }
-  } else {
-    CompAB (NULL, keys, keys->next);
-    CompAB (keys, last, NULL);
-  }
-  return ast3d_err_ok;
-}
 
 int32 spline_getkey_float (t_TRACK *track, float frame, float *out)
 {
@@ -488,47 +381,9 @@ int32 spline_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out)
   return ast3d_err_ok;
 }
 
-int32 spline_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
-{
-/*
-  spline_getkey_quat: get spline interpolated quaternion for frame "frame".
-*/
-  t_KEY  *keys;
-  c_QUAT a, b, p, q, q1;
-  float  t, angle, spin;
 
-  if (frame < 0.0) return ast3d_err_badframe;
-  if (!track || !track->keys) return ast3d_err_nullptr;
+// Quaternion interpolation:
+#include "spl_quat.c"
 
-  if (frame < track->last->frame) keys = track->keys; else
-    keys = track->last;
-  while (keys->next && frame > keys->next->frame) keys = keys->next;
-  track->last = keys;
-  if (!keys->next || frame < keys->frame) { /* frame is above last key */
-    qt_copy (&keys->qa, out);
-    return ast3d_err_ok;
-  }
-  t = (frame - keys->frame) / (keys->next->frame - keys->frame);
-  t = spline_ease (t, keys->easefrom, keys->next->easeto);
-  qt_copy (&keys->qa, &a);
-  qt_copy (&keys->next->qa, &b);
 
-  angle = keys->next->val._quat.w - keys->val._quat.w;
-  if (angle > 0) spin = floor (angle / (2*M_PI));
-    else spin = ceil (angle / (2*M_PI));
-//  !!! FIX !!!
-//  angle = angle - (2*M_PI)*spin;
-//  if (fabs (angle) > M_PI) {
-    qt_slerpl (&a,&b,spin,t,&p);
-    qt_slerpl (&keys->dd, &keys->next->ds,spin,t,&q);
-    t = (((1.0-t)*2.0)*t);
-    qt_slerpl (&p,&q,0,t,&q1);
-//  } else {
-//    qt_slerp (&a,&b,spin,t,&p);
-//    qt_slerp (&keys->dd,&keys->next->ds,spin,t,&q);
-//    t = (((1.0-t)*2.0)*t);
-//    qt_slerp (&p,&q,0,t,&q1);
-//  }
-  qt_copy (&q1, out);
-  return ast3d_err_ok;
-}
+

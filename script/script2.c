@@ -36,10 +36,15 @@
 
 
 // ------ LIMITS ---------------
+// vars:
 #define scrMAXVARS 512
 #define scrHASH 256
+// draw:
 #define FX_DB 10
 #define MAX_FADER 32
+// file:
+#define SCRIPT_MAXSIZE 65536
+#define SOR_MAXSIZE 8192
 
 // ------ TYPEs ----------------
 #define scrTYPE_command 0

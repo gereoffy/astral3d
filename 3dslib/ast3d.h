@@ -487,6 +487,7 @@ typedef struct _c_OBJECT { /* object struct */
   c_VECTOR   scale;                      /* object scale vector        */
   c_BOUNDBOX bbox, pbbox;                /* object bounding box        */
   c_QUAT     rotate;                     /* object rotation quaternion */
+//  c_VECTOR   rotate;                     /* object rotation angles     */
   c_MORPH    morph;                      /* object morph               */
   c_MATRIX   matrix;                     /* object keyframer matrix    */
   c_MAPPING  mapping;                    /* texture mapping info       */
