@@ -168,6 +168,8 @@ typedef struct {
   float* vOff;
   float* WarpHeight;
   float* WarpFreq;
+  int basecurve_segs;
+  Point3* basecurve;
 } Class_TorusKnot;
 
 //============================= Modifiers ===================================
@@ -205,8 +207,16 @@ typedef struct {
   node_st *Modifiers;
   node_st *ModifiedObjs;
   node_st *Nodes;
-  int fps;
+  int fps;  // not used, but config reader fill it
   int start_frame,end_frame,current_frame;
+  node_st *cam;
+  int texture_id; // temporary hack!
+  int texture2_id; // more temporary hack!
+  int texture3_id; // more temporary hack!
+  int nodeno;
+  node_st *nodes; //[MAX_NODES];
+  float knot1_alpha;
+  float knot2_alpha;
 } Scene;
 
 #define CLASSTYPE_ERROR 0

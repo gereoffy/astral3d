@@ -168,7 +168,7 @@ void update_track(node_st *node,float frame){
       case 0x2522: { SET_KEY(TCB_Rot_Key)
         Quat p,q;
         float d_angle, spin;
-        float t=spline_ease(alpha,keys[keyno].tcb.easeto,keys[keyno1].tcb.easefrom);
+        float t=spline_ease_MAX(alpha,keys[keyno].tcb.easeto,keys[keyno1].tcb.easefrom);
 
         d_angle=keys[keyno1].angle;
         if(d_angle>0) spin = M_PI * floor (d_angle / (2*M_PI));

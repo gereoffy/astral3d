@@ -1,6 +1,6 @@
           float t,t2,t3;
           float h[4];
-          t=spline_ease(alpha,keys[keyno].tcb.easeto,keys[keyno1].tcb.easefrom);
+          t=spline_ease_MAX(alpha,keys[keyno].tcb.easeto,keys[keyno1].tcb.easefrom);
           /* interpolate */
           t2 = t * t; t3 = t2 * t;
           h[0] =  2 * t3 - 3 * t2 + 1;

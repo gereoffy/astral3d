@@ -128,7 +128,7 @@ char* init_Node(node_st *node){
   node_st *orient;
   node_st *object;
   node_st *parent=node_by_id(n->parent);
-  printf("Node %s refdb=%d\n",n->name,node->refdb);
+//  printf("Node %s refdb=%d\n",n->name,node->refdb);
   if(node->refdb==8 || node->refdb==6){
     orient=dep_node_by_ref(node,0);
     object=dep_node_by_ref(node,1);
@@ -217,7 +217,7 @@ int i;
     class_st *node_cl=class_by_node(node);
     char *err=NULL;
     if(node_cl){
-      printf("Init_node #%d\n",i);
+//      printf("Init_node #%d\n",i);
     switch(node_cl->type){
       case CLASSTYPE_ORIENTATION: {
         switch(node_cl->subtype){

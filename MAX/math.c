@@ -326,7 +326,7 @@ INLINE void vec_normalize(Point3 *a){  // by A'rpi
 
 
 
-float spline_ease (float t, float a, float b){
+float spline_ease_MAX (float t, float a, float b){
 /* spline_ease: remap parameter between two keys to apply eases. */
   float k;
   float s = a+b;

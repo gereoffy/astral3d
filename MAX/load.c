@@ -1,6 +1,5 @@
 // 3D Studio MAX file loader v0.5   (C) 2000. by A'rpi of Astral
 
-#include "max3d.h"
 #include "math.c"
 
 //========================================================================//
@@ -9,10 +8,7 @@
 
 #include "classdir.c"
 
-node_st nodes[MAX_NODES];
-int nodeno=0;
-
-Scene scene;
+// Scene scene;
 
 #include "mesh.c"
 #include "normals.c"
@@ -192,18 +188,19 @@ if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 #include "update.c"
 
 
-int load_scene(FILE *configfile,FILE *classdirfile,FILE *f){
+int load_scene(Scene *scene,FILE *configfile,FILE *classdirfile,FILE *f){
 
-while(!feof(configfile)) config_reader(configfile,0);
-printf("frames: %d - %d   current: %d\n",scene.start_frame,scene.end_frame,scene.current_frame);
+while(!feof(configfile)) config_reader(scene,configfile,0);
+printf("frames: %d - %d   current: %d\n",scene->start_frame,scene->end_frame,scene->current_frame);
 
 while(!feof(classdirfile)) class_dir_reader(classdirfile,0);
 
 init_classreaders();
-
 read_classdef();
 
 nodeno=0;
+nodes=scene->nodes=malloc(sizeof(node_st)*MAX_NODES);
+
 { unsigned short int chunk_id=0;
   unsigned int chunk_size=0;
   fread(&chunk_id,2,1,f);fread(&chunk_size,4,1,f);
@@ -214,19 +211,22 @@ nodeno=0;
   while(ftell(f)<chunk_size) node_reader(f,nodeno++);
 }
 printf("\n%d nodes readed\n",nodeno);
+scene->nodeno=nodeno;
 
-scene.Tracks=link_nodes(CLASSTYPE_TRACK);
-//scene.ParamBlocks=link_nodes(CLASSTYPE_PARAMBLOCK);
-//scene.Shapes=link_nodes(CLASSTYPE_SHAPE);
-//scene.Objects=link_nodes(CLASSTYPE_OBJECT);
-//scene.Modifiers=link_nodes(CLASSTYPE_MODIFIER);
-//scene.ModifiedObjs=link_nodes(CLASSTYPE_MODOBJ);
-scene.Nodes=link_nodes(CLASSTYPE_NODE);
+//------------- Nodes readed, let's init them! --------------
+
+scene->Tracks=link_nodes(CLASSTYPE_TRACK);
+//scene->ParamBlocks=link_nodes(CLASSTYPE_PARAMBLOCK);
+//scene->Shapes=link_nodes(CLASSTYPE_SHAPE);
+//scene->Objects=link_nodes(CLASSTYPE_OBJECT);
+//scene->Modifiers=link_nodes(CLASSTYPE_MODIFIER);
+//scene->ModifiedObjs=link_nodes(CLASSTYPE_MODOBJ);
+scene->Nodes=link_nodes(CLASSTYPE_NODE);
 
 init_nodes();
 fflush(stdout);
 
-//list_nodes(scene.Nodes);
+//list_nodes(scene->Nodes);
 
 return 0;
 }

@@ -88,7 +88,7 @@ char* update_TorusKnot(node_st *objnode){
 	GV(WarpFreq);
 #undef GV
 
-  printf("update TorusKnot.  segs=%d  sides=%d  P=%5.3f  Q=%5.3f  E=%5.3f\n",segs,sides,P,Q,E);
+//  printf("update TorusKnot.  segs=%d  sides=%d  P=%5.3f  Q=%5.3f  E=%5.3f\n",segs,sides,P,Q,E);
 
 	delTheta = (float)2.0*PI/(float)segs;
 	delPhi   = (float)2.0*PI/(float)sides;
@@ -164,6 +164,20 @@ char* update_TorusKnot(node_st *objnode){
       phi += delPhi;
 		}
 		theta += delTheta;
+	}
+
+  // HACK:
+	theta = startTheta;
+	for (ix=0; ix<=knot->basecurve_segs; ix++){
+    Point3 mValue;
+    // calc. base curve:
+    torusKnot(&mValue,theta,P,Q,radius);
+    // <hack>
+    knot->basecurve[ix].x=mValue.x;
+    knot->basecurve[ix].y=mValue.y;
+    knot->basecurve[ix].z=mValue.z;
+    // </hack>
+	  theta += (float)2.0*PI/(float)knot->basecurve_segs;
 	}
 
 // Make faces
@@ -255,6 +269,8 @@ char* init_TorusKnot(node_st *node){
   knot->vOff=getparam_float(pblock,PB_TORUSKNOT_VOFF);
   knot->WarpHeight=getparam_float(pblock,PB_TORUSKNOT_WARP_HEIGHT);
   knot->WarpFreq=getparam_float(pblock,PB_TORUSKNOT_WARP_FREQ);
+  knot->basecurve_segs=500;
+  knot->basecurve=malloc(knot->basecurve_segs*sizeof(Point3));
   return NULL;
 }
 

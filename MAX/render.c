@@ -8,24 +8,23 @@
 #include <string.h>
 
 #include "../agl/agl.h"
-#include <GL/glut.h>
+//#include <GL/glut.h>
 
 #include "../afs/afs.h"
 #include "../afs/afsmangle.h"
 #include "../timer/timer.h"
 #include "../loadmap/loadmaps.h"
 
+#include "max3d.h"
+
+static node_st *nodes=NULL;
+static int nodeno=0;
 
 #include "load.c"
 
-int play_frame = 2;
-int play_back_frame = 0;
-float frame;
-node_st *max3d_camera=NULL;
-int window_w,window_h;
-int coins_id=0;
+//node_st *max3d_camera=NULL;
 
-node_st *node_by_name(node_st* node,char* name){
+static node_st *node_by_name(node_st* node,char* name){
   while(node){
     Class_Node *n=node->data;
     if(strcmp(n->name,name)==0) return node;
@@ -34,7 +33,7 @@ node_st *node_by_name(node_st* node,char* name){
   return NULL;
 }
 
-void draw_scene(){
+void MAX_draw_scene(Scene *scene,float frame){
   node_st *node;
 //  Matrix objmat;
   Matrix cammat;
@@ -42,10 +41,10 @@ void draw_scene(){
   Matrix normat;
   Class_Node *camnode=NULL;
 
-  update(frame);  // update Tracks and Nodes
+  update(scene,frame);  // update Tracks and Nodes
   
-  if(max3d_camera){
-    camnode=max3d_camera->data;
+  if(scene->cam){
+    camnode=scene->cam->data;
     mat_inverse(cammat,camnode->objmat);
 //    mat_inverse(cammat,camnode->mat);
 //    mat_inverse_cam(cammat,camnode->mat);
@@ -53,19 +52,19 @@ void draw_scene(){
   }
 
   aglInit();
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+//  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
-  gluPerspective(45.0,(float)window_w / (float)window_h,10.0,20000.0);
+  gluPerspective(45.0,640.0f/480.0f,10.0,20000.0);
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
 
   // render objects
-  printf("Rendering objs from %s   frame=%f\n",camnode?camnode->name:"0,0,0  LookAt 0,0,-1",frame);
+//  printf("Rendering objs from %s   frame=%f\n",camnode?camnode->name:"0,0,0  LookAt 0,0,-1",frame);
 //  mat_print(cammat); mat_test(cammat);
-  
-  node=scene.Nodes; while(node){
+
+  node=scene->Nodes; while(node){
     Class_Node *n=node->data;
     Point3 pos;
     Point3 pos0;
@@ -86,14 +85,85 @@ void draw_scene(){
     glColor3ubv(n->wirecolor);
     if(n->mesh){
       Mesh *mesh=n->mesh;
+      float utile=1;
+      float vtile=1;
+      int normalcolor=1;
       int i;
-        printf("Rendering mesh: %s\n",n->name);
+//        printf("Rendering mesh: %s\n",n->name);
 #if 1
+
         Mesh_Transform(mesh,trmat,normat);
-//        if(mesh->numtfaces>0) aglTexture(coins_id); else aglTexture(0);
-        aglTexture(coins_id);
+
         aglBlend(AGL_BLEND_ADD);
         aglZbuffer(AGL_ZBUFFER_NONE);
+        
+        if(strncmp(n->name,"Torus Knot",10)==0){
+          float theta=0.00152*frame;
+          Class_TorusKnot *knot=mesh;
+          aglTexture(scene->texture3_id);
+          glColor3f(1,0.9,0.6);
+//          printf("Knot particles: %d\n",knot->basecurve_segs);
+          glBegin(GL_QUADS);
+          for(i=0;i<knot->basecurve_segs;i++){
+            Point3 *v=&knot->basecurve[i];
+            Point3 p;
+            float s=10;
+            p.x = v->x*trmat[X][X] + v->y*trmat[X][Y] + v->z*trmat[X][Z] + trmat[X][W];
+            p.y = v->x*trmat[Y][X] + v->y*trmat[Y][Y] + v->z*trmat[Y][Z] + trmat[Y][W];
+            p.z = v->x*trmat[Z][X] + v->y*trmat[Z][Y] + v->z*trmat[Z][Z] + trmat[Z][W];
+            p.x += 3*sin(theta*84.672367437);
+            p.y += 3*sin(theta*92.937892367);
+            p.z += 3*sin(theta*112.456356267);
+            glTexCoord2f(0,0); glVertex3f(p.x-s,p.y-s,p.z);
+            glTexCoord2f(1,0); glVertex3f(p.x+s,p.y-s,p.z);
+            glTexCoord2f(1,1); glVertex3f(p.x+s,p.y+s,p.z);
+            glTexCoord2f(0,1); glVertex3f(p.x-s,p.y+s,p.z);
+            theta+=0.7625423;
+          }
+          glEnd();
+//          glLineWidth(1.0f);
+          if(scene->knot1_alpha){ Vertex *v=mesh->vertices;
+            glColor3f(scene->knot1_alpha,scene->knot1_alpha,scene->knot1_alpha);
+            aglTexture(0);
+            for(i=0;i<*knot->segs;i++){
+              int j;
+              glBegin(GL_LINE_LOOP);
+              for(j=0;j<*knot->sides;j++){
+                glVertex3f(v->tp.x,v->tp.y,v->tp.z);
+                ++v;
+              }
+              glEnd();
+            }
+          }
+//          glLineWidth(1.0f);
+          if(scene->knot2_alpha){ 
+            glColor3f(scene->knot2_alpha,scene->knot2_alpha,scene->knot2_alpha);
+            aglTexture(0);
+            for(i=0;i<*knot->sides;i++){
+              int j;
+              glBegin(GL_LINE_LOOP);
+              for(j=0;j<*knot->segs;j++){
+                Vertex *v=&mesh->vertices[j*(*knot->sides)+i];
+                glVertex3f(v->tp.x,v->tp.y,v->tp.z);
+                ++v;
+              }
+              glEnd();
+            }
+          }
+        }
+        
+//        if(mesh->numtfaces>0) aglTexture(coins_id); else aglTexture(0);
+        if(strncmp(n->name,"Sphere",6)==0){
+          aglTexture(scene->texture2_id);
+          glColor3f(0.3,0.3,0.3);
+          normalcolor=0;
+          utile=vtile=4;
+        } else {
+          aglTexture(scene->texture_id);
+          utile=0.2;
+          vtile=3;
+//          glColor3f(1,1,1);
+        }
         glBegin(GL_TRIANGLES);
         for(i=0;i<mesh->numfaces;i++){
           Face* f=&mesh->faces[i];
@@ -106,12 +176,15 @@ void draw_scene(){
             TVertex *tv2=&mesh->tvertices[tf->verts[1]];
             TVertex *tv3=&mesh->tvertices[tf->verts[2]];
             // Textured
-            glTexCoord2f(tv1->u,tv1->v);
-            glColor3f(0.5+0.5*v1->tn.x,0.5+0.5*v1->tn.y,0.5-0.5*v1->tn.z);glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z);
-            glTexCoord2f(tv2->u,tv2->v);
-            glColor3f(0.5+0.5*v2->tn.x,0.5+0.5*v2->tn.y,0.5-0.5*v2->tn.z);glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z);
-            glTexCoord2f(tv3->u,tv3->v);
-            glColor3f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y,0.5-0.5*v3->tn.z);glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);
+            glTexCoord2f(utile*tv1->u,vtile*tv1->v);
+if(normalcolor) glColor3f(0.5+0.5*v1->tn.x,0.5+0.5*v1->tn.y,0.5-0.5*v1->tn.z);
+            glVertex3f(v1->tp.x,v1->tp.y,v1->tp.z);
+            glTexCoord2f(utile*tv2->u,vtile*tv2->v);
+if(normalcolor) glColor3f(0.5+0.5*v2->tn.x,0.5+0.5*v2->tn.y,0.5-0.5*v2->tn.z);
+            glVertex3f(v2->tp.x,v2->tp.y,v2->tp.z);
+            glTexCoord2f(utile*tv3->u,vtile*tv3->v);
+if(normalcolor) glColor3f(0.5+0.5*v3->tn.x,0.5+0.5*v3->tn.y,0.5-0.5*v3->tn.z);
+            glVertex3f(v3->tp.x,v3->tp.y,v3->tp.z);
           } else {
 #if 1
             // Envmap
@@ -163,99 +236,35 @@ void draw_scene(){
     node=node->next;
   }
 
-  glutSwapBuffers();
-  
+ 
 }
 
-//========================== OpenGL RuleZ ==================================
-
-static void key(unsigned char k, int x, int y){
-  switch (k) {
-    case 27: exit(0);  /* Escape */
-    case 'p':  printf("frame=%f\n",frame);
-  }
-}
-
-static void mouse(int button, int state, int x, int y) {
-  switch (button) {
-    case GLUT_LEFT_BUTTON:    ++play_frame; break;
-//    case GLUT_MIDDLE_BUTTON:  resize_window(640,480); break;
-    case GLUT_RIGHT_BUTTON:   ++play_back_frame; break;
-  }
-}
-
-static void idle(void){
-  float dt=GetRelativeTime();
-	if(play_frame&2){ 
-    frame+=dt*FPS; if(frame>scene.end_frame) frame=scene.start_frame;
-    glutPostRedisplay(); 
-  } else if(play_back_frame&2){
-    frame-=dt*FPS; if(frame<scene.start_frame) frame=scene.end_frame;
-    glutPostRedisplay();	
-  }
-}
-
-GLvoid resize_window(int w, int h){ 
-  glViewport(0,0,w,h); window_w=w;window_h=h;
-}
-
-int main(int argc,char* argv[]){
+Scene* LoadMAXScene(char *filename){
   OLE2_File *of;
   afs_FILE *f1;
   afs_FILE *f2;
   afs_FILE *f3;
-
-    afs_init("",AFS_TYPE_FILES);
+  Scene *scene=malloc(sizeof(Scene));
+//  scene->nodes=NULL; scene->nodeno=0;
 
     // Load Scene:
-    of=OLE2_Open(fopen((argc>1)?argv[1]:"test.max","rb"));
-    if(!of){ printf("File not found!\n");exit(1);}
+    of=OLE2_Open(fopen(filename,"rb"));
+    if(!of){ printf("File not found!\n");return 0;}
     f1=afs_open_OLE2(of,"ClassDirectory3");
     if(!f1) f1=afs_open_OLE2(of,"ClassDirectory2");
-    if(!f1){ printf("Invalid MAX file (missing ClassDirectory2/3)!\n");exit(1);}
+    if(!f1){ printf("Invalid MAX file (missing ClassDirectory2/3)!\n");return 0;}
     f2=afs_open_OLE2(of,"Scene");
-    if(!f2){ printf("Invalid MAX file (missing Scene)!\n");exit(1);}
+    if(!f2){ printf("Invalid MAX file (missing Scene)!\n");return 0;}
     f3=afs_open_OLE2(of,"Config");
-    if(!f3){ printf("Invalid MAX file (missing Config)!\n");exit(1);}
-    if(load_scene(f3,f1,f2)) {printf("Error reading scene.\n"); return 1;} // error
+    if(!f3){ printf("Invalid MAX file (missing Config)!\n");return 0;}
+    if(load_scene(scene,f3,f1,f2)) {printf("Error reading scene.\n"); return 0;} // error
     afs_fclose(f1); afs_fclose(f2); afs_fclose(f3);
     OLE2_Close(of);
 
-    max3d_camera=node_by_name(scene.Nodes,"Camera01");
-    if(!max3d_camera) max3d_camera=node_by_name(scene.Nodes,"rolli");
+    scene->cam=node_by_name(scene->Nodes,"Camera01");
+    if(!scene->cam) scene->cam=node_by_name(scene->Nodes,"rolli");
 //    if(!max3d_camera) {printf("No camera found!!!\n"); return 1;} // error
 
-    InitTimer();
-    
-    glutInit(&argc, argv);
-    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize (640, 480);
-//    glutInitWindowSize (1024, 768);
-//    glutInitWindowSize (1280, 1024);
-    glutInitWindowPosition (0, 0);
-    glutCreateWindow (argv[0]);
-//    glutFullScreen();
-
-    glClearColor( 0.0, 0.0, 0.0, 1.0 );
-    glClearDepth( 1.0 );
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
-
-    coins_id=LoadSimpleMap("coins");
-    printf("Coins id=%d\n",coins_id);
-
-    resize_window(640,480);
-    glutDisplayFunc(draw_scene);
-    glutMouseFunc(mouse);
-    glutKeyboardFunc(key);
-    glutReshapeFunc(resize_window);
-    glutIdleFunc(idle);
-    glutMainLoop();
-  return 0;
+    return scene;
 }
-
-
-
-
 

@@ -29,19 +29,19 @@ int update_node(node_st *node){
   return 1;
 }
 
-void update(float frame){
+void update(Scene *scene,float frame){
 int i;
 node_st *node;
   //
-  for(i=0;i<nodeno;i++) nodes[i].state=STATE_UNKNOWN;
+  for(i=0;i<scene->nodeno;i++) scene->nodes[i].state=STATE_UNKNOWN;
   //
 //  printf("Updating Tracks\n");
-  node=scene.Tracks; while(node){ 
+  node=scene->Tracks; while(node){ 
     if(node->state==STATE_UNKNOWN) update_track(node,frame);
     node=node->next;}
   //
 //  printf("Updating Nodes\n");
-  node=scene.Nodes; while(node){ 
+  node=scene->Nodes; while(node){ 
     if(node->state==STATE_UNKNOWN) update_node(node);
     node=node->next;}
 
