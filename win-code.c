@@ -20,7 +20,7 @@
 #include "timer/timer.h"
 #include "loadmap/load_map.h"
 #include "loadmap/loadmaps.h"
-#include "blob/blob.h"
+#include "fx/blob/blob.h"
 #include "afs/afs.h"
 #include "script/script.h"
 

@@ -902,6 +902,17 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 
 //===============================================================================
 
+// 46: 
+      if(cmdp->code==46){
+        if(cmdp->type){
+          int f;
+          for(f=0;f<MAX_FADER;f++) fader[f].ptr=NULL; // kill all faders
+          script_pos=script_restart_pos;
+        } else
+          script_restart_pos=script_pos;
+        return;
+      }
+//===============================================================================
       scrSyntax("Internal error: Unimplemented command (check command code!)");
     }
   }

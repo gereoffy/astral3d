@@ -76,10 +76,10 @@ VAR_FX(scrTYPE_float,"noise_xoffs",pic.xoffs,0.5);
 VAR_FX(scrTYPE_float,"noise_yoffs",pic.yoffs,0.5);
 
 // SPLINE:
-VAR_FX(scrTYPE_float,"fade_blend",face_blend,1.0);
-VAR_FX(scrTYPE_float,"wire_blend",wire_blend,0.5);
-VAR_FX(scrTYPE_float,"spline_size",spline_size,100.0);
-VAR_FX(scrTYPE_float,"spline_n",spline_n,16);
+VAR_FX(scrTYPE_float,"fade_blend",spline.face_blend,1.0);
+VAR_FX(scrTYPE_float,"wire_blend",spline.wire_blend,0.5);
+VAR_FX(scrTYPE_float,"spline_size",spline.spline_size,100.0);
+VAR_FX(scrTYPE_float,"spline_n",spline.spline_n,16);
 
 // SINzoom:
 VAR_FX(scrTYPE_float,"sinzoom_size",sinzoom.size,100);

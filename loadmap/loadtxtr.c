@@ -325,7 +325,7 @@ int i;
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
   glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  if(negflags&512){
+  if(negflags&512 && 0){
     // MipMap
     glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, 
     (negflags&1024)?GL_LINEAR_MIPMAP_NEAREST:GL_LINEAR_MIPMAP_LINEAR);
@@ -336,8 +336,16 @@ int i;
   } else {
     // Single
     glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+#if 0
+    // 16bit textures
     glTexImage2D(GL_TEXTURE_2D, 0, t->pixelsize, t->xsize, t->ysize, 0,
        (t->pixelsize==4)?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, remix_base);
+#else
+    // 32bit textures
+    glTexImage2D(GL_TEXTURE_2D, 0, (t->pixelsize==4)?GL_RGBA4:GL_RGB4,
+       t->xsize, t->ysize, 0,
+       (t->pixelsize==4)?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, remix_base);
+#endif
     map_memory_used+=t->pixelsize*t->xsize*t->ysize;
     map_memory_used_16bpp+=2*t->xsize*t->ysize;
   }

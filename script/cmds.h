@@ -189,6 +189,11 @@ V("gears",scrCLASS_fx,44,0,0,0);
 // 45
 V("init_gears",scrCLASS_global,45,0,0,0);
 
+// 46
+V("restart_here",scrCLASS_global,46,0,0,0);
+V("goto_restart",scrCLASS_global,46,1,0,0);
+
+
 //===========================================================================
 #undef V
 #undef P_MAXSCENE

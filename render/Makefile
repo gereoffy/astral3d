@@ -26,6 +26,6 @@ distclean:
 dep:	depend
 
 depend:
-	makedepend -- $(CFLAGS) -- $(SRCS)
+	makedepend -- $(CFLAGS) -- $(SRCS) &>/dev/null
 
 # DO NOT DELETE
