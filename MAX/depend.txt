@@ -1,0 +1,48 @@
+terv.
+
+Minden node-nak be lesznek flag-ezve a ref-jei, hogy melyikektol fugg.
+(Tehat ha pl. a ref legfelso bitje 1, akkor ha a a ref valtozik akkor
+ezt a node-t is updatelni kell)
+kesobb: lesz kulon depdb es deplist, ami a node pointereket tarolja,
+igy nem kell mindig dereferencelni runtime, hanem eleg betolteskor 1x.
+Gyorsabb (kerdes mennyivel) de tobb memoria kell (kerdes mennyivel).
+
+Minden node-nak lesz egy update() fuggvenye (ami lehet NULL is), ezt
+kell meghivni ha valamelyik depend-je (flag-elt ref) valtozott. A fv
+NULL-t ad vissza ha OK, es char* pointert a hibauzenetre ha ERR.
+  tehat:  char* update(node_st *node);
+
+Pl. a Node tipusu node dependje a 2. es a 4. ref, az update-je pedig
+az a fv, ami ujraszamolja a matrixot.
+
+Lesz egy globalis update_node(node_st *node) fuggveny, ami a parameterkent
+kapott node-t updateli:
+
+int update_node(node_st *node){
+  int i;
+  int chg=force_changed; // force_changed = 0 (play) vagy 1 (init)
+  node->state=STATE_UPDATED; // vegtelen ciklus elkerulese miatt
+  for(i=0;i<depdb;i++){
+    node_st *dep=deplist[i];
+    if(dep->state==STATE_UNKNOWN){
+      if(!update_node(dep)) return 0;  // rekurzio jol, hibakezelessel
+    }
+    if(dep->state==STATE_CHANGED) chg=1;
+  }
+  if(chg){ 
+    char *err=node->update(node);
+    if(err){ printf("Error updating node, message: %s\n",err);return 0;}
+    node->state=STATE_CHANGED;
+  }
+  return 1;
+}
+
+
+A node strukturakban pointerek lesznek a parameterek, ezek gyakorlatilag
+a ref altal mutatott node strukturaba fognak mutatni.
+Pl. a PRS strukturaja:
+  Point3 *pos;     // == &(node(ref[0]).pos_key.value)
+  Quat *rot;
+  Point3 *scale;
+  Quat *scaleaxis;
+

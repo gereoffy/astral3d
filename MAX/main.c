@@ -1,11 +1,14 @@
 // 3D Studio MAX file reader v0.5   (C) 2000. by A'rpi of Astral
 
+#define INLINE inline
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
 #include "max3d.h"
+#include "math.c"
 
 //========================================================================//
 //               Scene reader
@@ -18,11 +21,14 @@ int nodeno=0;
 
 Scene scene;
 
+#include "get.c"
 #include "reader.c"
 
 //========================================================================//
 //               Class readers
 //========================================================================//
+static int extra_refs=0;
+
 #include "trackrdr.c"
 #include "textrdr.c"
 #include "noderdr.c"
@@ -68,8 +74,6 @@ void init_classreaders(){
 //               node reader
 //========================================================================//
 
-//#include "hierarch.c"
-
 void node_chunk_reader(FILE *f,node_st *node,int level){
 unsigned short int chunk_id=0;
 unsigned int chunk_size=0;
@@ -106,7 +110,7 @@ switch(chunk_id){
     // References:
     int n=chunk_size/4;
     node->refdb=n;
-    node->reflist=malloc(sizeof(int)*n);
+    node->reflist=malloc(sizeof(int)*(n+extra_refs));
     fread(node->reflist,4,n,f);
     for(i=0;i<n;i++){
       int ref=node->reflist[i];
@@ -186,6 +190,7 @@ node->classid=chunk_id;
 node->refdb=0;
 node->data=NULL;
 node->next=NULL;
+node->update=NULL;
 
 printf("\nNode #%d: %s (%d)\n",nodeno,nodename,chunk_size);
 
@@ -195,6 +200,7 @@ if(!recurse_flag){
   return;
 }
 
+extra_refs=0; // !!!
 if(nodeclass && nodeclass->class_init) nodeclass->class_init(node);
 
 /*
@@ -219,6 +225,10 @@ if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 
 #include "classdef.c"
 #include "linknode.c"
+
+#include "init.c"
+#include "update.c"
+
 
 int main(int argc,char* argv[]){
 FILE *f;
@@ -248,14 +258,18 @@ f=fopen((argc>2)?argv[2]:"scene","rb");if(!f) return 1;
 printf("\n%d nodes readed\n",nodeno);
 
 scene.Tracks=link_nodes(CLASSTYPE_TRACK);
-scene.ParamBlocks=link_nodes(CLASSTYPE_PARAMBLOCK);
-scene.Shapes=link_nodes(CLASSTYPE_SHAPE);
-scene.Objects=link_nodes(CLASSTYPE_OBJECT);
-scene.Modifiers=link_nodes(CLASSTYPE_MODIFIER);
-scene.ModifiedObjs=link_nodes(CLASSTYPE_MODOBJ);
+//scene.ParamBlocks=link_nodes(CLASSTYPE_PARAMBLOCK);
+//scene.Shapes=link_nodes(CLASSTYPE_SHAPE);
+//scene.Objects=link_nodes(CLASSTYPE_OBJECT);
+//scene.Modifiers=link_nodes(CLASSTYPE_MODIFIER);
+//scene.ModifiedObjs=link_nodes(CLASSTYPE_MODOBJ);
 scene.Nodes=link_nodes(CLASSTYPE_NODE);
 
-list_nodes(scene.Nodes);
+init_nodes();
+fflush(stdout);
+update(100);
+
+//list_nodes(scene.Nodes);
 
 return 0;
 }

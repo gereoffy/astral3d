@@ -9,6 +9,7 @@ typedef struct node_st_ {
   unsigned short classid;
   unsigned short refdb;
   int* reflist;
+  char* (*update)(struct node_st_ *node);
   void* data;
   struct node_st_ *next;
 } node_st;
@@ -52,6 +53,11 @@ typedef struct { float x,y,z; } Point3;
 
 typedef struct { float w,x,y,z;} Quat;
 
+typedef struct { 
+  Point3 amount;
+  Quat axis;
+} Scale;
+
 typedef float Matrix[3][4];
 #define X 0
 #define Y 1
@@ -61,31 +67,50 @@ typedef float Matrix[3][4];
 typedef struct {
   Point3 pos;
   Quat rot;
-  Point3 scale;
-  Quat scaleaxis;
+  Scale scale;
 } TMatrix;
 
 typedef struct {
   char *name;
-  int parent;
+  int parent;          // erre is kene dependelni!
   unsigned int flags;
-  Point3 pos;
-  TMatrix tm;
-  Matrix mat; // calculated transformation matrix (tm*PRS*hierarchy)
   unsigned char wirecolor[4];
+  TMatrix tm; // pivot
+  // Calculated:
+  Matrix tm_mat;  // mat_from_tm(tm)
+  Matrix *orient_mat;  // PRS / LookAt mat-janak cime
+  Matrix *parent_mat;  // NULL vagy a parent mat-janak cime
+  Matrix mat; // calculated transformation matrix (tm*PRS*hierarchy)
 } Class_Node;
 
+
 typedef struct {
-  TMatrix tm;
   Matrix mat;
+} Orientation;
+
+typedef struct {
+  Matrix mat;
+  Point3 *pos;      // P0
+  Quat *rot;        // P1
+  Point3 *scale;    // P2
+  Quat *scaleaxis;
 } Class_PRS;
 
 typedef struct {
-  Point3 from;
-  Point3 to;
-  float roll;
+  Matrix mat;
+  Matrix *to; // pointer to P0.Node's mat
+  Point3 *from;     // P1
+  float *roll;      // P2
+  Point3 *scale;    // P3
+  Quat *scaleaxis;
 } Class_LookAt;
 
+typedef struct {
+  Quat quat;
+  float *x;
+  float *y;
+  float *z;
+} Class_EulerXYZ;
 
 typedef struct {
   Point3 p;
@@ -132,6 +157,9 @@ typedef struct {
   int frame_from,frame_to; // frame of first&last keys
   int keytype; // chunk id
   void* keys;  // key data
+// Calced:
+  int current_key;
+  float current_alpha;
 } Track;
 
 //====================== Float Key ====================
@@ -194,29 +222,20 @@ typedef struct {
 
 typedef struct {
   int frame,flags;
-  Point3 value;
-  Quat axisvalue;
+  Scale value;
 } Scale_Key;
 
 typedef struct {
   int frame,flags;
-  Point3 value;
-  Quat axisvalue;
+  Scale value;
   TCBparams tcb;
-  Point3 d1_value;
-  Quat d1_axis;
-  Point3 d2_value;
-  Quat d2_axis;
+  Scale deriv1,deriv2;
 } TCB_Scale_Key;
 
 typedef struct {
   int frame,flags;
-  Point3 value;
-  Quat axisvalue;
-  Point3 it_value;
-  Quat it_axis;
-  Point3 ot_value;
-  Quat ot_axis;
+  Scale value;
+  Scale in_tan,out_tan;
 } Bezier_Scale_Key;
 
 

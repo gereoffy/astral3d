@@ -94,7 +94,7 @@ void track_uninit(node_st *node){
         printf(" (%f,%f)",k->in_tan,k->out_tan);
         break; }
       case 0x2519: {
-        PRINT_KEY(Bezier_Scale_Key) PRINT_POINT3(value)
+        PRINT_KEY(Bezier_Scale_Key) PRINT_POINT3(value.amount)
         break; }
       case 0x2520: {
         PRINT_KEY(TCB_Float_Key) PRINT_FLOAT(value)
@@ -111,7 +111,7 @@ void track_uninit(node_st *node){
         printf("\n      D1: ");PRINT_QUAT(deriv1) printf(" D2: ");PRINT_QUAT(deriv2)
         break; }
       case 0x2523: {
-        PRINT_KEY(TCB_Scale_Key) PRINT_POINT3(value)
+        PRINT_KEY(TCB_Scale_Key) PRINT_POINT3(value.amount)
         PRINT_TCB
         break; }
       case 0x2524: {

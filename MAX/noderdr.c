@@ -9,13 +9,14 @@ void nodeclass_init(node_st *node){
   n->parent=-1;
   n->flags=0;
   n->wirecolor[0]=n->wirecolor[1]=n->wirecolor[2]=255;  n->wirecolor[3]=0;
+  extra_refs=1; // parent node
 }
 
 void print_tm(TMatrix *tm){
   printf("  TM.pos xyz: %f %f %f\n",tm->pos.x,tm->pos.y,tm->pos.z);
   printf("  TM.rot xyz: %f %f %f angle: %f\n",tm->rot.x,tm->rot.y,tm->rot.z,tm->rot.w);
-  printf("  TM.scale xyz: %f %f %f\n",tm->scale.x,tm->scale.y,tm->scale.z);
-  printf("  TM.scaleaxis xyz: %f %f %f angle: %f\n",tm->scaleaxis.x,tm->scaleaxis.y,tm->scaleaxis.z,tm->scaleaxis.w);
+  printf("  TM.scale xyz: %f %f %f\n",tm->scale.amount.x,tm->scale.amount.y,tm->scale.amount.z);
+  printf("  TM.scaleaxis xyz: %f %f %f angle: %f\n",tm->scale.axis.x,tm->scale.axis.y,tm->scale.axis.z,tm->scale.axis.w);
 }
 
 void nodeclass_uninit(node_st *node){
@@ -49,13 +50,13 @@ switch(chunk_id){
     n->tm.rot.w=float_reader(f,&chunk_size);
     break;
   case 0x096C:
-    n->tm.scale.x=float_reader(f,&chunk_size);
-    n->tm.scale.y=float_reader(f,&chunk_size);
-    n->tm.scale.z=float_reader(f,&chunk_size);
-    n->tm.scaleaxis.x=float_reader(f,&chunk_size);
-    n->tm.scaleaxis.y=float_reader(f,&chunk_size);
-    n->tm.scaleaxis.z=float_reader(f,&chunk_size);
-    n->tm.scaleaxis.w=float_reader(f,&chunk_size);
+    n->tm.scale.amount.x=float_reader(f,&chunk_size);
+    n->tm.scale.amount.y=float_reader(f,&chunk_size);
+    n->tm.scale.amount.z=float_reader(f,&chunk_size);
+    n->tm.scale.axis.x=float_reader(f,&chunk_size);
+    n->tm.scale.axis.y=float_reader(f,&chunk_size);
+    n->tm.scale.axis.z=float_reader(f,&chunk_size);
+    n->tm.scale.axis.w=float_reader(f,&chunk_size);
     break;
   case 0x0974:
     n->wirecolor[0]=byte_reader(f,&chunk_size);
