@@ -88,6 +88,8 @@ VAR_LIGHT(scrTYPE_float,"light_zbuffer",use_zbuffer);
 VAR_LIGHT(scrTYPE_float,"light_enabled",enabled);
 VAR_LIGHT(scrTYPE_int,"lightmap_calc_normal",lightmap_calc_normal);
 
+VAR_LIGHT(scrTYPE_int,"light_laser",laser);
+
 #undef VAR_LIGHT
 
 //=============================
@@ -117,6 +119,11 @@ VAR_OBJ(scrTYPE_int  ,"part_sizelimit",particle.sizelimit);
 
 // hair
 VAR_OBJ(scrTYPE_float,"hair_length",hair_len);
+
+// laser
+VAR_OBJ(scrTYPE_float,"laser_transparency",laser_transparency);
+VAR_OBJ(scrTYPE_float,"laser_reflection",laser_reflection);
+VAR_OBJ(scrTYPE_int,"receive_laser",receive_laser);
 
 #undef VAR_OBJ
 

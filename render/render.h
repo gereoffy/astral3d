@@ -20,6 +20,7 @@ extern int camno;
 extern c_LIGHT *lights[MAX_LIGHTNO];
 extern c_AMBIENT *ambient;
 extern int lightno;
+extern int laserno;
 
 extern int window_w,window_h;
 extern unsigned int lightmap;

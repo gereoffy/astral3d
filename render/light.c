@@ -61,6 +61,7 @@ static void SetupLightMode(void){
 
    lightno=0;
    ambient=NULL;
+   laserno=0;
 
 #ifndef NO_LIGHTING
    glEnable(GL_LIGHTING);
@@ -76,6 +77,8 @@ static void SetupLightMode(void){
         lit = (c_LIGHT*)node->object;
         lights[lightno]=lit;
         mat_mulvec(scene->cam->matrix,&lit->pos,&lit->ppos);  /* Transformation */
+        
+        if(lit->laser) ++laserno; // count laser lights
         
 //        printf("Light #%d color %f %f %f\n",lightno,lit->color.rgb[0],lit->color.rgb[1],lit->color.rgb[2]);
 

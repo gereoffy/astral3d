@@ -107,6 +107,7 @@ void recurse_lightmap_uv(c_FACE *list,int x1,int y1,int xs,int ys){
 void make_lightmap_uv(c_OBJECT *obj,int xsize,int ysize){
 int i;
 float Amin=(obj->A)/2048.0;
+  if(obj->numfaces<1) return;
   for(i=0;i<obj->numfaces;i++){
     obj->faces[i].next=&obj->faces[i+1];
     if(obj->faces[i].A<Amin) obj->faces[i].A=Amin;  // save small faces!

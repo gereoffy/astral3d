@@ -46,4 +46,4 @@ script2.o: /usr/include/GL/glu.h ../3dslib/ast3d.h ../timer/timer.h
 script2.o: ../mp3lib/mp3.h ../afs/afs.h ../loadmap/loadtxtr.h ../blob/blob.h
 script2.o: ../fdtunnel/fdtunnel.h ../spline/spline.h ../smoke/smoke.h
 script2.o: ../sinpart/sinpart.h ../greets/greets.h ../render/render.h vars.h
-script2.o: cmds.h scr_event.c scr_draw.c file.c
+script2.o: cmds.h scr_evnt.c scr_draw.c file.c

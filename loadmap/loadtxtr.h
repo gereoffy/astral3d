@@ -17,7 +17,7 @@ typedef struct {
   int flags;
   int pixelsize;
   int xsize,ysize;
-  int id;
+  unsigned int id;
 } texture_st;
 
 /* Downcase path/filename and cut extension. Duplicates string. */

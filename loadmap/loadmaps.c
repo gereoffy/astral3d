@@ -41,7 +41,7 @@ int Load_RGBAmap(char *mapname,char *alphamap){
 
 
 int load_blob_map(char *mapname){
-  int map_id=0;
+  unsigned int map_id=0;
   map_st map_light;
       if(LoadMAP(mapname,&map_light)){
         char *map=malloc(256*256*4);

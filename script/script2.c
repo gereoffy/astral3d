@@ -244,7 +244,7 @@ void fx_init(){
 
 #define FX_RESET(fx) memcpy(fx,&fxdefault,sizeof(fxdefault))
 
-#include "scr_event.c"
+#include "scr_evnt.c"
 #include "scr_draw.c"
 
 #include "file.c"

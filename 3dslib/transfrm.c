@@ -24,3 +24,15 @@
                 } // mat_mulnorm (normat, &obj->vertices[i].norm,&obj->vertices[i].pnorm);
               } // if visible
             }  // end of transformation loop (FOR)
+
+      if(obj->receive_laser){  // transform facenormals
+        int i;
+        for(i=0;i<obj->numfaces;i++){
+                { c_VECTOR *b=&obj->faces[i].norm;
+                  c_VECTOR *c=&obj->faces[i].pnorm;
+                  c->x= b->x*normat[X][X] + b->y*normat[X][Y] + b->z*normat[X][Z];
+                  c->y= b->x*normat[Y][X] + b->y*normat[Y][Y] + b->z*normat[Y][Z];
+                  c->z= b->x*normat[Z][X] + b->y*normat[Z][Y] + b->z*normat[Z][Z];
+                } // mat_mulnorm (normat, &obj->vertices[i].norm,&obj->vertices[i].pnorm);
+        }
+      }

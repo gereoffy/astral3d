@@ -43,11 +43,14 @@ int camno=0;
 c_LIGHT *lights[MAX_LIGHTNO];
 c_AMBIENT *ambient=NULL;
 int lightno;
+int laserno;
 
 #include "triangle.c"
 //#include "frustum.c"
 #include "light.c"
 #include "vertlits.c"
+
+#include "laser.c"
 
 void draw3dsframe(void){
     int i;
@@ -74,6 +77,14 @@ PROF_END(prof_3d_matrixmode);
 PROF_START(prof_3d_setuplight);
     SetupLightMode();
 PROF_END(prof_3d_setuplight);
+
+if(laserno){
+  int i;
+  for(i=0;i<lightno;i++){
+    c_LIGHT *lit=lights[i];
+    if(lit->laser) DrawLaser(lit);
+  }
+}
 
 /*------------------ START OF RENDERING LOOP --------------------*/
     for (node = scene->world; node; node=node->next) {
@@ -146,7 +157,7 @@ PROF_START(prof_3d_envmap);
 PROF_END(prof_3d_envmap);
 
 PROF_START(prof_3d_lightmap);
-#include "6_lightmap.c"
+#include "6_ltmap.c"
 PROF_END(prof_3d_lightmap);
 
 PROF_START(prof_3d_specmap);
@@ -161,7 +172,9 @@ if(obj->hair_len!=0.0){
   aglTexture(obj->pmat->texture_id);
   aglZbuffer(AGL_ZBUFFER_RW);
   aglBlend(AGL_BLEND_NONE);
-  glColor3f(1,1,1);
+//  glColor3f(ast3d_blend,ast3d_blend,ast3d_blend);
+  glColor4f(1,1,1,ast3d_blend);
+  if(ast3d_blend<1) aglBlend(AGL_BLEND_ALPHA);
   glBegin(GL_LINES);
   for(i=0;i<obj->numverts;i++){
     c_VERTEX *v=&obj->vertices[i];

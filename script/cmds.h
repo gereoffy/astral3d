@@ -94,7 +94,8 @@ V("play",scrCLASS_global,19,0, 0,-1);
 // 20/0:  stop_music
 // 20/1:  start_music "filename"
 V("stop_music",scrCLASS_global,20,0, 0,0);
-V("start_music",scrCLASS_global,20,1, 1,1);
+V("start_music",scrCLASS_global,20,1,1,2); P_CONST(2,0);
+V("seek_music",scrCLASS_global,20,2, 1,1); P_CONST(1,0);
 
 // 21:  mount type "path"
 V("mount",scrCLASS_global,21,0,2,2);

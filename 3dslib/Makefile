@@ -64,7 +64,7 @@ file_3ds.o: /usr/include/alloca.h /usr/include/stdio.h /usr/include/libio.h
 file_3ds.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h
 file_3ds.o: /usr/include/math.h /usr/include/bits/huge_val.h
 file_3ds.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h ast3d.h
-file_3ds.o: ast3di.h ../afs/afs.h vector.h matrix.h chunknam.c
+file_3ds.o: ast3di.h ../afs/afs.h vector.h matrix.h
 quatern.o: /usr/include/math.h /usr/include/features.h
 quatern.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
 quatern.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h

@@ -109,7 +109,7 @@ int i;
   t->pixelsize= (t->flags&4)? 4 : 3;
 
   glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_txtsize);
-  printf("GL_MAX_TEXTURE_SIZE=%d\n",max_txtsize);
+//  printf("GL_MAX_TEXTURE_SIZE=%d\n",max_txtsize);
 //  if(max_txtsize<64 || max_txtsize>512) max_txtsize=512;
   if(max_txtsize>=512) max_txtsize=512; else max_txtsize=256;
 
@@ -125,8 +125,120 @@ int i;
   remix=remix_base=malloc(t->pixelsize*t->xsize*t->ysize);
   if(!remix) { printf("Out of memory!!!!!!\n");exit(11);}
 
+  if((t->flags&255)==1 && 
+      map_txt1.xsize==t->xsize && map_txt1.ysize==t->ysize &&
+      txt1a==1.0f && (negflags&1)==0      ){
+    // Special case 1: only Texture1, size match, amount=1, neg=off
+    int i;
+    int siz=(t->xsize*t->ysize)/2;
+    if(map_txt1.colors==0){
+      unsigned char *p=map_txt1.map;
+      // truecolor
+      printf("TXT.special.true\n");
+      for(i=0;i<siz;i++){
+        remix[0]=p[0];
+        remix[1]=p[1];
+        remix[2]=p[2];
+        //
+        remix[3]=p[3];
+        remix[4]=p[4];
+        remix[5]=p[5];
+        remix+=6;
+        p+=6;
+      }
+      
+    } else {
+      // paletted
+      unsigned char *p=map_txt1.map;
+      unsigned char *pal=map_txt1.pal;
+      printf("TXT.special.pal\n");
+      for(i=0;i<siz;i++){
+        int c=3*p[0];
+        remix[0]=pal[c+0];
+        remix[1]=pal[c+1];
+        remix[2]=pal[c+2];
+        c=3*p[1];
+        remix[3]=pal[c+0];
+        remix[4]=pal[c+1];
+        remix[5]=pal[c+2];
+        remix+=6;
+        p+=2;
+      }
+    }
+   
+    
+  } else
+
+
+  if((t->flags&255)==5 && 
+      map_txt1.xsize==t->xsize && map_txt1.ysize==t->ysize &&
+      map_alp.xsize==t->xsize && map_alp.ysize==t->ysize &&
+      map_alp.colors>0 &&
+      txt1a==1.0f && (negflags&1)==0      ){
+    // Special case 2: only Texture1+Alphamap, size match, amount=1, neg=off
+    int i;
+    int siz=(t->xsize*t->ysize)/2;
+    unsigned char newpal[256];
+    for(i=0;i<map_alp.colors;i++){
+      float r=(float)map_alp.pal[3*i+0];
+      float g=(float)map_alp.pal[3*i+1];
+      float b=(float)map_alp.pal[3*i+2];
+      if(negflags&4)
+        newpal[i]=clip_255(alpa*(1.0f-(0.3*r+0.59*g+0.11*b)/256.0f));
+      else
+        newpal[i]=clip_255(alpa*(0.3*r+0.59*g+0.11*b)/256.0f);
+    }
+    if(map_txt1.colors==0){
+      unsigned char *p=map_txt1.map;
+      unsigned char *q=map_alp.map;
+      // truecolor
+      printf("TXT.special.true+pal\n");
+      for(i=0;i<siz;i++){
+        remix[0]=p[0];
+        remix[1]=p[1];
+        remix[2]=p[2];
+        remix[3]=newpal[q[0]];
+        //
+        remix[4]=p[3];
+        remix[5]=p[4];
+        remix[6]=p[5];
+        remix[7]=newpal[q[1]];
+        remix+=8;
+        p+=6;
+        q+=2;
+      }
+      
+    } else {
+      // paletted
+      unsigned char *p=map_txt1.map;
+      unsigned char *q=map_alp.map;
+      unsigned char *pal=map_txt1.pal;
+      printf("TXT.special.pal+pal\n");
+      for(i=0;i<siz;i++){
+        int c=3*p[0];
+        remix[0]=pal[c+0];
+        remix[1]=pal[c+1];
+        remix[2]=pal[c+2];
+        remix[3]=newpal[q[0]];
+        c=3*p[1];
+        remix[4]=pal[c+0];
+        remix[5]=pal[c+1];
+        remix[6]=pal[c+2];
+        remix[7]=newpal[q[1]];
+        remix+=8;
+        p+=2;
+        q+=2;
+      }
+    }
+   
+    
+  } else
+
+
   /* MIX maps into a single RGB or RGBA texture */
   { int x,y;
+
+      printf("TXT.generic  flag=%d  neg=%d  txt1a=%f\n",t->flags,negflags,txt1a);
   
         for(y=0;y<t->ysize;y++) for(x=0;x<t->xsize;x++){
           int xx,yy;

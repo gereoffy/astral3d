@@ -572,6 +572,7 @@ static int read_TRIMESH (afs_FILE *f)
   obj->pmat = Default_MATERIAL;
   obj->lightmap_id=0;
   obj->hair_len=0.0;
+  obj->receive_laser=0;
 
   if(strncmp(obj->name,"PARTICLE",8)==0) obj->flags|=ast3d_obj_particle;
   obj->particle.np=obj->particle.maxnp=0;
@@ -792,6 +793,7 @@ static int read_LIGHT (afs_FILE *f)
   light->attenuation[1]=0.0;
   light->attenuation[2]=0.0;
   light->lightmap_calc_normal=1;
+  light->laser=0;
   
   vec_make (c[0], c[1], c[2], &light->pos);
   vec_swap (&light->pos);

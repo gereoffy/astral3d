@@ -163,8 +163,8 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
   if(scr_playing) return;
 
   do{
-    if(!scr_readln(sor)) ExitDemo();
-    if(strcmp(sor,"end")==0) ExitDemo();
+    if(!scr_readln(sor)){ ExitDemo();return;}
+    if(strcmp(sor,"end")==0){ ExitDemo();return;}
   }while(sor[0]==0);
 
   /* ------------- PARSE COMMAND PARAMETERS ------------------ */
@@ -561,11 +561,20 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 //===============================================================================
 // 20/0:  stop_music
 // 20/1:  start_music "filename"
+// 20/2:  seek_music int
       if(cmdp->code==20){
+        if(cmdp->type==2){
+          // seek
+          if(pval[1]<0)
+            MP3_SkipFrames=-pval[1]-MP3_frames;
+          else
+            MP3_SkipFrames=pval[1];
+          return;
+        }
         if(cmdp->type==1) adk_mp3_frame=0;
         if(nosound) return;
         MP3_Stop();
-        if(cmdp->type==1) if(!MP3_Play(p[1])) nosound=1;
+        if(cmdp->type==1) if(!MP3_Play(p[1],pval[2])) nosound=1;
         return;
       }
 //===============================================================================

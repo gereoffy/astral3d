@@ -8,6 +8,9 @@ cd 3dslib;make;cd ..
 cd render;make;cd ..
 cd script;make;cd ..
 
+# cd mp3lib;./c;cd ..
+
+
 # cd smoke;./c;cd ..
 
 echo "------------- Compiling DEMO ------------------"

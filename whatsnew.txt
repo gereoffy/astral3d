@@ -567,6 +567,16 @@ v3.d  00/04/xx by A'rpi  - System Apoc demo miatti valtoztatasok
 - afs3-ba: kiirja a file neveket megnyitaskor (AFS_OPEN es AFS_NOTF)
     d apoc.scr | grep AFS_ | sort | uniq > files.txt
   igy egyszeruen kiszurhetok lesznek a nem hasznalt texturak!
+- hair effekt. scriptbol hair_length= valtozo allitasa, object dependent.
+- hair bugfix (ast3d_blend)
+
+Strepto elvitet forrast, compile WinVER!
+
+v3.e  00/04/xy by A'rpi
+- mp3 seekelese:
+  start_music filename framepos
+  igy nem az elejerol indul (idozitgetesnel hasznos!)
+
 
 TERVEK a 4.0-ba:
 - particlesys dt=0.015-ot fixelni!!

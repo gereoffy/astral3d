@@ -34,13 +34,16 @@ void ExitDemo(){
   exit(0);
 }
 
+static float time_dt=0;
+
 /* handle KEY events */
 static void key(unsigned char k, int x, int y){
   switch (k) {
   case 27:  /* Escape */
     ExitDemo();
   case 'p': 
-    printf("MARK:  p=%5d   t=%4d\n",MP3_frames,(int)adk_time);
+    printf("MARK:  p=%5d   t=%6.2f  dt=%5.2f\n",MP3_frames,adk_time,adk_time-time_dt);
+    time_dt=adk_time;
   default:
     return;
   }
@@ -128,7 +131,7 @@ int main(int argc,char* argv[]){
     blob_init();
     scrInit();
     fx_init();
-    if(argc>1) scrLoad(argv[1]); else scrLoad("alpha2.scr");
+    if(argc>1) scrLoad(argv[1]); else scrLoad("astral.scr");
     adk_time=0.0; // adk_frame=0.0;
     
 //    fx_debug=fopen("effects.log","wt");

@@ -293,7 +293,7 @@ typedef struct _c_FACE { /* face struct */
   c_VERTEX   *pa, *pb, *pc;                /* pointers to vertices    */
 //  c_MATERIAL *pmat;                        /* pointer to material     */
   c_VECTOR   norm;                         /* face normal             */
-//  c_VECTOR   pnorm;                        /* face normal             */
+  c_VECTOR   pnorm;                        /* face normal             */
   float      D;                            /* distance from 0;0;0     */
   float      A;                            /* terulet/felulet         */
 //  int        visible;                      /* visibility flag         */
@@ -330,6 +330,7 @@ typedef struct _c_LIGHT { /* light struct */
   float inner_range,outer_range;
   int attenuate;
   int lightmap_calc_normal;
+  int laser;
 //  float specular_limit,specular_coef,specular_mult;
 } c_LIGHT;
 
@@ -428,6 +429,8 @@ typedef struct _c_OBJECT { /* object struct */
   int lightmap_id;
   int lightmap_xsize,lightmap_ysize;
   float hair_len;
+  int receive_laser;
+  float laser_transparency,laser_reflection;
 } c_OBJECT;
 
 typedef struct _w_NODE { /* world node */
