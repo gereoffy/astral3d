@@ -5,7 +5,7 @@
 
 #include "afs.h"
 
-// Astral File System v3.0
+// Astral File System v4.0
 
 typedef struct {
   char name[80-8];
@@ -180,6 +180,7 @@ int afs_fseek(afs_FILE* f,int offs,int type){
   if(type==SEEK_CUR) f->pos+=offs;
   if(type==SEEK_END) f->pos=f->size+offs;
   if(f->pos>f->size) f->pos=f->size;
+  if(f->pos<0) f->pos=0;
 //  printf("AFS: fseek complete: pos=%d\n",f->pos);
   return 0;
 }
@@ -193,6 +194,45 @@ int afs_fgetc(afs_FILE* f){
   return f->ptr[f->pos++];
 }
 
+char* afs_fgets(char *s, int size, afs_FILE *f){
+  char *ss=s;
+  int c=0;
+  while(size>1 && (c=afs_fgetc(f))>=0){
+    s[0]=c;++s;--size;if(c==10) break;
+  }
+  s[0]=0;
+  if(c<0) return NULL;
+  return ss;
+}
+
+int afs_feof(afs_FILE *f){
+  if(f->pos>=f->size) return 1;
+  return 0;
+}
+
+afs_FILE* afs_open_virtual(char *ptr,int size){
+  afs_FILE *f=malloc(sizeof(afs_FILE));
+  f->ptr=ptr;
+  f->size=size;
+  f->pos=0;
+  return f;
+}
+
+afs_FILE* afs_open_OLE2(OLE2_File *of,char *olename){
+  OLE2_DirEntry *e;
+  afs_FILE *f;
+  char *ptr;
+  int len;
+  if(!of || !olename) return NULL;
+  e=OLE2_Find(olename,of);  if(!e) return NULL;
+  len=OLE2_Load(&ptr,e,of);
+  if(len<=0) return NULL;
+  f=malloc(sizeof(afs_FILE));
+  f->ptr=ptr;
+  f->size=len;
+  f->pos=0;
+  return f;
+}
 
 #if 0
 char ize[65536];
