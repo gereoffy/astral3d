@@ -1,7 +1,7 @@
 ; Script of demo called ALPHA, made for Ragest'99
 ; Astral Script System and 3D engine (C) 1999. Astral
 ;==================== LOADERS ==========================
-writeln "Loading world..."
+writeln "Loading world..."
 
 loadpic alpha_logo 002.jpg
 loadpic alphastral 003.jpg
