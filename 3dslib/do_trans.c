@@ -1,6 +1,6 @@
 
 #ifdef SPLINE_MORPH
-#include "morph-spl.h"
+#include "morphspl.h"
 #endif
 
 #define SET_MINMAX(x,min,max) if(x<min) min=x;if(x>max) max=x;
@@ -59,12 +59,12 @@ static void do_transform (){
 
 #ifdef SPLINE_MORPH
 if(alpha>0.0 && morph->numkeys>2){
-#include "morph-spl.c"
+#include "morphspl.c"
 } else {
-#include "morph-lin.c"
+#include "morphlin.c"
 }
 #else
-#include "morph-lin.c"
+#include "morphlin.c"
 #endif
 
         } else {

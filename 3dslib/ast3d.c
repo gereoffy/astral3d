@@ -25,7 +25,7 @@ int32     ast3d_flags=0;     /* curreng flags         */
 *****************************************************************************/
 
 #include "uv_grad.c"
-#include "smoothgrp.c"
+#include "smothgrp.c"
 #include "normals.c"
 #include "fix_uv.c"
 
@@ -34,7 +34,7 @@ int32     ast3d_flags=0;     /* curreng flags         */
 #endif
 
 #ifdef OTIMIZE_VERTEX
-#include "optimvert.c"
+#include "optimvtx.c"
 #endif
 
 static void calc_normals (){
@@ -85,6 +85,10 @@ static void calc_bbox (){
         obj->bbox.p[i].y= (i&2) ? obj->bbox.max.y : obj->bbox.min.y;
         obj->bbox.p[i].z= (i&4) ? obj->bbox.max.z : obj->bbox.min.z;
       }
+      printf("bbox: %f %f %f\n",
+          (obj->bbox.max.x+obj->bbox.min.x)/2,
+          (obj->bbox.max.y+obj->bbox.min.y)/2,
+          (obj->bbox.max.z+obj->bbox.min.z)/2);
     }
 }
 

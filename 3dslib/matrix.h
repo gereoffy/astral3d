@@ -160,8 +160,7 @@ LOCAL int32 mat_inverse (c_MATRIX a, c_MATRIX out)
   return ast3d_err_ok;
 }
 
-LOCAL int32 mat_invscale (c_MATRIX a, c_MATRIX out)
-{
+LOCAL int32 mat_invscale (c_MATRIX a, c_MATRIX out){
 /*
   mat_invscale: inverse matrix scale.
 */

@@ -1,3 +1,6 @@
+// #define SHOW_UNKNOWN_CHUNKS
+#define SHOW_CHUNK_TREE
+#define SHOW_CHUNK_NAMES
 
 #include <string.h>
 #include <stdlib.h>
@@ -8,6 +11,10 @@
 
 #include "vector.h"
 #include "matrix.h"
+
+#ifdef SHOW_CHUNK_NAMES
+#include "chunknam.c"
+#endif
 
 /*****************************************************************************
   chunks/readers definitions, structures
@@ -686,8 +693,7 @@ static int read_MAPLIST (afs_FILE *f)
   return ast3d_err_ok;
 }
 
-static int read_TRMATRIX (afs_FILE *f)
-{
+static int read_TRMATRIX (afs_FILE *f){
 /*
   read_TRMATRIX: Transformation matrix reader.
 */
@@ -695,6 +701,7 @@ static int read_TRMATRIX (afs_FILE *f)
   c_VERTEX *v = obj->vertices;
   c_VECTOR  piv;
   c_MATRIX  mat;
+  c_MATRIX  mat2;
   float     pivot[3];
   int       i, j;
 
@@ -706,13 +713,17 @@ static int read_TRMATRIX (afs_FILE *f)
   if (afs_fread (pivot, sizeof (pivot), 1, f) != 1) return ast3d_err_badfile;
   vec_make (pivot[0], pivot[1], pivot[2], &piv);
   vec_swap (&piv);
+  printf("TRMATRIX.PIVOT: %f %f %f\n",piv.x,piv.y,piv.z);
   mat_swap (mat);
-  mat_invscale (mat, mat);
+  mat_invscale (mat, mat2);
+//  mat_inverse_v02(mat, mat2);
+#if 1
   for (i = 0; i < obj->numverts; i++) {
     vec_sub (&v->vert, &piv, &v->vert);
-    mat_mulvec (mat, &v->vert, &v->vert);
+    mat_mulvec (mat2, &v->vert, &v->vert);
     v++;
   }
+#endif
   return ast3d_err_ok;
 }
 
@@ -1255,8 +1266,8 @@ static int read_TRACKPIVOT (afs_FILE *f)
   if (afs_fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
   vec_make (pos[0], pos[1], pos[2], &obj->pivot);
   vec_swap (&obj->pivot);
-  for (i = 0; i < obj->numverts; i++)
-    vec_sub (&obj->vertices[i].vert, &obj->pivot, &obj->vertices[i].vert);
+  printf("TRACKPIVOT: %f %f %f\n",obj->pivot.x,obj->pivot.y,obj->pivot.z);
+  for (i = 0; i < obj->numverts; i++) vec_sub (&obj->vertices[i].vert, &obj->pivot, &obj->vertices[i].vert);
   return ast3d_err_ok;
 }
 
@@ -1565,12 +1576,18 @@ static int ChunkReaderWorld (afs_FILE *f, long p, word parent){
 #endif    
     c_chunk_curr=h.chunk_id;
     pc+=h.chunk_size;
+#ifdef SHOW_CHUNK_TREE
+#ifdef SHOW_CHUNK_NAMES
+    printf("%*s%04X (%ld)  %s\n",chunk_level*2,"",h.chunk_id,h.chunk_size,get_chunk_name(h.chunk_id));
+#else
     printf("%*s%04X (%ld)\n",chunk_level*2,"",h.chunk_id,h.chunk_size);
+#endif
+#endif
     n=-1;
     for (i = 0; i < sizeof (world_chunks) / sizeof (world_chunks[0]); i++)
       if (h.chunk_id == world_chunks[i].id){ n = i; break; }
     if (n < 0) {
-#if 0
+#ifdef SHOW_UNKNOWN_CHUNKS
       int i;
       for (i=0; i < sizeof (key_chunks) / sizeof (key_chunks[0]); i++)
         if (h.chunk_id == key_chunks[i].id) goto key_chunk;

@@ -5,13 +5,13 @@
 #include <sys/time.h>
 
 // Returns current time in seconds
-float GetTimer(){
+unsigned int GetTimer(){
   struct timeval tv;
   struct timezone tz;
-  float s;
+//  float s;
   gettimeofday(&tv,&tz);
-  s=tv.tv_usec+1000000*tv.tv_sec;
-  return (s*0.000001);
+//  s=tv.tv_usec;s*=0.000001;s+=tv.tv_sec;
+  return (tv.tv_sec*1000000+tv.tv_usec);
 }  
 
 // Returns current time in microseconds
@@ -22,15 +22,16 @@ int uGetTimer(){
   return (int)(tv.tv_usec+1000000*tv.tv_sec);
 }  
 
-static float RelativeTime=0.0;
+static unsigned int RelativeTime=0;
 
 // Returns time spent between now and last call in seconds
 float GetRelativeTime(){
-float t,r;
+unsigned int t,r;
   t=GetTimer();
+//  t*=16;printf("time=%ud\n",t);
   r=t-RelativeTime;
   RelativeTime=t;
-  return r;
+  return (float)r * 0.000001F;
 }
 
 // Initialize timer, must be called at least once at start

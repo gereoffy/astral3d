@@ -56,6 +56,9 @@ int32 ast3d_update (){
         obj = (c_OBJECT *)node->object;
         tobj = (t_OBJECT *)node->track;
         ast3d_getkey_vect (tobj->translate, frame, &obj->translate);
+//	obj->translate.x-=obj->pivot.x;
+//	obj->translate.y-=obj->pivot.y;
+//	obj->translate.z-=obj->pivot.z;
         ast3d_getkey_vect (tobj->scale, frame, &obj->scale);
         ast3d_getkey_quat (tobj->rotate, frame, &obj->rotate);
         qt_make_objmat(obj);

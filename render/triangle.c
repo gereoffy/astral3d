@@ -7,7 +7,9 @@
 #define TRI_TEX1(p) glTexCoord2fv(&f->u1)
 #define TRI_TEX2(p) glTexCoord2fv(&f->u2)
 #define TRI_TEX3(p) glTexCoord2fv(&f->u3)
-#define TRI_REFL_COLOR(p) glColor4ubv(p->refl_rgb)
+#define TRI_BUMP_COLOR(p) glColor4ubv(p->refl_rgb)
+// #define TRI_REFL_COLOR(p) glColor4ubv(p->refl_rgb)
+#define TRI_REFL_COLOR(p) 
 #define TRI_REFL_TEX(p) glTexCoord2fv((float*)&p->pnorm)
 #define TRI_REFL_EUV(p) glTexCoord2fv(&p->env_u)
 #define TRI_SPEC_TEX(p) glTexCoord2fv((float*)&p->specular)
@@ -61,9 +63,9 @@ INLINE void ast3d_DrawGLTriangle_texture(c_FACE *f){
 
 INLINE void ast3d_DrawGLTriangle_bump(c_FACE *f){
   c_VERTEX *p;
-        p=f->pa; glTexCoord2f(f->u1+p->bump_du,f->v1+p->bump_dv); TRI_REFL_COLOR(p); TRI_VERTEX(p);
-        p=f->pb; glTexCoord2f(f->u2+p->bump_du,f->v2+p->bump_dv); TRI_REFL_COLOR(p); TRI_VERTEX(p);
-        p=f->pc; glTexCoord2f(f->u3+p->bump_du,f->v3+p->bump_dv); TRI_REFL_COLOR(p); TRI_VERTEX(p);
+        p=f->pa; glTexCoord2f(f->u1+p->bump_du,f->v1+p->bump_dv); TRI_BUMP_COLOR(p); TRI_VERTEX(p);
+        p=f->pb; glTexCoord2f(f->u2+p->bump_du,f->v2+p->bump_dv); TRI_BUMP_COLOR(p); TRI_VERTEX(p);
+        p=f->pc; glTexCoord2f(f->u3+p->bump_du,f->v3+p->bump_dv); TRI_BUMP_COLOR(p); TRI_VERTEX(p);
 }
 
 INLINE void ast3d_DrawGLTriangle_envmap(c_FACE *f){

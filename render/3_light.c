@@ -4,11 +4,15 @@
 
   if(matflags&ast3d_mat_bump){
     c_LIGHT *l=lights[0];
+    
+    if(lightno==0){
+      printf("FATAL ERROR! Can't do bumpmapping without light!\n");
+      exit(1);
+    }
 
 //------------------------- BUMP -----------------------
     for (i = 0; i < obj->numverts; i++){
       if(obj->flags&ast3d_obj_allvisible || obj->vert_visible[i]){
-//        obj->vertices[i].visible=0;
         { c_VERTEX *v=&obj->vertices[i];
           c_VECTOR *normal=&obj->vertices[i].pnorm;
           c_VECTOR u_normal,v_normal,delta;
@@ -66,13 +70,10 @@
   
     for (i = 0; i < obj->numverts; i++){
       if(obj->flags&ast3d_obj_allvisible || obj->vert_visible[i]){
-//      if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){
-//        obj->vertices[i].visible=0;
         { c_VECTOR *p=&obj->vertices[i].pvert;
           c_VECTOR *n=&obj->vertices[i].pnorm;
           int li;
           float r=base_r,g=base_g,b=base_b;
-///          if(matflags&(ast3d_mat_reflect|ast3d_mat_env_positional)==(ast3d_mat_reflect|ast3d_mat_env_positional)){
           if((matflags&ast3d_mat_reflect)&&(matflags&ast3d_mat_env_positional)){
             /* Reflection (real envmap) */
             c_VECTOR t;
@@ -85,7 +86,7 @@
               float dist=sqrt(d);
               d=t.x*t.x+t.y*t.y+(dist+t.z)*(dist+t.z);
             }
-            if(d>0) d=1.0/sqrt(d); else d=1.0;
+            if(d>0) d=0.5F/sqrt(d); else d=0.5F;
             obj->vertices[i].env_u=0.5+t.x*d;
             obj->vertices[i].env_v=0.5+t.y*d;
           }
@@ -221,7 +222,6 @@ if(l->flags&ast3d_light_attenuation){
             obj->vertices[i].refl_rgb[0]=clip_255_blend(r,ast3d_blend);
             obj->vertices[i].refl_rgb[1]=clip_255_blend(g,ast3d_blend);
             obj->vertices[i].refl_rgb[2]=clip_255_blend(b,ast3d_blend);
-            obj->vertices[i].refl_rgb[3]=src_alpha;
           }
 //          printf("Lighting vertex %d color=%f %f %f\n",i,r,g,b);
         }

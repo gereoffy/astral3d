@@ -6,18 +6,30 @@ if(mat!=current_mat){
     current_mat=mat;
         /* mat -> current material struct */
 #ifdef NO_LIGHTING
+        if(mat->shading==ast3d_mat_metal){
+          refl_rgb[0]=clip_255_blend(mat->diffuse.rgb[0],ast3d_blend);
+          refl_rgb[1]=clip_255_blend(mat->diffuse.rgb[1],ast3d_blend);
+          refl_rgb[2]=clip_255_blend(mat->diffuse.rgb[2],ast3d_blend);
+        } else {
+          refl_rgb[0]=clip_255_blend(mat->specular.rgb[0],ast3d_blend);
+          refl_rgb[1]=clip_255_blend(mat->specular.rgb[1],ast3d_blend);
+          refl_rgb[2]=clip_255_blend(mat->specular.rgb[2],ast3d_blend);
+        }
         src_alpha=clip_255((1-mat->transparency)*ast3d_blend);
         base_r=base_g=base_b=(mat->self_illum);
+	printf("lightno=%d\n",lightno);
         { int li;
           for(li=0;li<lightno;li++) if(lights[li]->enabled){
             c_LIGHT *l=lights[li];
-            LIGHTCOLOR(l->MatAmb,mat->ambient.rgb ,ambient->color.rgb);
-            l->ambient=(l->MatAmb[0]>0 || l->MatAmb[1]>0 || l->MatAmb[2]>0);
-//            l->MatAmb[0]=l->MatAmb[1]=l->MatAmb[2]=0;l->ambient=0;
+            if(ambient){ // 3DS MAX workaround
+              LIGHTCOLOR(l->MatAmb,mat->ambient.rgb ,ambient->color.rgb);
+              l->ambient=(l->MatAmb[0]>0 || l->MatAmb[1]>0 || l->MatAmb[2]>0);
+            } else {
+              l->MatAmb[0]=l->MatAmb[1]=l->MatAmb[2]=0.0;
+              l->ambient=0;
+            }
             LIGHTCOLOR(l->MatDiff,mat->diffuse.rgb ,l->color.rgb);
-//            l->MatDiff[0]=l->MatDiff[1]=l->MatDiff[2]=0;
             LIGHTCOLOR(l->MatSpec,mat->specular.rgb,l->color.rgb);
-//            l->MatSpec[0]=l->MatSpec[1]=l->MatSpec[2]=1;
             if(matflags&ast3d_mat_transadd){
               float src_alpha=(1-mat->transparency)*ast3d_blend;
 //              printf("src_alpha=%f\n",src_alpha);

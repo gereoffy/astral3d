@@ -3,6 +3,8 @@
 
     aglBlend(AGL_BLEND_ADD);
     aglTexture(mat->reflection_id);
+    
+    glColor4ubv(refl_rgb);
 
     if(matflags&ast3d_mat_env_positional){
         glBegin(GL_TRIANGLES);

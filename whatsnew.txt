@@ -480,7 +480,7 @@ v3.7  00/01/15-17  by  A'rpi    - killing clax & optimize & bugfix
       (a (float) nagyon fontos, azert bugzott eddig a keskeny ablakoknal
       mert int-nek vette, es az eredmeny lefele kerekitve 0 lett)
     scr_draw.c:  cam->aspectratio = 640.0F / 480.0F;
-      Hogy miert fix? mert kulonben a demok atemretezett ablakban elegge
+      Hogy miert fix? mert kulonben a demok atmeretezett ablakban elegge
       furcsan neztek ki... (a tobbi effekt torzult, a 3d sceneknel pedig
       a fovx>180 lett (fovx=fov*aspratio), backface cull behulyult stb...)
       Masreszt mindig fullscreenben fut, es a kepernyo fizikailag minden
@@ -515,8 +515,21 @@ v3.8  00/01/18  by  A'rpi    - real environment mapping
   uj script parancsok:
     smoothing [obj1name [obj2...]]    (ugyanugy mint a fixUV)
 
+** Strepto elvitte a forrast!
+
+v3.9  00/01/27  by  A'rpi    - 
+- pivot hack: visibchk.c-ben objspace-be transzformalt kamera poziciohoz
+  hozza kellett adni a pivotot valamiert, mert csak igy muxik jol...
+- ir bugreport: tens/cont/bias nem muxik
+  teszteltem, szerintem jo
+- effron/brs bugreport: lefagy  
+  oka: max 3 nem exportal ambient lightot, javitva
+- ha nincs egyaltalan light a sceneben akkor elszall vagy bugzik
+
+
 
 TERVEK a 4.0-ba:
+- particlesys dt=0.015-ot fixelni!!
 - optimize vertex-be: textura koordinatakra figyelni!!!
 - atlatszo objectekre valami egyszerusitett BSP
 - loop-ot tesztelni (rotation, float, vect)

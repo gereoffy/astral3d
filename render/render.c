@@ -55,6 +55,7 @@ void draw3dsframe(void){
     c_MATERIAL *current_mat=(c_MATERIAL*)(-1);
     float specular_coef,specular_limit,specular_limit4,specular_mult;
     float base_r,base_g,base_b;
+    unsigned char refl_rgb[3];
     int specular=0;
     unsigned char src_alpha=255;
     
@@ -72,7 +73,7 @@ PROF_END(prof_3d_matrixmode);
 PROF_START(prof_3d_setuplight);
     SetupLightMode();
 PROF_END(prof_3d_setuplight);
-   
+
 /*------------------ START OF RENDERING LOOP --------------------*/
     for (node = scene->world; node; node=node->next) {
       if (node->type == ast3d_obj_object) {
