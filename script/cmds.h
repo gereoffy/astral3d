@@ -181,6 +181,11 @@ V("pointer_hack",scrCLASS_scene,42,0,0,0);
 // 43
 V("download_textures",scrCLASS_global,43,0,0,0);
 
+// 44
+V("gears",scrCLASS_fx,44,0,0,0);
+// 45
+V("init_gears",scrCLASS_global,45,0,0,0);
+
 //===========================================================================
 #undef V
 #undef P_MAXSCENE

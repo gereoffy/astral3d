@@ -234,23 +234,40 @@ afs_FILE* afs_open_OLE2(OLE2_File *of,char *olename){
   return f;
 }
 
-#if 0
-char ize[65536];
+void afs_unpak(){
+ int i,j;
+ for(j=fs_db-1;j>=0;j--){
+  afs=&filesystems[j];
 
-int main(){
-afs_FILE* f;
-int i;
-  afs_init("astral.dat");
-  
-  f=afs_fopen("maps/light.jpg","rb");
-  i=afs_fread(ize,1,65536,f);
-  printf("%d bytes\n",i);
-  { FILE *f=fopen("debug","wb");
-    fwrite(ize,1,i,f);fclose(f);}
-  afs_fclose(f);
+  if(afs->type==AFS_TYPE_DAT || afs->type==AFS_TYPE_PAK){
+   for(i=0;i<afs->file_db;i++){
+     //
+     FILE *f=fopen(afs->dir[i].name,"wb");
+     if(!f){
+       printf("Cannot create file: %s\n",afs->dir[i].name);
+     } else {
+       int siz=afs->dir[i].size;
+       void *ptr=malloc(siz);
+       int packed=(afs->type==AFS_TYPE_PAK);
+       if(!ptr){printf("Not enough memory!\n");return;}
+       fseek(afs->file,afs->base+afs->dir[i].pos,SEEK_SET);
+       if(strstr(afs->dir[i].name,".jpg"))packed=0;
+       if(packed){
+         int i=unesp(ptr,siz+1,esp_buffer_read,NULL);
+         if(i<0){ printf("UNESP error: %d\n",i); return;}
+       } else {
+         if(1!=fread(ptr,siz,1,afs->file)){printf("Read error\n");return;}
+       }
+       fwrite(ptr,siz,1,f);
+       free(ptr);
+       fclose(f);
+       printf("Successfully unpacked: %s\n",afs->dir[i].name);
+     }
+   }
+  }
 
-return 0;
+ }
+ return;
 }
-#endif
 
 

@@ -772,22 +772,22 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 // 35/1: projected_map_anim picanim [scale]
       if(cmdp->code==35){
         picanim_st* picanim=scrGetPtr(pvar[1],fx);
-        scene->projmap.maps=picanim;
+        current_material->projmap.maps=picanim;
         if(cmdp->type==0){
-          scene->projmap.nummaps=1;
+          current_material->projmap.nummaps=1;
         } else {
-          scene->projmap.nummaps=picanim->nummaps;
+          current_material->projmap.nummaps=picanim->nummaps;
           
           if(picanim->nummaps==1)
-            scene->projmap.maps=picanim->maps[0];
+            current_material->projmap.maps=picanim->maps[0];
           else
-            scene->projmap.maps=picanim->maps;
+            current_material->projmap.maps=picanim->maps;
         }
-        if(scene->projmap.nummaps<1) scrSyntax("projected_map: minimum 1 texture must exisist!!!");
-        printf("Enabling projected-mapping, animated textures: %d\n",scene->projmap.nummaps);
+        if(current_material->projmap.nummaps<1) scrSyntax("projected_map: minimum 1 texture must exists!!!");
+        printf("Enabling projected-mapping, animated textures: %d\n",current_material->projmap.nummaps);
         current_material->flags|=ast3d_mat_reflect|ast3d_mat_projected_map;
-        scene->projmap.animphase=0;
-        scene->projmap.scale=pval[2];
+        current_material->projmap.animphase=0;
+        current_material->projmap.scale=pval[2];
 //        printf("projected_map_anim nummaps=%d\n",scene->projmap.nummaps);
         return;
       }
@@ -875,6 +875,21 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         Download_Textures();
         return;
       }
+//===============================================================================
+// 44: V("gears",scrCLASS_fx,44,0,0,0);
+      if(cmdp->code==44){
+        FX_RESET(fx);
+        fx->type=FXTYPE_GEARS;
+        return;
+      }
+
+//===============================================================================
+// 45: V("init_gears",scrCLASS_global,45,0,0,0);
+      if(cmdp->code==45){
+        GEARS_init();
+        return;
+      }
+
 //===============================================================================
 
       scrSyntax("Internal error: Unimplemented command (check command code!)");

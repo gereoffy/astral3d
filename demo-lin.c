@@ -87,7 +87,7 @@ GLvoid IdleFunc(){
 
 int main(int argc,char* argv[]){
 char* scriptname="astral.scr";
-int fullscreen=0;
+int fullscreen=1;
 int xs=640;
 int ys=480;
 

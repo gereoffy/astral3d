@@ -237,6 +237,16 @@ typedef struct _c_MAP { /* map struct */
   float amountof;
 } c_MAP;
 
+typedef struct {
+    int nummaps;
+    void *maps;
+    float animphase;
+    float uoffs;
+    float voffs;
+    float scale;
+    float amount;
+} c_projmap;
+
 typedef struct _c_MATERIAL { /* material struct */
   char  *name;                           /* material name        */
   int32 id;                              /* material id          */
@@ -274,6 +284,9 @@ typedef struct _c_MATERIAL { /* material struct */
   unsigned int specularmap_id;
   unsigned int lightmap_id;
   unsigned int bumpmap_id;
+
+  c_projmap projmap;
+
 } c_MATERIAL;
 
 typedef struct _c_VERTEX { /* vertex struct */
@@ -533,15 +546,6 @@ typedef struct _k_NODE { /* keyframer node */
   struct _k_NODE *next, *prev;           /* next/previous node     */
 } k_NODE;
 
-typedef struct {
-    int nummaps;
-    void *maps;
-    float animphase;
-    float uoffs;
-    float voffs;
-    float scale;
-    float amount;
-} c_projmap;
 
 typedef struct _c_SCENE { /* scene (world, keyframer) */
   float    f_start, f_end, f_current;    /* start/end/current frame */
@@ -556,7 +560,6 @@ typedef struct _c_SCENE { /* scene (world, keyframer) */
 //  int sphere_map;
   float znear,zfar;
   int frustum_cull;
-  c_projmap projmap;
 } c_SCENE;
 
 /*****************************************************************************

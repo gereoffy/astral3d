@@ -1,0 +1,2 @@
+
+gcc -c $CFLAGS -Wall gears.c

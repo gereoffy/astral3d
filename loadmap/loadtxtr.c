@@ -76,7 +76,7 @@ void Download_Textures(){
       glTexCoord2f(1,1); glVertex2i(64,64);
       glTexCoord2f(0,1); glVertex2i(0,64);
     glEnd();
-    glutSwapBuffers();
+//    glutSwapBuffers();
 //    sleep(1);
   }
 }

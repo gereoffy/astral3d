@@ -10,6 +10,7 @@ typedef struct {
   float bright;
   float u_speed1,v_speed1;
   float u_speed2,v_speed2;
+  float u_scale,v_scale;
 } fx_fdwater_struct;
 
 // void draw_fdtunnel(float frame,unsigned int texture,unsigned int texture2);

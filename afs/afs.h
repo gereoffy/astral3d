@@ -9,6 +9,7 @@ typedef struct {
 #include "ole2.h"
 
 int afs_init(char *filename,int type);
+void afs_unpak();
 
 afs_FILE* afs_fopen(char *filename,char *mode);
 FILE* afs_fopen2(char *filename,char *mode);

@@ -4,19 +4,19 @@ if(matflags&ast3d_mat_reflect){
   if(matflags&ast3d_mat_projected_map){
     texture_st *t1;
     texture_st *t2;
-    int phasei=scene->projmap.animphase;
-    float phasef=scene->projmap.animphase-phasei;
+    int phasei=mat->projmap.animphase;
+    float phasef=mat->projmap.animphase-phasei;
     
-//    printf("AT: nummaps=%d\n",scene->projmap.nummaps);
+//    printf("AT: nummaps=%d\n",mat->projmap.nummaps);
     
-    if(scene->projmap.nummaps<=1){
-      t1=scene->projmap.maps;
+    if(mat->projmap.nummaps<=1){
+      t1=mat->projmap.maps;
       t2=NULL;
 //      phasef=0.0f;
     } else {
-      texture_st **p=scene->projmap.maps;
-      t1=p[phasei%(scene->projmap.nummaps)];
-      t2=p[(phasei+1)%(scene->projmap.nummaps)];
+      texture_st **p=mat->projmap.maps;
+      t1=p[phasei%(mat->projmap.nummaps)];
+      t2=p[(phasei+1)%(mat->projmap.nummaps)];
     }
 
 //    printf("Renderint projmap, txt=%d  alpha=%5.3f\n",phasei,phasef);

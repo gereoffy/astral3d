@@ -42,6 +42,7 @@
 #include "../swirl/swirl.h"
 #include "../fdwater/fdwater.h"
 #include "../sinzoom/sinzoom.h"
+#include "../gears/gears.h"
 
 
 // ------ LIMITS ---------------
@@ -50,7 +51,7 @@
 #define scrHASH 256
 // draw:
 #define FX_DB 20
-#define MAX_FADER 32
+#define MAX_FADER 64
 // file:
 #define SCRIPT_MAXSIZE 65536
 #define SOR_MAXSIZE 8192
@@ -91,6 +92,7 @@
 #define FXTYPE_FDWATER 12
 #define FXTYPE_SINZOOM 13
 #define FXTYPE_MAXSCENE 14
+#define FXTYPE_GEARS 15
 
 #define MAX_PDB 20
 
@@ -154,6 +156,7 @@ typedef struct {
   fx_swirl_struct swirl;
   fx_fdwater_struct fdwater;
   fx_sinzoom_struct sinzoom;
+  fx_gears_struct gears;
   /* 3DS player: */
   c_SCENE *scene;
   c_CAMERA *cam;

@@ -22,7 +22,7 @@
 #include "../agl/agl.h"
 
 #include "../afs/afs.h"
-#include "../afs/afsmangle.h"
+//#include "../afs/afsmangl.h"
 #include "../loadmap/loadmaps.h"
 
 #include "../3dslib/ast3d.h"
@@ -68,10 +68,14 @@ static int poly_points[2][256][2];  // [polydb][vertexdb][xy]
 static void read_logo_file(){
 char sor[256];
 // cat akarmi.dxf | egrep -v ^\  > yyy2
-FILE *f=fopen("logo.vec","rt");
+afs_FILE *f=afs_fopen("logo.vec","rt");
 int pdb;
-  if(!f) return;
-  while(fgets(sor,250,f)){
+  printf("HJBTUNNEL: Reading vector file...\n");
+  if(!f){
+    return;
+    printf("HJBTUNNEL: FILE NOT FOUND!!!\n");
+  }
+  while(afs_fgets(sor,250,f)){
     if(strncmp(sor,"POLYLINE",8)==0){
       pdb=0;
       continue;
@@ -85,9 +89,9 @@ int pdb;
     if(strncmp(sor,"VERTEX",6)==0){
       float x,y;
       int xx,yy;
-      fgets(sor,250,f); // "7"
-      fgets(sor,250,f);sscanf(sor,"%f",&x);
-      fgets(sor,250,f);sscanf(sor,"%f",&y);
+      afs_fgets(sor,250,f); // "7"
+      afs_fgets(sor,250,f);sscanf(sor,"%f",&x);
+      afs_fgets(sor,250,f);sscanf(sor,"%f",&y);
       y-=0.3;
       xx=x+((x<0)?(-0.5):(0.5));// kerekites, CorelDraw5 pontatlansaga miatt :(
       yy=y+((y<0)?(-0.5):(0.5));
@@ -95,8 +99,9 @@ int pdb;
       poly_points[poly_db][pdb][1]=yy;
       ++pdb;
     }
+    printf("HJBTUNNEL: readed %d polys, %d vertices\n",poly_db,pdb);
   }
-  fclose(f);
+  afs_fclose(f);
 }
 
 static int poly_vertex_db=0;

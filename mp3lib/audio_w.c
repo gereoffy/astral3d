@@ -185,7 +185,7 @@ int MP3_Play(char *filename,int pos){
   if(!MP3_file) return 0;
 //  if(pos>0) fseek(MP3_file,pos,SEEK_SET);
   MP3_Init(MP3_file,pos);
-  MP3_eof=0; MP3_frames=20+pos;
+  MP3_eof=0; MP3_frames=pos;
   play_frames();  // fill the buffer
   return 1;
 }

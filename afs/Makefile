@@ -5,7 +5,7 @@ OBJS = afs4.o unesplib.o ole2.o
 LIB  = libafs.a
 
 CC   = gcc
-CFLAGS = -O2 -Wall
+CFLAGS = $(OPTFLAGS) -Wall
 
 .SUFFIXES: .c .o
 
@@ -61,4 +61,4 @@ ole2.o: /usr/include/sys/types.h /usr/include/time.h /usr/include/endian.h
 ole2.o: /usr/include/bits/endian.h /usr/include/sys/select.h
 ole2.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
 ole2.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
-ole2.o: /usr/include/string.h afs.h ole2.h afsmangle.h
+ole2.o: /usr/include/string.h afs.h ole2.h afsmangl.h

@@ -115,9 +115,9 @@
             temp.x = p->x*obj->matrix[X][X] + p->y*obj->matrix[X][Y] + p->z*obj->matrix[X][Z] + obj->matrix[X][W];
             temp.z = p->x*obj->matrix[Z][X] + p->y*obj->matrix[Z][Y] + p->z*obj->matrix[Z][Z] + obj->matrix[Z][W];
             temp.y = n->x*obj_normat.x + n->y*obj_normat.y + n->z*obj_normat.z;
-            obj->vertices[i].env_u=scene->projmap.uoffs+scene->projmap.scale*temp.x;
-            obj->vertices[i].env_v=scene->projmap.voffs+scene->projmap.scale*temp.z;
-            refl_a=temp.y*scene->projmap.amount;
+            obj->vertices[i].env_u=mat->projmap.uoffs+mat->projmap.scale*temp.x;
+            obj->vertices[i].env_v=mat->projmap.voffs+mat->projmap.scale*temp.z;
+            refl_a=temp.y*mat->projmap.amount;
 //            refl_a=1.0f;
 //            printf("Proj:  u=%8.3f  v=%8.3f  n=%8.3f\n", obj->vertices[i].env_u,obj->vertices[i].env_v,refl_a);
           }

@@ -44,6 +44,15 @@ VAR_FX(scrTYPE_float,"blob_vscale",blob.vscale,0.5);
 VAR_FX(scrTYPE_float,"blob_zpos",blob.zpos,-10);
 VAR_FX(scrTYPE_int  ,"blob_zsort",blob.zsort,0);
 
+// GEARS
+VAR_FX(scrTYPE_float,"gears_x",gears.xpos,0);
+VAR_FX(scrTYPE_float,"gears_y",gears.ypos,0);
+VAR_FX(scrTYPE_float,"gears_z",gears.zpos,-40);
+VAR_FX(scrTYPE_float,"gears_speed",gears.speed,1);
+VAR_FX(scrTYPE_float,"gears_rotx",gears.rotx,0);
+VAR_FX(scrTYPE_float,"gears_roty",gears.roty,0);
+VAR_FX(scrTYPE_float,"gears_rotz",gears.rotz,0);
+
 // PICTURE:
 VAR_FX(scrTYPE_float,"pic_r",pic.rgb[0],1.0);
 VAR_FX(scrTYPE_float,"pic_g",pic.rgb[1],1.0);
@@ -134,7 +143,8 @@ VAR_FX(scrTYPE_float,"fdwater_u_speed1",fdwater.u_speed1,0);
 VAR_FX(scrTYPE_float,"fdwater_v_speed1",fdwater.v_speed1,0);
 VAR_FX(scrTYPE_float,"fdwater_u_speed2",fdwater.u_speed2,0);
 VAR_FX(scrTYPE_float,"fdwater_v_speed2",fdwater.v_speed2,0);
-
+VAR_FX(scrTYPE_float,"fdwater_u_scale",fdwater.u_scale,0.95);
+VAR_FX(scrTYPE_float,"fdwater_v_scale",fdwater.v_scale,-0.95);
 
 #undef VAR_FX
 
@@ -214,6 +224,12 @@ VAR_MAT(scrTYPE_flag ,"env_spheremap",flags,ast3d_mat_env_sphere);
 
 //VAR_MAT(scrTYPE_flag ,"projected_map",flags,ast3d_mat_projected_map);
 
+VAR_MAT(scrTYPE_float,"projmap_uoffs",projmap.uoffs,0);
+VAR_MAT(scrTYPE_float,"projmap_voffs",projmap.voffs,0);
+VAR_MAT(scrTYPE_float,"projmap_amount",projmap.amount,0);
+VAR_MAT(scrTYPE_float,"projmap_scale",projmap.scale,0);
+VAR_MAT(scrTYPE_float,"projmap_animphase",projmap.animphase,0);
+
 #undef VAR_MAT
 
 
@@ -228,12 +244,6 @@ VAR_SCENE(scrTYPE_int  ,"fog_type",fog.type);
 VAR_SCENE(scrTYPE_float,"fog_znear",fog.fog_znear);
 VAR_SCENE(scrTYPE_float,"fog_zfar",fog.fog_zfar);
 VAR_SCENE(scrTYPE_int,  "frustum_culling",frustum_cull);
-
-VAR_SCENE(scrTYPE_float,"projmap_uoffs",projmap.uoffs);
-VAR_SCENE(scrTYPE_float,"projmap_voffs",projmap.voffs);
-VAR_SCENE(scrTYPE_float,"projmap_amount",projmap.amount);
-VAR_SCENE(scrTYPE_float,"projmap_scale",projmap.scale);
-VAR_SCENE(scrTYPE_float,"projmap_animphase",projmap.animphase);
 
 #undef VAR_SCENE
 

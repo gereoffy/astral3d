@@ -3,7 +3,7 @@
 SRCS = script2.c
 OBJS = script2.o
 CC   = gcc
-CFLAGS = -O2 -Wall
+CFLAGS = $(OPTFLAGS) -Wall
 
 .SUFFIXES: .c .o
 
@@ -49,5 +49,5 @@ script2.o: ../MAX/track.h ../MAX/render.h ../blob/blob.h
 script2.o: ../fdtunnel/fdtunnel.h ../spline/spline.h ../smoke/smoke.h
 script2.o: ../sinpart/sinpart.h ../greets/greets.h ../render/render.h
 script2.o: ../hjbtunel/hjbtunel.h ../bsptunel/bsptunel.h ../swirl/swirl.h
-script2.o: ../fdwater/fdwater.h ../sinzoom/sinzoom.h vars.h cmds.h scr_evnt.c
-script2.o: scr_draw.c file.c
+script2.o: ../fdwater/fdwater.h ../sinzoom/sinzoom.h ../gears/gears.h vars.h
+script2.o: cmds.h scr_evnt.c scr_draw.c file.c

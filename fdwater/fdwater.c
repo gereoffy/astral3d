@@ -76,14 +76,16 @@ int flag=0;
     v=(float)y/60.0f;
     //----------- pass 1 ----------------
     aglTexture(params->texture);
-    if(params->type&2)
+    if(params->type&2){
       aglBlend(AGL_BLEND_ADD);
-    else
+      glColor3f(params->color[0]*ast3d_blend,params->color[1]*ast3d_blend,params->color[2]*ast3d_blend);
+    } else {
       aglBlend((ast3d_blend==1)?AGL_BLEND_NONE:AGL_BLEND_ALPHA);
 //    glColor3f(1,1,1);
 //    glColor3f(0,0,0);
 //    glColor3fv(params->color);
-    glColor4f(params->color[0],params->color[1],params->color[2],ast3d_blend);
+      glColor4f(params->color[0],params->color[1],params->color[2],ast3d_blend);
+    }
     glBegin(GL_TRIANGLE_STRIP);
     for(x=0;x<=80;x++){
       float u1,v1,u2,v2;
@@ -103,8 +105,10 @@ if(!(params->type&1)){
       h2-=h1;h3-=h1;
       du=params->amp*h2;
       dv=params->amp*h3;
-      texcoord[x][0]=u+du;
-      texcoord[x][1]=1-(v+dv);
+//      texcoord[x][0]=u+du;
+//      texcoord[x][1]=1-(v+dv);
+      texcoord[x][0]=0.5+params->u_scale*(u+du-0.5);
+      texcoord[x][1]=0.5+params->v_scale*(v+dv-0.5);
       h1*=h1;
       h1*=h1*params->bright;
 //      h1=h2*=params->bright;

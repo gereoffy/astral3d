@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "afs.h"
-#include "afsmangle.h"
+#include "afsmangl.h"
 
 typedef struct {
   unsigned char Magic_Num[8];

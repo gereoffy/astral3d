@@ -147,6 +147,13 @@ int active_faders=0;
       HJBTUNNEL_Render(&fx->hjbtunnel,fx->frame);
     }
 
+    if(fx->type==FXTYPE_GEARS){
+      CLEAR_ZB
+//      printf("Playing FDTUNNEL for fx #%d\n",f);
+//      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      GEARS_draw(fx->frame,&fx->gears);
+    }
+
     if(fx->type==FXTYPE_BSPTUNNEL){
 //      printf("Playing FDTUNNEL for fx #%d\n",f);
 //      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;

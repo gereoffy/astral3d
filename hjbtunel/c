@@ -1,2 +1,2 @@
 
-gcc -c -O3 tunnel2.c
+gcc -c $OPTFLAGS  tunnel2.c
