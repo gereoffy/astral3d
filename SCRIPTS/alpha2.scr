@@ -1,0 +1,791 @@
+;========================================================;
+;| Script of demo called ALPHA II, made for TheParty'99 |;
+;| Modify this only if you want to make a new demo! :-) |;
+;| Astral Script System and 3D engine  (C) 1999. Astral |;
+;========================================================;
+
+load_scene vlogo vlogo3.3ds
+loadpic loading loading2.jpg
+;--------- VLOGO ---------------------
+time=0
+; enable motion blur:
+clear_buffer=0
+0:
+colorbox 0 480 640 0 0 0 0
+blend=0.4
+; Volumetric lighting "ASTRAL" logo
+1:
+scene vlogo
+loop_scene=0
+fps=100
+object light
+additivetexture=1
+zbuffer=0
+light 0
+corona_scale 100
+play 3s
+
+;---- "Loading..."
+3:
+picture loading
+fade blend 0 1 1
+play 2s
+
+; disable motion blur:
+clear_buffer=1
+
+2:
+colorbox 0 480 640 0 0 0 0
+fade blend 0 1 0.5
+play 1s
+
+;-----------------------------------------;
+;       LOADING TEXTURES & SCENES         ;
+;-----------------------------------------;
+0:
+
+loadpic sintxt light.bmp
+
+loadpic cred1 cred1.jpg
+loadpic cred2 cred2.jpg
+loadpic cred3 cred3.jpg
+loadpic cred4 cred4.jpg
+loadpic cred4bl cred4bl.jpg
+loadpic alpha2 alpha2.jpg
+
+loadpic fdtunnel1 2.jpg
+loadpic fdtunnel2 text01.jpg
+loadpic fdtunnel3 text04.jpg
+loadpic fdtunnel4 text03.jpg
+
+loadpic smoke_blue warp11.jpg
+
+loadpic belogo pic14.jpg
+
+loadpic smoketxt1 nebula.jpg
+loadpic smoketxt2 nebula2.jpg
+loadpic smoketxt3 sky4.jpg
+loadpic smoketxt4 text01.jpg
+
+loadpic alphaii alphaii.jpg
+loadpic greetings greet2.jpg
+
+;loadpic irtrace irtrace.jpg
+loadRGBA irtrace irtrace.jpg sand.jpg
+loadpic endpic endpic.jpg
+
+;--------- SCENEs: --------------
+
+load_scene tp2 tp2uj.3ds
+scene tp2
+fixUV
+
+load_scene lightsphere vol4.3ds
+
+load_scene sex sex12.3ds
+
+load_scene cubes cubes.3ds
+scene cubes
+
+object Object01
+additivetexture=1
+zbuffer=0
+
+object Object02
+additivetexture=1
+zbuffer=0
+
+object Object03
+additivetexture=1
+zbuffer=0
+
+object Object04
+additivetexture=1
+zbuffer=0
+
+object Object05
+additivetexture=1
+zbuffer=0
+
+object Object06
+additivetexture=1
+zbuffer=0
+
+object Object07
+additivetexture=1
+zbuffer=0
+
+object Object08
+additivetexture=1
+zbuffer=0
+
+object Object09
+additivetexture=1
+zbuffer=0
+
+object Object10
+additivetexture=1
+zbuffer=0
+
+object Object11
+additivetexture=1
+zbuffer=0
+
+object Object12
+additivetexture=1
+zbuffer=0
+
+object Object13
+additivetexture=1
+zbuffer=0
+
+object Object14
+additivetexture=1
+zbuffer=0
+
+object Object15
+additivetexture=1
+zbuffer=0
+
+object Object16
+additivetexture=1
+zbuffer=0
+
+object Object17
+additivetexture=1
+zbuffer=0
+
+object Object18
+additivetexture=1
+zbuffer=0
+
+object Object19
+additivetexture=1
+zbuffer=0
+
+object Object20
+additivetexture=1
+zbuffer=0
+
+object Object21
+additivetexture=1
+zbuffer=0
+
+object Object22
+additivetexture=1
+zbuffer=0
+
+object Object23
+additivetexture=1
+zbuffer=0
+
+object Object24
+additivetexture=1
+zbuffer=0
+
+object Object25
+additivetexture=1
+zbuffer=0
+
+object Object26
+additivetexture=1
+zbuffer=0
+
+object Object27
+additivetexture=1
+zbuffer=0
+
+object Object28
+additivetexture=1
+zbuffer=0
+
+object Object29
+additivetexture=1
+zbuffer=0
+
+object Object30
+additivetexture=1
+zbuffer=0
+
+object Object31
+additivetexture=1
+zbuffer=0
+
+object Object32
+additivetexture=1
+zbuffer=0
+
+object Object33
+additivetexture=1
+zbuffer=0
+
+load_scene mtorus mtorus.3ds
+
+load_scene qrvajo qrvjofi2.3ds
+scene qrvajo
+fixUV
+
+;------------------------
+; setup particle system
+;------------------------
+load_scene particle1 tplevel3.3ds
+loadpic particle_txt light.jpg
+scene particle1
+particle PARTICLE01 particle_txt 2000
+part_sizelimit=100
+part_eject_r=1
+part_eject_vy=60
+part_eject_vl=15
+part_energy=1
+part_colordecrement=0.999
+particle_preplay PARTICLE01 0.015 600
+
+;--------- load BUMP scene ---------
+load_scene bump bump2d.3ds
+loadpic bumpbgr pic05.jpg
+
+;--------- loading INONE -----------
+load_scene inone uj4a.3ds
+scene inone
+fixUV inone1 inone2 inone3
+fixUV inone01m inone03m inone04m
+
+;==============================================================================;
+0: blend=0
+1: blend=0
+2: blend=0
+
+time=0
+
+3:
+picture loading
+blend=1
+fade blend 1 0 0.5
+play 0.5s
+blend=0
+
+;==============================================================================;
+;              START!!!!!!
+;==============================================================================;
+start_music alpha2.mp3
+time=0
+;;;play 0s
+;==============================================================================;
+;==============================================================================;
+
+0:
+scene tp2
+
+object Object01
+additivetexture=1
+zbuffer=0
+object Object02
+additivetexture=1
+zbuffer=0
+object Object03
+;additivetexture=1
+zbuffer=0
+
+light 0
+corona_scale=0
+
+frame=150
+fps=10
+
+fade blend 0 1 1
+
+;================================
+; Sinus particle
+;--------------------
+7:
+sinusparticle sintxt 300 20
+fps=20
+sinpart_size=300
+sinpart_speed=0.0005
+sinpart_sinspeed=0.01
+sinpart_scale=100
+
+play -510p
+
+7: fade blend 1 0.1 2
+;7: fade sinpart_scale 100 60 2
+
+;================================
+; Setup TUNNEL1
+1:
+fdtunnel 0 fdtunnel2
+fps=21
+fdtunnel_select 1
+fdtunnel_radius=1000
+fdtunnel_rad_szog=8
+fdtunnel_rad_amp=800
+fdtunnel_fovx=10
+fdtunnel_fovy=10
+blend=0
+
+;================================
+;  CREDITS PART
+;--------------------------------
+; tunnel bevillantasa:
+1: sinfade blend 180 270 2 1 1
+
+; kockak alul:
+9:
+scene cubes
+fade blend 0 0.5 3
+;fps=40
+
+; blob:
+8:
+blob
+fps=2
+blob_ox=31000
+blob_oy=21000
+;blob_rx=1500
+;blob_ry=2500
+vlimit=400000
+fade blend 0 1 0.5
+fade blob_rx 0 1500 3
+fade blob_ry 0 2500 3
+
+; kepek:
+2:
+addsprite cred1 0 480 640 0
+fade blend 0 1 0.5
+play 3s
+fade blend 1 0 1
+3:
+addsprite cred2 0 480 640 0
+fade blend 0 1 1
+play 3s
+fade blend 1 0 1
+2:
+addsprite cred3 0 480 640 0
+fade blend 0 1 1
+play 3.5s
+fade blend 1 0 1
+3:
+addsprite cred4 0 480 640 0
+fade blend 0 1 1
+play 3.5s
+fade blend 1 0 2
+2:
+addsprite cred4bl 0 480 640 0
+fade blend 0 1 2
+
+; sinus ki:
+7: fade blend 0.1 0 2
+; blob ki:
+8: fade blend 1 0 2
+; kockak ki:
+9: fade blend 0.5 0 4
+
+
+; tunnel be:
+1: fade blend 0 1 4
+play 2s
+; blurozott credits ki:
+fade blend 1 0 1
+
+;==============================================
+; TUNNELs part
+;--------------------
+
+play -1135p
+
+2:
+fdtunnel 0 fdtunnel1
+fade blend 0 1 0.5 ;blend=1
+fps=20
+fdtunnel_select 1
+fdtunnel_radius=500
+fdtunnel_rad_szog=4
+fdtunnel_rad_amp=120
+fdtunnel_fovx=40
+fdtunnel_fovy=40
+
+play -1259p
+
+3:
+fdtunnel 0 fdtunnel3
+fade blend 0 1 0.5 ;blend=1
+fps=20
+fdtunnel_select 1
+fdtunnel_radius=400
+fdtunnel_rad_speed=0.04708
+fdtunnel_rad_szog=4
+fdtunnel_rad_amp=420
+fdtunnel_fovx=80
+fdtunnel_fovy=80
+
+play -1380p
+
+4:
+fdtunnel 0 fdtunnel4
+fade blend 0 1 0.5 ;blend=1
+fps=20
+fdtunnel_select 1
+fdtunnel_radius=500
+fdtunnel_rad_speed=0.04708
+fdtunnel_rad_szog=16
+fdtunnel_rad_amp=70
+fdtunnel_fovx=30
+fdtunnel_fovy=120
+
+play -1517p
+
+; tunnelek ki:
+;1: fade blend 1 0 0.5
+2: fade blend 1 0 0.5
+3: fade blend 1 0 0.5
+4: fade blend 1 0 0.5
+
+;==============================================
+; LIGHT SPHERE part
+;--------------------
+
+; Logo with the cat
+9:
+addsprite alpha2 0 480 640 0
+fade blend 0 1 3
+
+play -1754p
+
+; Light sphere effect
+2:
+scene lightsphere
+object OBJECT01
+zbuffer=0
+additivetexture=1
+fps=100
+fade blend 0 1 5
+
+; yellow tunnel go away:
+1: fade blend 1 0 5
+
+play 2s
+9: fade blend 1 0 1
+
+play -2000p
+;fade blend 1 0 0.3
+;play 0.5s
+
+clear_buffer=0
+9: colorbox 0 480 640 0 1 1 1
+9: fade blend 0 1 0.5
+play 0.5s
+clear_buffer=1
+9: fade blend 1 0 1
+;0.3
+
+8:
+smoke smoke_blue 0.1 0 2.5 0.2 0
+fps=5
+;fade blend 0 0.5 0.3
+blend=1
+;fade blend 1 0.5 0.5
+
+
+;==============================================
+; Walking sexy girl
+;--------------------
+
+2:
+scene sex
+loop_scene=0
+fps=37
+znear=5
+zfar=5000
+
+object Object01
+zbuffer=0
+additivetexture=1
+;transparency=0.5
+
+light 0
+corona_scale=0
+light 1
+light_enabled=0
+corona_scale=100
+
+blend=1
+;fade blend 0 1 0.5
+
+play -930f
+; smoke off:
+8: fade blend 1 0 2
+
+play -980f
+; starfield off:
+0: fade blend 1 0 0.3
+
+play -995f
+; disable tunnel:
+zfar=20
+fade blend 1 0 0.1
+play 0.1s
+;play -1000f
+
+; a 2 scenet nem birja egyutt gyorsan
+;play 0.5s
+0: blend=0
+2: blend=0
+
+3:
+scene mtorus
+fog_type=1
+fog_znear=200
+fog_zfar=2000
+fade blend 0 1 0.2
+fps=20
+loop_scene=0
+
+play -470f
+fade blend 1 0 1
+
+;------- fade to background picture -----
+1:
+picture belogo
+;;blend=0.2
+
+sinfade blend 0 90 5 0.5
+;0.5
+
+play 1s
+3: blend=0
+
+;====================================
+; transparent qrvjo
+
+; setup motion blur:
+clear_buffer=0
+0:
+colorbox 0 480 640 0 0 0 0
+blend=0.5
+
+2:
+scene qrvajo
+fps=20
+object No4
+additivetexture=1
+zbuffer=0
+fade blend 0 0.9 2
+
+play 5s
+1: sinfade blend 90 180 5 0.5
+
+play -4310p
+
+;---- more motion blur:
+0: fade blend 0.5 0 5
+play -4490p
+;---- fade to white:
+9:
+colorbox 0 480 640 0 1 1 1
+fade blend 0 1 0.3
+play 0.3s
+;---- disable object + motionblur + picture
+0: blend=0
+1: blend=0
+2: blend=0
+clear_buffer=1
+;---- fade back to black:
+fade blend 1 0 0.5
+
+;==============================================
+;  Agyonbasz particle system by Strepto
+;-----------------------------------------------
+
+3:
+scene particle1
+loop_scene=0
+fps=17
+
+frustum_culling=0
+object plat
+zbuffer=0
+light 0
+corona_scale 25
+light_zbuffer=0
+light 1
+corona_scale 25
+light_zbuffer=0
+light 2
+corona_scale 25
+light_zbuffer=0
+light 3
+corona_scale 25
+light_zbuffer=0
+
+;;;;;fade blend 0 1 0.5
+; ^^ felesleges colorbox miatt!
+blend=1
+;^^^ de ez kell mindenkeppen helyette!!!
+
+;play -480f -5485p
+;play -480f -5472p
+play -480f -5470p
+
+;fade blend 1 0 1
+
+;------- blend with colorbox
+7: colorbox 0 480 640 0 0 0 0
+7: fade blend 0 1 1
+;play -5523p
+play -5510p
+blend=0
+7: fade blend 1 0 1
+;!!!
+;=========================================================
+; Realtime BUMP Mapping
+
+;-- background
+1:
+picture bumpbgr
+blend=1
+
+;-- foreground mask
+6:
+addsprite alphaii 0 480 640 0
+blend=1
+
+;-- bump object
+5:
+scene bump
+loop_scene=0
+fps=8
+light 0
+corona_scale=10
+
+;blend=1
+;fade blend 0 1 0.5
+play -105f
+;fade blend 1 0 0.5
+;play
+
+7:
+colorbox 0 480 640 0 1 1 1
+fade blend 0 1 0.5
+play 0.5s
+; disable bump + bgr
+1: blend=0
+5: blend=0
+6: blend=0
+fade blend 1 0 0.3
+
+;=========================================================
+; Multi-layered reflected transparent objects with opacitymap... :)
+
+1:
+scene inone
+loop_scene=0
+fps=3.2
+
+light 0
+corona_scale=5
+light 1
+corona_scale=3
+
+blend=1
+;fade blend 0 1 0.5
+;fade fps 0 3.2 0.5
+
+play 14s -6516p
+
+;fade blend 1 0 1
+;play 1s
+
+;=========================================================
+;     ------====>  SMOKE GREETINGS  <=====--------
+;=========================================================
+
+1:
+smoke smoketxt1 0.1 0 5 0.5 1
+fps=20
+
+fade blend 0 1 3
+play 5s
+fade blend 1 0 5
+
+7:
+addsprite greetings 0 480 640 0
+fade blend 0 0.5 3
+
+2:
+smoke smoketxt2 0.1 0 5 0.3 1
+fps=20
+
+fade blend 0 1 5
+play 10s
+fade blend 1 0 5
+
+1:
+smoke smoketxt3 0.1 0.01 5 0.1 1
+fps=20
+
+fade blend 0 1 5
+play 10s
+fade blend 1 0 5
+
+2:
+smoke smoketxt4 0.1 0 5 0.2 1
+fps=20
+
+fade blend 0 0.5 5
+play 10s
+fade blend 0.5 0 3
+
+3:
+smoke smoketxt1 0.1 0 5 0.5 1
+fps=20
+
+fade blend 0 0.5 3
+play -7950p
+
+fade fps 20 0 2
+
+; greetings ki
+7: fade blend 0.5 0 2
+
+;play 2s
+
+;--------------- IR's raytraced picture ---------
+1:
+picture irtrace
+pic_alphamode=1
+pic_alphalevel=0
+fade blend 0 1 2
+3: fade blend 0.5 0 2
+
+play 5s
+
+;play 2s
+
+; alphachannel fade effekt:
+0: picture endpic
+0: blend=1
+1: blend=1
+1: fade pic_alphalevel 0 1 1
+play 1s
+1: blend=0
+play 2s
+
+;=========================================================
+;1:
+;colorbox 0 480 640 0 1 1 1
+;blend=1
+;====================== THE END ==========================
+play -8350p
+play -8320p
+9:
+colorbox 0 480 640 0 0 0 0
+fade blend 0 1 1
+play 1s
+end
+;=========================================================
+
+
+
+
+ 
+

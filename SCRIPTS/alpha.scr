@@ -1,0 +1,347 @@
+; Script of demo called ALPHA, made for Ragest'99
+; Astral Script System and 3D engine (C) 1999. Astral
+;==================== LOADERS ==========================
+writeln "Loading world..."
+
+loadpic alpha_logo 002.jpg
+loadpic alphastral 003.jpg
+loadpic credit1 cr01.jpg
+loadpic credit2 cr02.jpg
+loadpic credit3 cr03.jpg
+loadpic credit4 cr04.jpg
+loadRGBA csaj pic01x.jpg pic01a.jpg
+;loadpic csaj pic01x.jpg
+
+load_scene morphtunnel morphtun.3ds
+load_scene smooth smooth.3ds
+load_scene pach pach2.3ds
+load_scene future scene3.3ds
+load_scene unreal newproj.3ds
+load_scene torusknot part2.3ds
+load_scene default 2.3ds
+load_scene 4alpha 4inone.3ds
+
+
+;================== START MUSIC ========================
+start_music mindgoa.mp3
+time=0
+
+;********** alpha logo, befadel a tunnel
+8: sprite alpha_logo 0 480 640 0
+8: blend=1
+play 2s
+
+2:
+scene morphtunnel
+;scene erdo
+fixUV
+directional_lighting 1
+blend=1
+fps=20
+
+light 0
+corona_scale 10
+light 1
+corona_scale 10
+light 2
+corona_scale 10
+light 3
+corona_scale 10
+
+8: fade blend 1 0 10
+
+play -510p
+
+
+;******** credits
+3:
+addsprite credit1 0 480 640 0
+fade blend 0 0.5 0.5
+play 3s
+
+4: addsprite credit2 0 480 640 0
+3: fade blend 0.5 0 1
+4: fade blend 0 0.5 1
+play 3s
+
+3: addsprite credit3 0 480 640 0
+4: fade blend 0.5 0 1
+3: fade blend 0 0.5 1
+play 3s
+
+4: addsprite credit4 0 480 640 0
+3: fade blend 0.5 0 1
+4: fade blend 0 0.5 1
+play 3s
+
+4: fade blend 0.5 0 1
+
+play -1062p
+
+;==================================
+3: blend=0
+4: blend=0
+
+;------------ smooth ------------
+1: 
+scene smooth
+fixUV
+light_zbuffer 0
+light 0
+corona_scale 10
+light 1
+corona_scale 10
+light 2
+corona_scale 10
+fps=20
+
+2: fade blend 1 0 1
+1: blend=1
+;1: fade blend 0 1 1
+
+play -1610p
+2: blend=0
+
+;********************
+
+;-----------  pach
+2:
+scene pach
+;fixUV
+;directional_lighting 1
+
+light 0
+corona_scale 15
+light 1
+corona_scale 15
+light 2
+corona_scale 15
+
+fps=10
+
+1: fade blend 1 0 2
+2: fade blend 0 1 2
+
+; play -280f
+play -2680p
+
+;============================
+1: blend=0
+1: fade blend 0 1 1
+2: fade blend 1 0 1
+
+;----------- future --------
+1:
+scene future
+light 0
+corona_scale 15
+light_zbuffer 1
+attenuation0=0
+attenuation1=0.003
+light 1
+corona_scale 15
+light_zbuffer 1
+attenuation0=0
+attenuation1=0.003
+light 2
+corona_scale 15
+light_zbuffer 1
+attenuation0=0
+attenuation1=0.003
+
+play -3000p
+
+2: blend=0
+;======================= enable blob
+
+3:
+blob
+fps=3
+vlimit=200000
+; fade vlimit 300000 160000 5
+blob_alpha=1.0
+blend=1
+
+; fade in the blob:
+; 3: fade blend 0 1 3
+
+play 5s
+3: fade blob_alpha 1 0 4
+
+play -3234p
+
+;=======================  unreal szoba
+
+;----------- unreal & BLOB --------
+2:
+scene unreal
+light 0
+corona_scale 15
+light_zbuffer 0
+attenuation0=0
+attenuation1=0.01
+light 1
+corona_scale 15
+light_zbuffer 0
+attenuation0=0
+attenuation1=0.01
+light 2
+corona_scale 15
+light_zbuffer 0
+attenuation0=0
+attenuation1=0.01
+
+; fade  future -> unreal
+2: fade blend 0 1 2
+1: fade blend 1 0 2
+
+play -4100p
+
+3: fade vlimit 200000 120000 7
+
+play -4300p
+
+;----------- torusknot --------
+1:
+scene torusknot
+fixUV
+fps=16
+light 0
+corona_scale 10
+
+2: fade blend 1 0 2
+3: fade blend 1 0 2
+1: fade blend 0 1 2
+
+play -4840p
+6: sprite csaj 0 480 640 0
+6: fade blend 0 1 2
+
+play -5346p
+;-------------------------------
+
+6: fade blend 1 0 2
+
+play -6600p
+
+1:
+fade fps 16 0 3
+play 2s
+fade blend 1 0 3
+
+; 4 alphas test fade IN
+4:
+scene 4alpha
+fixUV
+fps=8
+fade blend 0 1 3
+
+2: fade blend 0 1 3
+
+play -7054p
+
+2: fade blend 1 0 1.5
+4: fade blend 1 0 2
+
+;========= line blob =============
+
+3:
+blob
+line_blob=1
+fps=5
+vlimit=180000
+blob_alpha=0
+fade blend 0 1 3
+
+1:
+sprite alphastral 0 480 640 0
+fade blend 0 1 3
+
+;play 15s
+play -8136p
+
+3: fade vlimit 180000 500000 7
+play 7s
+
+3: fade blend 1 0 3
+
+;----------- csak + default ----------
+4:
+scene default
+fixUV
+light 0
+corona_scale 10
+fps=100
+fade blend 0 1 3
+
+play -9795p
+
+4: fade blend 1 0 3
+1: fade blend 1 0 3
+play 3.5s
+
+;end
+
+
+
+;================ END of PART 1 ========================
+stop_music
+1: blend=0
+2: blend=0
+3: blend=0
+4: blend=0
+5: blend=0
+6: blend=0
+
+;================ ENDPART: ========================
+
+;----------- astrans
+load_scene astrans astrans3.3ds
+loadpic end1 end001.jpg
+loadpic end2 end002.jpg
+loadpic end3 end003.jpg
+loadpic end4 end004.jpg
+loadpic end5 end005.jpg
+
+start_music pl_disc.mp3
+
+1: scene astrans
+1: fps=15
+1: fade blend 0 1 1
+play 3s
+
+2: addsprite end1 0 480 640 0
+2: fade blend 0 0.5 2
+play 8s
+3: addsprite end2 0 480 640 0
+3: blend=0.5
+2: fade blend 0.5 0 2
+3: fade blend 0 0.5 2
+play 8s
+2: addsprite end3 0 480 640 0
+2: blend=0.5
+3: fade blend 0.5 0 2
+2: fade blend 0 0.5 2
+play 8s
+3: addsprite end4 0 480 640 0
+3: blend=0.5
+2: fade blend 0.5 0 2
+3: fade blend 0 0.5 2
+play 8s
+2: addsprite end5 0 480 640 0
+2: blend=0.5
+3: fade blend 0.5 0 2
+2: fade blend 0 0.5 2
+play 8s
+2: fade blend 0.5 0 1
+play 2s
+
+play -7080p
+1: fade blend 1 0 2
+
+play -7160p
+end
+
+
+;================ END ========================
+

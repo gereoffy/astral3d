@@ -1,0 +1,239 @@
+; Script of demo called BETA, made for Conference3000
+; Modify this only if you want to make a new demo! :)
+; Astral Script System and 3D engine (C) 1999. Astral
+;==================== LOADERS ==========================
+writeln "[*]-----> Loading world..."
+
+;loadRGBA buborek 1co.jpg 1op.jpg
+;loadRGBA buborek 1co256.jpg 1op256.jpg
+;load_scene walk walk2.3ds
+
+9:
+
+load_scene 2fog 2-light6.3ds
+scene 2fog
+fixUV
+
+load_scene 2light 2-light.3ds
+load_scene logo logo4.3ds
+load_scene brutal brutal.3ds
+load_scene green level3.3ds
+
+load_scene ripp ripp3.3ds
+scene ripp
+fixUV
+
+load_scene volumetric ven8.3ds
+
+load_scene terem terem2.3ds
+
+9: blend=0  ; HACK!
+
+;========= PICtures ================
+writeln "[*]-----> Loading pictures..."
+
+loadpic fdtunnel1 a5.jpg
+loadpic fdtunnel2 text02.jpg
+loadpic fdtunnel3 szep2.jpg
+
+loadpic title focim.jpg
+
+loadpic credit1 code.jpg
+loadpic credit2 music.jpg
+loadpic credit3 keyframe.jpg
+
+loadpic gr_main grmain.jpg
+loadpic gr_1 gr1.jpg
+loadpic gr_2 gr2.jpg
+loadpic gr_3 gr3.jpg
+loadpic gr_4 gr4.jpg
+loadpic gr_5 gr5.jpg
+
+loadpic join join.jpg
+
+;================ START DEMO =====================
+
+start_music landscape.mp3
+
+play 1s
+
+1:
+scene 2fog
+fps=63
+;blend=0.5
+fog_znear=0
+fog_zfar=2000
+
+play 1f
+
+8:
+addsprite title 0 480 640 0
+blend=0.6
+
+play -1010p
+
+8: blend=0
+1: blend=0
+
+;****** FDTUNNEl *********
+
+2:
+fdtunnel fdtunnel1 fdtunnel2
+fps=10
+fade blend 0 1 2
+play 2s
+fade fps 10 70 1
+play -1580p
+
+;****** CREDITS ***********
+
+5:
+addsprite credit1 0 480 640 0
+fade blend 0 1 2
+play 3s
+fade blend 1 0 1
+6:
+addsprite credit2 0 480 640 0
+fade blend 0 1 2
+play 3s
+fade blend 1 0 1
+5:
+addsprite credit3 0 480 640 0
+fade blend 0 1 2
+play 3s
+fade blend 1 0 1
+play 2s
+
+;============== MORPHOLO ASTRAl LOGO + BRUTAL ===================
+
+1:
+scene logo
+blend=1
+fps=50
+
+2: fade blend 1 0 1
+
+play 500f
+fade fps 50 20 3
+
+2:
+scene brutal
+fade blend 0 1 1
+fps=25
+play 545f
+blend=0
+
+1: fade blend 1 0 2
+play 2s
+
+;2: blend=0
+;1: blend=0
+;fade blend 1 0 5
+;play 1s
+
+;*********** RIPP ****************
+
+2:
+scene ripp
+fps=45
+fade blend 0 1 2
+
+play -900f
+fade blend 1 0 0.2
+play 0.2s
+
+;********** VENTILLATOR *************
+
+1:
+scene volumetric
+fps=80
+fade blend 0 1 0.2
+
+play 1700f
+fade blend 1 0 1
+;play
+
+;*********** GREEN *******************
+2:
+scene green
+fade blend 0 1 1
+fps=15
+play 250f
+fade blend 1 0 0.5
+
+play 1s
+
+;********** NAGYSZOBA :) ***********
+1:
+scene terem
+fps=15
+light 0
+corona_scale 10
+fade blend 0 1 1
+play -6470p
+fade blend 1 0 1
+play 1s
+blend=0
+
+;================ GREETINGS PART =====================
+
+0:
+fdtunnel fdtunnel3 0
+fade blend 0 1 2
+
+1:
+addsprite gr_main 0 480 640 0
+fade blend 0 1 2
+
+5:
+scene 2light
+fade blend 0 1 1
+light 0
+corona_scale 5
+fps=52
+
+play 6s
+
+2:
+addsprite gr_1 0 480 640 0
+fade blend 0 1 1
+play 2s
+fade blend 1 0 1
+3:
+addsprite gr_2 0 480 640 0
+fade blend 0 1 1
+play 2s
+fade blend 1 0 1
+2:
+addsprite gr_3 0 480 640 0
+fade blend 0 1 1
+play 2s
+fade blend 1 0 1
+3:
+addsprite gr_4 0 480 640 0
+fade blend 0 1 1
+play 2s
+fade blend 1 0 1
+2:
+addsprite gr_5 0 480 640 0
+fade blend 0 1 1
+play 2s
+fade blend 1 0 1
+
+play 5s
+1: fade blend 1 0 3
+
+5: play -1850f
+
+0: fade blend 1 0 2
+5: fade blend 1 0 2
+
+play -7981p
+1:
+sprite join 0 480 640 0
+blend=1
+
+play 10s
+fade blend 1 0 2s
+end
+
