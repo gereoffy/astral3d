@@ -1,28 +1,3 @@
-/*SPLINE.C********************************************************************
-
-   Clax: Portable keyframing library
-         see inclosed LICENSE.TXT for licensing terms.
-
-         for documentation, refer to CLAX.TXT
-
-   author           : Adept
-   file created     : 17/04/97
-   file description : spline interpolation routines
-
-   revision history :
-     ----- (06/03/97) Adept:  Initial version (spline_1).
-     v0.10 (17/04/97) Borzom: Changed to fit clax structure.
-           (19/05/97) Borzom: Added 2-key spline support.
-           (08/06/97) Borzom: Added track loop/repeat support.
-
-   notes            :
-     It is Kochanek-Bartels spline sub-type of hermit curve developped
-     especially for computer key animations, first presented at SIGGRAPH'84.
-
-     correct quaternion interpolation is still missing.
-
-*****************************************************************************/
-
 #include <math.h>
 #include <stdio.h>
 #include "ast3d.h"
@@ -451,7 +426,7 @@ int32 spline_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
   t_KEY  *keys;
   c_QUAT a, b, p, q, q1;
   float  t, angle, spin;
-  
+
   if (frame < 0.0) return ast3d_err_badframe;
   if (!track || !track->keys) return ast3d_err_nullptr;
 

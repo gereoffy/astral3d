@@ -1,23 +1,3 @@
-/*CAMERA.C********************************************************************
-
-   Clax: Portable keyframing library
-         see inclosed LICENSE.TXT for licensing terms.
-
-         for documentation, refer to CLAX.TXT
-
-   author           : Adept
-   file created     : 16/04/97
-   file description : camera math
-
-   revision history :
-     v0.10 (16/04/97) Adept: Initial version.
-           (17/06/97) Borzom: Added lens to fov conversion.
-           (20/06/97: Borzom: Camera pivot inside matrix.
-
-   notes            :
-
-*****************************************************************************/
-
 #include <math.h>
 #include <stdio.h>
 #include "ast3d.h"

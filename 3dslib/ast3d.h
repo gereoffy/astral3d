@@ -1,16 +1,3 @@
-/*CLAX.H**********************************************************************
-
-   Clax: Portable keyframing library, version 0.10
-         see inclosed LICENSE.TXT for licensing terms.
-
-         for documentation, refer to CLAX.TXT
-
-   author           : BoRZoM
-   file created     : 16/04/97
-   file description : clax include file
-
-*****************************************************************************/
-
 #ifndef _AST3D_H_
 #define _AST3D_H_
 

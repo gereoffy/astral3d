@@ -1,23 +1,3 @@
-/*MATRIX.C********************************************************************
-
-   Clax: Portable keyframing library
-         see inclosed LICENSE.TXT for licensing terms.
-
-         for documentation, refer to CLAX.TXT
-
-   author           : Borzom
-   file created     : 17/04/97
-   file description : matrix math
-
-   revision history :
-     v0.10 (17/04/97) Borzom: Initial version.
-
-   notes            :
-     ( xx , xy , xz , xw ) clax 3x4 matrix structure.
-     ( yx , yy , yz , yw )
-     ( zx , zy , zz , zw )
-
-*****************************************************************************/
 
 #include <math.h>
 #include <stdio.h>

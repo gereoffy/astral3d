@@ -1,21 +1,3 @@
-/*VECTOR.C********************************************************************
-
-   Clax: Portable keyframing library
-         see inclosed LICENSE.TXT for licensing terms.
-
-         for documentation, refer to CLAX.TXT
-
-   author           : Borzom
-   file created     : 29/04/97
-   file description : vector math
-
-   revision history :
-     v0.10 (29/04/97) Borzom: Initial version.
-
-   notes            :
-
-*****************************************************************************/
-
 #include <math.h>
 #include <stdio.h>
 #include "ast3d.h"

@@ -1,16 +1,3 @@
-/*CLAXI.H*********************************************************************
-
-   Clax: Portable 3DStudio keyframer library, version 0.10
-	 see inclosed LICENSE.TXT for licensing terms.
-
-	 for documentation, refer to CLAX.TXT
-
-   author           : BoRZoM
-   file created     : 16/04/97
-   file description : clax internal include file
-
-*****************************************************************************/
-
 /* compilation defines */
 
 #define ast3d_SWAP_YZ          /* swap y and z when loading 3ds file     */

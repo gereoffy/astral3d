@@ -1,23 +1,3 @@
-/*QUATERN.C*******************************************************************
-
-   Clax: Portable keyframing library
-         see inclosed LICENSE.TXT for licensing terms.
-
-         for documentation, refer to CLAX.TXT
-
-   author           : Borzom
-   file created     : 16/04/97
-   file description : quaternion math
-
-   revision history :
-     v0.10 (16/04/97) Borzom: Initial version.
-
-   references       : Graphics Gems, Adept
-
-   notes            :
-
-*****************************************************************************/
-
 #include <math.h>
 #include <stdio.h>
 #include "ast3d.h"

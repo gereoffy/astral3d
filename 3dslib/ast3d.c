@@ -1,22 +1,3 @@
-/*CLAX.C**********************************************************************
-
-   Clax: Portable keyframing library
-         see inclosed LICENSE.TXT for licensing terms.
-
-         for documentation, refer to CLAX.TXT
-
-   author           : Borzom
-   file created     : 17/04/97
-   file description : main clax routines
-
-   revision history :
-     v0.10 (17/04/97) Borzom: Initial version.
-
-   notes            :
-     the library itself, if it has bugs, its probably here :)
-
-*****************************************************************************/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,8 +10,8 @@
   copyright, format table, etc...
 *****************************************************************************/
 
-  char    ast3d_version[]   = "clax version 0.10(beta)";
-  char    ast3d_copyright[] = "copyright (c) 1997 borzom";
+  char    ast3d_version[]   = "Astral 3d Engine v0.1a";
+  char    ast3d_copyright[] = "copyright (c) 1998 RoBSoN of Astral";
 
   c_SCENE  *ast3d_scene;  /* current active scene  */
   c_CAMERA *ast3d_camera; /* current active camera */
@@ -43,7 +24,8 @@ struct {
   int32 (*save_scene)  (FILE *f); /* saves the whole scene */
 } ast3d_drivers[] = {
   {"3DS", ast3d_load_mesh_3DS, ast3d_load_motion_3DS, NULL},
-  {"CLX", ast3d_load_mesh_CLX, ast3d_load_motion_CLX, ast3d_save_CLX}
+//  {"AST", ast3d_load_mesh_AST, ast3d_load_motion_AST, ast3d_save_AST}
+  {"AST", NULL, NULL, NULL}
 };
 
 /*****************************************************************************

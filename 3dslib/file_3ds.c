@@ -1,24 +1,3 @@
-/*FILE_3DS.C******************************************************************
-
-   Clax: Portable keyframing library
-         see inclosed LICENSE.TXT for licensing terms.
-
-         for documentation, refer to CLAX.TXT
-
-   author           : Borzom
-   file created     : 04/05/97
-   file description : 3D studio 4.0 driver (world + motion)
-
-   revision history :
-     ----- (xx/xx/96) Jare:   Initial version (3dsrdr.c).
-     v0.10 (04/05/97) Borzom: Rewritten to fit clax structure.
-           (10/05/97) Borzom: Added version check.
-           (11/05/97) Borzom: Added color track and dummy name chunks.
-           (22/05/97) Borzom: Added more material chunks.
-
-   notes            :
-
-*****************************************************************************/
 
 #include <string.h>
 #include <stdlib.h>
