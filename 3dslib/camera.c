@@ -35,6 +35,7 @@ void cam_update (c_CAMERA *cam)
   float    ax, ay, az;
   float    sinx, siny, sinz,
            cosx, cosy, cosz;
+  float	   sxsz, sxcz, szcx, cxcz;
 
   mat_identity (mat);
   vec_negate (&cam->pos, &pivot);
@@ -51,15 +52,30 @@ void cam_update (c_CAMERA *cam)
   sinx = sin (ax); cosx = cos (ax); siny = sin (ay);
   cosy = cos (ay); sinz = sin (az); cosz = cos (az);
 
-  mat[X][X] =  sinx * siny * sinz + cosx * cosz;
-  mat[X][Y] =  cosy * sinz;
-  mat[X][Z] =  sinx * cosz - cosx * siny * sinz;
-  mat[Y][X] =  sinx * siny * cosz - cosx * sinz;
-  mat[Y][Y] =  cosy * cosz;
-  mat[Y][Z] = -cosx * siny * cosz - sinx * sinz;
-  mat[Z][X] = -sinx * cosy;
-  mat[Z][Y] =  siny;
-  mat[Z][Z] =  cosx * cosy;
+  sxsz = sinx*sinz;
+  sxcz = sinx*cosz;
+  szcx = sinz*cosx;
+  cxcz = cosx*cosz;
 
-  mat_pretrans (&pivot, mat, cam->matrix);
+  cam->matrix[X][X] =  sxsz * siny + cxcz;
+  cam->matrix[X][Y] =  cosy * sinz;
+  cam->matrix[X][Z] =  sxcz - szcx * siny;
+
+  cam->matrix[Y][X] =  sxcz * siny - szcx;
+  cam->matrix[Y][Y] =  cosy * cosz;
+  cam->matrix[Y][Z] = -cxcz * siny - sxsz;
+
+  cam->matrix[Z][X] = -sinx * cosy;
+  cam->matrix[Z][Y] =  siny;
+  cam->matrix[Z][Z] =  cosx * cosy;
+
+  cam->matrix[X][W] =  pivot.x*cam->matrix[X][X]+
+                       pivot.y*cam->matrix[X][Y]+
+                       pivot.z*cam->matrix[X][Z];
+  cam->matrix[Y][W] =  pivot.x*cam->matrix[Y][X]+
+                       pivot.y*cam->matrix[Y][Y]+
+                       pivot.z*cam->matrix[Y][Z];
+  cam->matrix[Z][W] =  pivot.x*cam->matrix[Z][X]+
+                       pivot.y*cam->matrix[Z][Y]+
+                       pivot.z*cam->matrix[Z][Z];
 }

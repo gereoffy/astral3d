@@ -143,7 +143,7 @@ enum ast3d_track_flags_ { /* astral 3d track flags */
 typedef float c_MATRIX[3][4];
 
 typedef struct _c_RGB { /* color struct */
-  float r, g, b;                         /* red, green, blue (0 -> 1.0) */
+  float rgb[4];                         /* red, green, blue (0 -> 1.0) */
 } c_RGB;
 
 typedef struct _c_VECTOR { /* vector */
@@ -194,6 +194,7 @@ typedef struct _c_VERTEX { /* vertex struct */
   c_VECTOR vert, pvert;                  /* vertex              */
   c_VECTOR norm, pnorm;                  /* vertex normal       */
   float    u, v;                         /* texture coordinates */
+  int     visible;			 /* visibility		*/		
 } c_VERTEX;
 
 typedef struct _c_FACE { /* face struct */
@@ -203,6 +204,7 @@ typedef struct _c_FACE { /* face struct */
   c_VERTEX   *pa, *pb, *pc;                /* pointers to vertices    */
   c_MATERIAL *pmat;                        /* pointer to material     */
   c_VECTOR   norm, pnorm;                  /* face normal             */
+  int	     visible;			   /* face visibility	      */	
 } c_FACE;
 
 typedef struct _c_LIGHT { /* light struct */

@@ -348,9 +348,9 @@ static int read_RGBF (FILE *f)
   }
   if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if (rgb) {
-    rgb->r = c[0];
-    rgb->g = c[1];
-    rgb->b = c[2];
+    rgb->rgb[0] = c[0];
+    rgb->rgb[1] = c[1];
+    rgb->rgb[2] = c[2];
   }
   return ast3d_err_ok;
 }
@@ -372,9 +372,9 @@ static int read_RGBB (FILE *f)
   }
   if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if (rgb) {
-    rgb->r = (float)c[0] / 255.0;
-    rgb->g = (float)c[1] / 255.0;
-    rgb->b = (float)c[2] / 255.0;
+    rgb->rgb[0] = (float)c[0] / 255.0;
+    rgb->rgb[1] = (float)c[1] / 255.0;
+    rgb->rgb[2] = (float)c[2] / 255.0;
   }
   return ast3d_err_ok;
 }
@@ -397,7 +397,7 @@ static int read_AMOUNTOF (FILE *f)
     case CHUNK_SELFILLUM:    fl = &(mat->self_illum);
   }
   if (fread (&w, sizeof (w), 1, f) != 1) return ast3d_err_badfile;
-  if (fl) *fl = (float)w / 100.0;
+  if (fl) *fl = (float)w / 100.0 *128;
   return ast3d_err_ok;
 }
 
@@ -646,7 +646,7 @@ static int read_MATERIAL (FILE *f)
   if ((mat = (c_MATERIAL *)malloc (sizeof (c_MATERIAL))) == NULL)
     return ast3d_err_nomem;
   clear_mat (mat);
-  mat->id = c_id++;
+  mat->id = c_id++;    //fontos!!!!!
   c_node = mat;
   ast3d_add_world (ast3d_obj_material, mat);
   return ast3d_err_ok;
@@ -1139,7 +1139,7 @@ static int read_TRACKROT (FILE *f)
     if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
     if (fread (pos, sizeof(pos), 1, f) != 1) return ast3d_err_badfile;
     qt_fromang (pos[0], pos[1], pos[2], pos[3], &q);
-	// !!! FIX !!! I SAID ANGLE IS ABSOLUTE!!!!!!!!!
+        // !!! FIX !!! I SAID ANGLE IS ABSOLUTE!!!!!!!!!
     if (keys == n-1) angle = pos[0]; else angle += pos[0];
     qt_make (angle, pos[1], pos[2], pos[3], &key->val._quat);
     qt_swap (&key->val._quat);

@@ -148,10 +148,16 @@ static void do_transform ()
   c_OBJECT *obj, *o1, *o2;
   c_VERTEX *v1, *v2;
   c_FACE   *f1, *f2;
-  c_VECTOR  vec;
-  c_MATRIX  objmat, normat;
+  c_VECTOR  vec,c,cit;
+  c_MATRIX  objmat, normat, tnsmat;
+  c_CAMERA *cam;
   float     alpha;
   int32     i;
+
+  for (node = ast3d_scene->world; node; node = node->next)
+    if (node->type == ast3d_track_camera)
+      cam = (c_CAMERA *)node->object;
+	vec_sub (&cam->target,&cam->pos,&c);
 
   for (node = ast3d_scene->world; node; node = node->next) {
     if (node->type == ast3d_obj_object) {
@@ -198,16 +204,53 @@ static void do_transform ()
       } else {
         mat_mulvec (obj->matrix, &obj->bbox.min, &obj->pbbox.min);
         mat_mulvec (obj->matrix, &obj->bbox.max, &obj->pbbox.max);
-        for (i = 0; i < obj->numverts; i++)
-          mat_mulvec (objmat, &obj->vertices[i].vert,
-                              &obj->vertices[i].pvert);
-        if (ast3d_flags & ast3d_calcnorm) {
+
+  cit.x = c.x*obj->matrix[X][X] + c.y*obj->matrix[Y][X] + c.z*obj->matrix[Z][X];
+  cit.y = c.x*obj->matrix[X][Y] + c.y*obj->matrix[Y][Y] + c.z*obj->matrix[Z][Y];
+  cit.z = c.x*obj->matrix[X][Z] + c.y*obj->matrix[Y][Z] + c.z*obj->matrix[Z][Z];
+
+        vec_normalize(&cit,&cit);
+
+        for (i = 0; i < obj->numfaces; i++){
+	vec_copy(&obj->faces[i].norm,&vec);
+	if(cit.x*vec.x+cit.y*vec.y+cit.z*vec.z>0){
+	obj->vertices[obj->faces[i].a].visible=1;
+	obj->vertices[obj->faces[i].b].visible=1;
+	obj->vertices[obj->faces[i].c].visible=1;
+        obj->faces[i].visible=TRUE;}
+
+	if(!obj->faces[i].visible){
+	vec_copy(&obj->vertices[obj->faces[i].a].norm,&vec);
+	if(cit.x*vec.x+cit.y*vec.y+cit.z*vec.z>0){
+	obj->vertices[obj->faces[i].a].visible=1;
+	obj->vertices[obj->faces[i].b].visible=1;
+	obj->vertices[obj->faces[i].c].visible=1;
+        obj->faces[i].visible=TRUE;}
+
+	if(!obj->faces[i].visible){
+	vec_copy(&obj->vertices[obj->faces[i].b].norm,&vec);
+	if(cit.x*vec.x+cit.y*vec.y+cit.z*vec.z>0){
+	obj->vertices[obj->faces[i].a].visible=1;
+	obj->vertices[obj->faces[i].b].visible=1;
+	obj->vertices[obj->faces[i].c].visible=1;
+        obj->faces[i].visible=TRUE;}
+
+	if(!obj->faces[i].visible){
+	vec_copy(&obj->vertices[obj->faces[i].c].norm,&vec);
+	if(cit.x*vec.x+cit.y*vec.y+cit.z*vec.z>0){
+	obj->vertices[obj->faces[i].a].visible=1;
+	obj->vertices[obj->faces[i].b].visible=1;
+	obj->vertices[obj->faces[i].c].visible=1;
+        obj->faces[i].visible=TRUE;}}}}}
+
+
+//	if (ast3d_flags & ast3d_calcnorm) {
           for (i = 0; i < obj->numverts; i++)
             mat_mulnorm (normat, &obj->vertices[i].norm,
                                  &obj->vertices[i].pnorm);
           for (i = 0; i < obj->numfaces; i++)
             mat_mulnorm (normat, &obj->faces[i].norm, &obj->faces[i].pnorm);
-        }
+//        }
       }
     }
   }
@@ -640,7 +683,7 @@ int32 ast3d_load_world (char *filename, c_SCENE *scene)
     return error;
   }
   calc_bbox ();
-  if (ast3d_flags & ast3d_calcnorm) calc_normals ();
+  calc_normals ();
   ast3d_setactive_scene (old_scene);
   return ast3d_err_ok;
 }
@@ -912,9 +955,15 @@ int32 ast3d_getkey_rgb (t_TRACK *track, float frame, c_RGB *out)
 /*
   ast3d_getkey_rgb: return rgb key at frame "frame".
 */
-  c_VECTOR *vect = (c_VECTOR *)out;
+//  c_VECTOR *vect = (c_VECTOR *)out;
+  c_VECTOR *vect;
+  int32    aa;    
 
-  return spline_getkey_vect (track, frame, vect);
+  aa = spline_getkey_vect (track, frame, vect);
+  out->rgb[0]=vect->x;
+  out->rgb[1]=vect->y;
+  out->rgb[2]=vect->z;
+  return aa;
 }
 
 int32 ast3d_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
