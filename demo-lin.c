@@ -16,6 +16,9 @@
 #include "afs/afs.h"
 #include "script/script.h"
 
+#define DEFINE_PROF_VARS
+#include "prof.h"
+
 // #include "glide.h"
 
 void ExitDemo(){

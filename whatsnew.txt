@@ -274,7 +274,22 @@ v2.5 99/11/25-26  by A'rpi
 - keves face-re nem kell pretrans-cull!!! (chevy...)
   => a chevy lassul tole, a tobbi meg semmit se valtozik. -> kiszedve :(
 
+v2.6 99/12/1  by A'rpi
+- Spline-os MORPH:  5 oran at irtam a forrast, compile, es elsore mukodott!!!
+- optimize_vertex() kiszedve ast3d.c-bol optimvert.c-be, es atirtam HASH
+  tablasra -> 1s alatt betolti a walk2.3ds-t!!!
+- lighting optim:
+  - 2 fele szedve a fenyszamolas, 1.: attenuation vagy spot
+                                  2.: egyszeru positional light
+    utobbinal az ambient elore ki van szamolva, nem vertexenkent kell!
+  - specular if()-ek osszevonva, igy talan gyorsabb picit amikor nincs specular
+  A directional lighting implementalasa mostmar viszonylag egyszeru lesz.
+  
+
 KELL MEG:
+- optimalt directional lighting attenuation nelkul, normal forgatas nelkul
+- objectek sortolasa: eloszor tomor obj-k, utana atlatszok z-sort-olva
+  megpedig nem sulypont hanem bbox.min.Z szerint!
 - uj picture formatum (xsize,ysize,alpha_flag,hany db texturabol,tomb ID-knek)
 - scriptbol vezerelheto lassu texturabetoltes (3ds play kozben tolti le
   oket egyenkent)
@@ -284,10 +299,9 @@ KELL MEG:
 - tobb fenyforras parametereinek 1ideju allitasa!  (bitmaszk kell light-nal)
 - commandline opciok: window/fullscreen, felbontas, mipmap on/off, fps
 - gyorstekeres scriptrendszerbe
-- optimalt directional lighting attenuation nelkul, normal forgatas nelkul
-- lighting optimalizalasa, a renderelesi ido 20-35%-a ezzel megy el
 - multitextura  (textura+lightmap esetre legalabb)
 - morph transzformaciot attenni render.c-be! meg a pre-trans cull-t is!
+- keyframer bug: LOOP-ot nem tamogat (spline.c tudja de ami hivja az nem igazan)
 
 EGYEB:
 - bug: chevy szelvedojen nincs specular!  -- specularmap-al van!!!!!

@@ -18,6 +18,7 @@ if(mat!=current_mat){
         } else glDisable(GL_TEXTURE_2D);
 #ifdef NO_LIGHTING
         src_alpha=clip_255((1-mat->transparency)*ast3d_blend);
+        base_r=base_g=base_b=(mat->self_illum);
         { int li;
           for(li=0;li<lightno;li++){
             c_LIGHT *l=lights[li];
@@ -28,6 +29,11 @@ if(mat!=current_mat){
 //            l->MatDiff[0]=l->MatDiff[1]=l->MatDiff[2]=0;
             LIGHTCOLOR(l->MatSpec,mat->specular.rgb,l->color.rgb);
 //            l->MatSpec[0]=l->MatSpec[1]=l->MatSpec[2]=1;
+	    if(!(l->flags&ast3d_light_attenuation)){
+	      base_r+=l->MatAmb[0];
+	      base_g+=l->MatAmb[1];
+	      base_b+=l->MatAmb[2];
+	    }
             if(mat->shading==ast3d_mat_phong){
               specular=1;
               specular_mult=mat->shin_strength;
@@ -83,7 +89,8 @@ if(mat!=current_mat){
             l->ambient=0;
             specular=1; specular_mult=1.0; specular_coef=64.0;
         } }
-        src_alpha=255;
+        src_alpha=clip_255(ast3d_blend); //  src_alpha=255;
+        base_r=base_g=base_b=0.0;
 #else
       glMaterialfv(GL_FRONT, GL_AMBIENT  ,ambient);
       glMaterialfv(GL_FRONT, GL_DIFFUSE  ,diffuse);

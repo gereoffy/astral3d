@@ -77,6 +77,7 @@ void draw3dsframe(void){
     w_NODE *node;
     c_MATERIAL *current_mat=(c_MATERIAL*)(-1);
     float specular_coef,specular_limit,specular_limit4,specular_mult;
+    float base_r,base_g,base_b;
     int specular=0;
     unsigned char src_alpha=255;
 //    int obj_num=0;
@@ -140,7 +141,7 @@ PROF_END(prof_3d_setuplight);
     }
 #endif
 
-      glEnable(GL_ALPHA_TEST);
+//      glEnable(GL_ALPHA_TEST);
 //      glAlphaFunc(GL_GEQUAL,0.1);
 
 PROF_START(prof_3d_calc);
@@ -192,6 +193,16 @@ PROF_END(prof_3d_draw);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
 
   }}}
+
+PROF_START(prof_3d_particle);
+    for (node = scene->world; node; node=node->next) {
+      if (node->type == ast3d_obj_light) {
+        c_LIGHT *lit = (c_LIGHT *)node->object;
+        if(!strncmp(lit->name,"PARTICLE",8))
+        particle_redraw(&lit->pos);
+      }
+    }
+PROF_END(prof_3d_particle);
 
 PROF_START(prof_3d_lightcorona);
   PutLightCoronas();

@@ -6,6 +6,10 @@
 /* If enabled, uses frustum culling for faces */
 #define FRUSTUM_CULL
 
+#define SPLINE_MORPH
+
+#define OTIMIZE_VERTEX
+
 // #define TRIANGLE_STRIP
 
 /* Minimum face number for pre-trans backface culling */
@@ -175,7 +179,8 @@ enum ast3d_obj_flags_ { /* astral 3d object flags */
 
 enum ast3d_light_flags_ { /* astral 3d light flags */
   ast3d_light_omni = 1,                    /* light is omni */
-  ast3d_light_spot = 2                     /* light is spotlight */
+  ast3d_light_spot = 2,                    /* light is spotlight */
+  ast3d_light_attenuation = 4              /* attenuation */
 };
 
 enum ast3d_track_flags_ { /* astral 3d track flags */
@@ -207,11 +212,6 @@ typedef struct _c_BOUNDBOX { /* bounding box */
   c_VECTOR max;                          /* bounding box */
   c_VECTOR p[8];
 } c_BOUNDBOX;
-
-typedef struct _c_MORPH { /* morph struct */
-  int32 from, to;                        /* morph: from/to object  */
-  float alpha;                           /* morph stage (0 -> 1.0) */
-} c_MORPH;
 
 typedef struct _c_MAP { /* map struct */
   char  *file;                           /* map filename   */
@@ -338,23 +338,6 @@ typedef struct _c_MAPPING {
   c_MATRIX matrix;                       /* matrix                     */
 } c_MAPPING;
 
-typedef struct _c_OBJECT { /* object struct */
-  char       *name;                      /* object name                */
-  int32      id, parent;                 /* object id, object parent   */
-  int32      numverts;                   /* number of vertices         */
-  int32      numfaces;                   /* number of faces            */
-  int32      flags;                      /* object flags: ast3d_obj_*  */
-  c_VERTEX   *vertices;                  /* object vertices            */
-  c_FACE     *faces;                     /* object faces               */
-  c_VECTOR   pivot;                      /* object pivot point         */
-  c_VECTOR   translate;                  /* object translation vector  */
-  c_VECTOR   scale;                      /* object scale vector        */
-  c_BOUNDBOX bbox, pbbox;                /* object bounding box        */
-  c_QUAT     rotate;                     /* object rotation quaternion */
-  c_MORPH    morph;                      /* object morph               */
-  c_MATRIX   matrix;                     /* object keyframer matrix    */
-  c_MAPPING  mapping;                    /* texture mapping info       */
-} c_OBJECT;
 
 typedef struct _c_AMBIENT { /* ambient struct */
   char  *name;                           /* ambient name    */
@@ -385,10 +368,21 @@ typedef struct _t_KEY { /* key struct */
   float          easeto, easefrom;       /* ease to, ease from             */
   t_KDATA        val;                    /* the interpolated values        */
   float          dsa, dsb, dsc, dsd, dda, ddb, ddc, ddd;
+#ifdef SPLINE_MORPH
+  float          ksm, ksp, kdm, kdp;     /* need for calc dsa,dda,dsb...   */
+  int            spline_type;          /* 0=linear 1=first 2=last 3=normal */
+#endif
   c_QUAT         ds, dd;
   c_QUAT         qa;
   struct _t_KEY *next, *prev;
 } t_KEY;
+
+typedef struct _c_MORPH { /* morph struct */
+  int32 from, to;                        /* morph: from/to object  */
+  float alpha;                           /* morph stage (0 -> 1.0) */
+  t_KEY *key;
+} c_MORPH;
+
 
 typedef struct _t_TRACK { /* track struct */
   int32  flags;                          /* track flags              */
@@ -448,6 +442,25 @@ typedef struct _k_NODE { /* keyframer node */
 typedef struct _c_FRUSTUM {
   float znear,zfar,x,y;
 } c_FRUSTUM;
+
+typedef struct _c_OBJECT { /* object struct */
+  char       *name;                      /* object name                */
+  int32      id, parent;                 /* object id, object parent   */
+  int32      numverts;                   /* number of vertices         */
+  int32      numfaces;                   /* number of faces            */
+  int32      flags;                      /* object flags: ast3d_obj_*  */
+  c_VERTEX   *vertices;                  /* object vertices            */
+  c_FACE     *faces;                     /* object faces               */
+  c_VECTOR   pivot;                      /* object pivot point         */
+  c_VECTOR   translate;                  /* object translation vector  */
+  c_VECTOR   scale;                      /* object scale vector        */
+  c_BOUNDBOX bbox, pbbox;                /* object bounding box        */
+  c_QUAT     rotate;                     /* object rotation quaternion */
+  c_MORPH    morph;                      /* object morph               */
+  c_MATRIX   matrix;                     /* object keyframer matrix    */
+  c_MAPPING  mapping;                    /* texture mapping info       */
+} c_OBJECT;
+
 
 typedef struct _c_SCENE { /* scene (world, keyframer) */
   float    f_start, f_end, f_current;    /* start/end/current frame */

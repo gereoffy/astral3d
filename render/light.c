@@ -69,10 +69,17 @@ static void SetupLightMode(void){
         lights[lightno]=lit;
         mat_mulvec(scene->cam->matrix,&lit->pos,&lit->ppos);  /* Transformation */
 
-#ifndef NO_LIGHTING
-        glLightf (GL_LIGHT0+lightno, GL_CONSTANT_ATTENUATION,lights[lightno]->attenuation[0]);
-        glLightf (GL_LIGHT0+lightno, GL_LINEAR_ATTENUATION,lights[lightno]->attenuation[1]);
-        glLightf (GL_LIGHT0+lightno, GL_QUADRATIC_ATTENUATION,lights[lightno]->attenuation[2]);
+#ifdef NO_LIGHTING
+	if(lit->attenuation[0]==1.0 &&
+	   lit->attenuation[1]==0.0 &&
+  	   lit->attenuation[2]==0.0 &&
+	   (!(lit->flags&ast3d_light_spot))
+	) lit->flags&=~ast3d_light_attenuation; else
+          lit->flags|=ast3d_light_attenuation;
+#else
+        glLightf (GL_LIGHT0+lightno, GL_CONSTANT_ATTENUATION,lit->attenuation[0]);
+        glLightf (GL_LIGHT0+lightno, GL_LINEAR_ATTENUATION,lit->attenuation[1]);
+        glLightf (GL_LIGHT0+lightno, GL_QUADRATIC_ATTENUATION,lit->attenuation[2]);
 
         /* LIGHT IS OMNI LIGHT */
         if(lit->flags&ast3d_light_omni){

@@ -1,3 +1,5 @@
+/* Optimized by A'rpi/ASTRAL */
+
 #include <math.h>
 #include <stdio.h>
 #include "ast3d.h"
@@ -41,6 +43,17 @@ static void CompDeriv (t_KEY *keyp, t_KEY *key, t_KEY *keyn)
   tmcp = tm * cp;
   ksm = tmcm * bp * fp; ksp = tmcp * bm * fp;
   kdm = tmcp * bp * fn; kdp = tmcm * bm * fn;
+  /* ami innentol kell:
+       - prev, current, next key ertekek
+       - ksm, ksp, kdm, kdp  valtozok erteke
+   */
+#ifdef SPLINE_MORPH
+  key->ksm=ksm;
+  key->ksp=ksp;
+  key->kdm=kdm;
+  key->kdp=kdp;
+  key->spline_type=3;
+#endif
   CompElementDeriv (keyp->val._quat.w, key->val._quat.w, keyn->val._quat.w,
                     &key->dsa, &key->dda, ksm, ksp, kdm, kdp);
   CompElementDeriv (keyp->val._quat.x, key->val._quat.x, keyn->val._quat.x,
@@ -57,21 +70,36 @@ static void CompDerivFirst (t_KEY *key, t_KEY *keyn, t_KEY *keynn)
   CompDerivFirst: compute derivative for first key "key".
 */
   float f20, f10, v20, v10;
+  float a,kdm,kdp;
 
   f20 = keynn->frame - key->frame;
   f10 = keyn->frame - key->frame;
+  a=(1-key->tens);
+  kdm=a*1.5;
+  kdp=a*(f10/(2*f20));
+#ifdef SPLINE_MORPH
+  key->ksm=
+  key->ksp=0;
+  key->kdm=kdm;
+  key->kdp=kdp;
+  key->spline_type=1;
+#endif
+
   v20 = keynn->val._quat.w - key->val._quat.w;
   v10 = keyn->val._quat.w - key->val._quat.w;
-  key->dda = (1-key->tens)*(v20*(0.25-f10/(2*f20))+(v10-v20/2)*3/2+v20/2);
+  key->dda = v10*kdm+v20*kdp;
+  
   v20 = keynn->val._quat.x - key->val._quat.x;
   v10 = keyn->val._quat.x - key->val._quat.x;
-  key->ddb = (1-key->tens)*(v20*(0.25-f10/(2*f20))+(v10-v20/2)*3/2+v20/2);
+  key->ddb = v10*kdm+v20*kdp;
+  
   v20 = keynn->val._quat.y - key->val._quat.y;
   v10 = keyn->val._quat.y - key->val._quat.y;
-  key->ddc = (1-key->tens)*(v20*(0.25-f10/(2*f20))+(v10-v20/2)*3/2+v20/2);
+  key->ddc = v10*kdm+v20*kdp;
+
   v20 = keynn->val._quat.z - key->val._quat.z;
   v10 = keyn->val._quat.z - key->val._quat.z;
-  key->ddd = (1-key->tens)*(v20*(0.25-f10/(2*f20))+(v10-v20/2)*3/2+v20/2);
+  key->ddd = v10*kdm+v20*kdp;
 }
 
 static void CompDerivLast (t_KEY *keypp, t_KEY *keyp, t_KEY *key)
@@ -80,21 +108,36 @@ static void CompDerivLast (t_KEY *keypp, t_KEY *keyp, t_KEY *key)
   CompDerivLast: compute derivative for last "key".
 */
   float f20, f10, v20, v10;
+  float a,ksm,ksp;
 
   f20 = key->frame - keypp->frame;
   f10 = key->frame - keyp->frame;
+  a=(1-key->tens);
+  ksm=a*1.5;
+  ksp=a*(f10/(2*f20));
+#ifdef SPLINE_MORPH
+  key->ksm=ksm;
+  key->ksp=ksp;
+  key->kdm=
+  key->kdp=0;
+  key->spline_type=2;
+#endif
+
   v20 = key->val._quat.w - keypp->val._quat.w;
   v10 = key->val._quat.w - keyp->val._quat.w;
-  key->dsa = (1-key->tens)*(v20*(0.25-f10/(2*f20))+(v10-v20/2)*3/2+v20/2);
+  key->dsa = v10*ksm+v20*ksp;
+  
   v20 = key->val._quat.x - keypp->val._quat.x;
   v10 = key->val._quat.x - keyp->val._quat.x;
-  key->dsb = (1-key->tens)*(v20*(0.25-f10/(2*f20))+(v10-v20/2)*3/2+v20/2);
+  key->dsb = v10*ksm+v20*ksp;
+
   v20 = key->val._quat.y - keypp->val._quat.y;
   v10 = key->val._quat.y - keyp->val._quat.y;
-  key->dsc = (1-key->tens)*(v20*(0.25-f10/(2*f20))+(v10-v20/2)*3/2+v20/2);
+  key->dsc = v10*ksm+v20*ksp;
+
   v20 = key->val._quat.z - keypp->val._quat.z;
   v10 = key->val._quat.z - keyp->val._quat.z;
-  key->dsd = (1-key->tens)*(v20*(0.25-f10/(2*f20))+(v10-v20/2)*3/2+v20/2);
+  key->dsd = v10*ksm+v20*ksp;
 }
 
 static void CompDerivLoopFirst (t_KEY *keyp, t_KEY *key, t_KEY *keyn, float lf)
@@ -121,6 +164,13 @@ static void CompDerivLoopFirst (t_KEY *keyp, t_KEY *key, t_KEY *keyn, float lf)
   tmcp = tm * cp;
   ksm = tmcm * bp * fp; ksp = tmcp * bm * fp;
   kdm = tmcp * bp * fn; kdp = tmcm * bm * fn;
+#ifdef SPLINE_MORPH
+  key->ksm=ksm;
+  key->ksp=ksp;
+  key->kdm=kdm;
+  key->kdp=kdp;
+  key->spline_type=3;
+#endif
   CompElementDeriv (keyp->val._quat.w, key->val._quat.w, keyn->val._quat.w,
                     &key->dsa, &key->dda, ksm, ksp, kdm, kdp);
   CompElementDeriv (keyp->val._quat.x, key->val._quat.x, keyn->val._quat.x,
@@ -155,6 +205,13 @@ static void CompDerivLoopLast (t_KEY *keyp, t_KEY *key, t_KEY *keyn, float lf)
   tmcp = tm * cp;
   ksm = tmcm * bp * fp; ksp = tmcp * bm * fp;
   kdm = tmcp * bp * fn; kdp = tmcm * bm * fn;
+#ifdef SPLINE_MORPH
+  key->ksm=ksm;
+  key->ksp=ksp;
+  key->kdm=kdm;
+  key->kdp=kdp;
+  key->spline_type=3;
+#endif
   CompElementDeriv (keyp->val._quat.w, key->val._quat.w, keyn->val._quat.w,
                     &key->dsa, &key->dda, ksm, ksp, kdm, kdp);
   CompElementDeriv (keyp->val._quat.x, key->val._quat.x, keyn->val._quat.x,
@@ -188,6 +245,9 @@ static void CompDerivTwo (t_KEY *key)
   keyn->dsb = (keyn->val._quat.x - key->val._quat.x) * (1 - keyn->tens);
   keyn->dsc = (keyn->val._quat.y - key->val._quat.y) * (1 - keyn->tens);
   keyn->dsd = (keyn->val._quat.z - key->val._quat.z) * (1 - keyn->tens);
+#ifdef SPLINE_MORPH
+  key->spline_type=keyn->spline_type=4;
+#endif
 }
 
 static void CompAB (t_KEY *prev, t_KEY *cur, t_KEY *next)
@@ -311,10 +371,10 @@ int32 spline_init (t_TRACK *track)
       CompDeriv (curr->prev, curr, curr->next);
     if (track->flags & ast3d_track_loop) {
       CompDerivLoopFirst (last->prev, keys, keys->next, track->frames);
-      CompDerivLoopLast (last->prev, last, keys->next, track->frames);
+      CompDerivLoopLast  (last->prev, last, keys->next, track->frames);
     } else {
       CompDerivFirst (keys, keys->next, keys->next->next);
-      CompDerivLast (curr->prev->prev, curr->prev, curr);
+      CompDerivLast  (curr->prev->prev, curr->prev, curr);
     }
   } else CompDerivTwo (keys); /* 2 keys */
   return ast3d_err_ok;
@@ -360,25 +420,31 @@ int32 spline_getkey_float (t_TRACK *track, float frame, float *out)
 
   if (frame < 0.0) return ast3d_err_badframe;
   if (!track || !track->keys) return ast3d_err_nullptr;
-
-  if (frame < track->last->frame) keys = track->keys; else
-    keys = track->last;
+  if (frame < track->last->frame) keys = track->keys; else keys = track->last;
   while (keys->next && frame > keys->next->frame) keys = keys->next;
   track->last = keys;
+  /* keys -> current keypoint */
+  
+  /* frame<first_key.frame || frame>last_key.frame */
   if (!keys->next || frame < keys->frame) { /* frame is above last key */
     *out = keys->val._float;
     return ast3d_err_ok;
   }
+  
+  /* interpolate */
   t = (frame - keys->frame) / (keys->next->frame - keys->frame);
   t = spline_ease (t, keys->easefrom, keys->next->easeto);
+  
   t2 = t * t;
   t3 = t2 * t;
   h[0] =  2 * t3 - 3 * t2 + 1;
   h[1] = -2 * t3 + 3 * t2;
   h[2] = t3 - 2 * t2 + t;
   h[3] = t3 - t2;
+  
   *out = (h[0]*keys->val._float) + (h[1]*keys->next->val._float) +
          (h[2]*keys->dda) +        (h[3]*keys->next->dsa);
+
   return ast3d_err_ok;
 }
 
@@ -393,29 +459,32 @@ int32 spline_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out)
 
   if (frame < 0.0) return ast3d_err_badframe;
   if (!track || !track->keys) return ast3d_err_nullptr;
-
-  if (frame < track->last->frame) keys = track->keys; else
-    keys = track->last;
+  if (frame < track->last->frame) keys = track->keys; else keys = track->last;
   while (keys->next && frame > keys->next->frame) keys = keys->next;
   track->last = keys;
+
   if (!keys->next || frame < keys->frame) { /* frame is above last key */
     vec_copy (&keys->val._vect, out);
     return ast3d_err_ok;
   }
+
   t = (frame - keys->frame) / (keys->next->frame - keys->frame);
   t = spline_ease (t, keys->easefrom, keys->next->easeto);
+
   t2 = t * t;
   t3 = t2 * t;
   h[0] =  2 * t3 - 3 * t2 + 1;
   h[1] = -2 * t3 + 3 * t2;
   h[2] = t3 - 2 * t2 + t;
   h[3] = t3 - t2;
+
   out->x = (h[0]*keys->val._vect.x) + (h[1]*keys->next->val._vect.x) +
            (h[2]*keys->dda) +         (h[3]*keys->next->dsa);
   out->y = (h[0]*keys->val._vect.y) + (h[1]*keys->next->val._vect.y) +
            (h[2]*keys->ddb) +         (h[3]*keys->next->dsb);
   out->z = (h[0]*keys->val._vect.z) + (h[1]*keys->next->val._vect.z) +
            (h[2]*keys->ddc) +         (h[3]*keys->next->dsc);
+
   return ast3d_err_ok;
 }
 

@@ -12,7 +12,7 @@ setenv GL_LIBS "-lGL -L/usr/src/Mesa-3.1/src-glut -lglut -L/usr/src/Mesa-3.1/src
 setenv LIBS "-lm -Ljpeglib -ljpeg -L3dslib -last3d -Lmp3lib -lMP3"
 setenv OBJ2 "loadmap/load_map.o loadmap/loadmaps.o loadmap/loadmat.o loadmap/loadtxtr.o"
 setenv OBJA "afs/afs3.o afs/unesplib.o"
-setenv OBJS "script/script.o blob/blob.o fdtunnel/fdtunnel.o render/render.o timer/timer-lx.o"
+setenv OBJS "script/script.o blob/blob.o fdtunnel/fdtunnel.o render/render.o render/particle.o timer/timer-lx.o"
 setenv INCL "-I/usr/include/glide"
 
 gcc -g -O2 demo-lin.c -o demo $INCL $OBJA $OBJS $OBJ2 $GL_LIBS $XLIBS $LIBS >& errors

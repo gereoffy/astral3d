@@ -1437,6 +1437,7 @@ static int read_TRACKMORPH (afs_FILE *f)
     key->val._int = ((c_OBJECT *)node->object)->id;
     add_key (track, key, nf);
   }
+  spline_init (track); /*!! NEW !!*/
   ast3d_set_track (ast3d_key_morph, c_id, track);
   return ast3d_err_ok;
 }
