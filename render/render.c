@@ -117,8 +117,10 @@ PROF_END(prof_3d_setuplight);
 
 
   if(obj->flags&ast3d_obj_visible){
-    c_MATERIAL *mat=obj->faces[0].pmat;
+    c_MATERIAL *mat=obj->pmat;
     int matflags= mat?(mat->flags):0;
+//    int matflags=0;
+    
     static c_MATRIX objmat;
     static c_MATRIX normat;
     

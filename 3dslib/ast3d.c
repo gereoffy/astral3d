@@ -13,13 +13,14 @@
   copyright, format table, etc...
 *****************************************************************************/
 
-  char    ast3d_version[]   = "Astral 3d Engine v0.1a";
-  char    ast3d_copyright[] = "copyright (c) 1998 RoBSoN of Astral";
+  char    ast3d_version[]   = "Astral 3DS Loader v4.0";
+  char    ast3d_copyright[] = "copyright (c) 1998-2000 Astral";
 
   c_SCENE  *ast3d_scene;  /* current active scene  */
   c_CAMERA *ast3d_camera; /* current active camera */
   int32     ast3d_flags;  /* curreng flags         */
 
+#if 0
 struct {
   char   *name;                       /* file extension        */
   int32 (*load_mesh)   (afs_FILE *f); /* loads mesh            */
@@ -28,8 +29,9 @@ struct {
 } ast3d_drivers[] = {
   {"3DS", ast3d_load_mesh_3DS, ast3d_load_motion_3DS, NULL},
 //  {"AST", ast3d_load_mesh_AST, ast3d_load_motion_AST, ast3d_save_AST}
-  {"AST", NULL, NULL, NULL}
+//  {"AST", NULL, NULL, NULL}
 };
+#endif
 
 /*****************************************************************************
   internal functions
@@ -62,8 +64,8 @@ static void calc_normals ()
       optimize_vertex ((c_OBJECT *)node->object);
 #endif
       calc_objnormals ((c_OBJECT *)node->object);
-      ast3d_NOfixUV((c_OBJECT *)node->object);
-      calc_uv_grads((c_OBJECT *)node->object);
+//      ast3d_NOfixUV((c_OBJECT *)node->object);
+//      calc_uv_grads((c_OBJECT *)node->object);
     }
 
 }
@@ -121,24 +123,19 @@ static void ast3d_free_track (t_TRACK *track)
   free (track);
 }
 
-static int32 strucmp (char *s1, char *s2)
-{
-/*
-  strucmp: non-case sensitive string compare.
-*/
-  int32 diff = 0;
-
+#if 0
+static int32 strucmp (char *s1, char *s2){
+/*  strucmp: non-case sensitive string compare. */
+  int32 diff;
   do {
-    diff += (toupper (*s1) - toupper (*s2));
-  } while (*s1++ && *s2++);
+    diff = (toupper (*s1) - toupper (*s2));
+  } while (diff==0 && *s1++ && *s2++);
   return diff;
 }
+#endif
 
-int ast3d_insidebox (c_BOUNDBOX *a, c_VECTOR *b)
-{
-/*
-  ast3d_insidebox: collision detection (point inside bounding box).
-*/
+int ast3d_insidebox (c_BOUNDBOX *a, c_VECTOR *b){
+/*  ast3d_insidebox: collision detection (point inside bounding box).*/
   if( b->x > a->min.x && b->y > a->min.y && b->z > a->min.z &&
       b->x < a->max.x && b->y < a->max.y && b->z < a->max.z) return 1;
   return 0;
@@ -149,32 +146,26 @@ int ast3d_insidebox (c_BOUNDBOX *a, c_VECTOR *b)
   astral 3d library (initialization, error handling)
 *****************************************************************************/
 
-int32 ast3d_init (int32 flags)
-{
-/*
-  ast3d_init: astral 3d initialization.
-*/
+c_MATERIAL *Default_MATERIAL=NULL;
+
+int32 ast3d_init (int32 flags){
+/*  ast3d_init: astral 3d initialization.*/
   ast3d_scene  = NULL;
   ast3d_camera = NULL;
   ast3d_flags  = flags;
+  Default_MATERIAL = create_Default_MATERIAL();
   return ast3d_err_ok;
 }
 
-int32 ast3d_done ()
-{
-/*
-  ast3d_done: astral 3d deinitialization.
-*/
+int32 ast3d_done (){
+/*  ast3d_done: astral 3d deinitialization.*/
   ast3d_scene = NULL;
   ast3d_flags = 0;
   return ast3d_err_ok;
 }
 
-char *ast3d_geterror (int32 code)
-{
-/*
-  ast3d_geterror: return error string.
-*/
+char *ast3d_geterror (int32 code){
+/*  ast3d_geterror: return error string.*/
   switch (code) {
     case ast3d_err_nomem:     return "not enough memory";
     case ast3d_err_nofile:    return "file not found";
@@ -200,11 +191,8 @@ char *ast3d_geterror (int32 code)
   astral 3d library (time and world handling)
 *****************************************************************************/
 
-int32 ast3d_getframes (float *start, float *end)
-{
-/*
-  ast3d_getframes: return number of frames.
-*/
+int32 ast3d_getframes (float *start, float *end){
+/*  ast3d_getframes: return number of frames.*/
   if (!ast3d_scene) return ast3d_err_notloaded;
   if (!ast3d_scene->keyframer) return ast3d_err_notloaded;
   if (ast3d_scene->f_end - ast3d_scene->f_start == 0) return ast3d_err_noframes;
@@ -213,11 +201,8 @@ int32 ast3d_getframes (float *start, float *end)
   return ast3d_err_ok;
 }
 
-int32 ast3d_setframe (float frame)
-{
-/*
-  ast3d_setframe: set current frame number.
-*/
+int32 ast3d_setframe (float frame){
+/*  ast3d_setframe: set current frame number.*/
   if (!ast3d_scene) return ast3d_err_notloaded;
   if (!ast3d_scene->keyframer) return ast3d_err_notloaded;
   if (ast3d_scene->f_end - ast3d_scene->f_start == 0) return ast3d_err_noframes;
@@ -227,11 +212,8 @@ int32 ast3d_setframe (float frame)
   } else return ast3d_err_badframe;
 }
 
-int32 ast3d_getframe (float *frame)
-{
-/*
-  ast3d_getframe: get current frame number.
-*/
+int32 ast3d_getframe (float *frame){
+/*  ast3d_getframe: get current frame number.*/
   if (!ast3d_scene) return ast3d_err_notloaded;
   if (!ast3d_scene->keyframer) return ast3d_err_notloaded;
   if (ast3d_scene->f_end - ast3d_scene->f_start == 0) return ast3d_err_noframes;
@@ -511,18 +493,9 @@ int32 ast3d_load_world (char *filename, c_SCENE *scene)
 /*
   ast3d_load_world: loads mesh data from file "filename" into scene "scene".
 */
-  int32   (*loader)(afs_FILE *f) = NULL;
-  c_SCENE *old_scene = ast3d_scene;
   afs_FILE    *f;
-  char    *s;
-  int32    i, error;
+  int32    error;
 
-  for (i = 0; i < sizeof (ast3d_drivers) / sizeof (ast3d_drivers[0]); i++) {
-    s = strchr (filename, '.') + 1;
-    if (strucmp (s, ast3d_drivers[i].name) == 0)
-      loader = ast3d_drivers[i].load_mesh;
-  }
-  if (!loader) return ast3d_err_badformat;
   scene->f_start = 0;
   scene->f_end = 0;
   scene->f_current = 0;
@@ -532,16 +505,15 @@ int32 ast3d_load_world (char *filename, c_SCENE *scene)
   scene->ktail = NULL;
   if ((f = afs_fopen (filename, "rb")) == NULL) return ast3d_err_nofile;
   ast3d_setactive_scene (scene);
-  error = loader (f);
+  error = ast3d_load_mesh_3DS(f);
   afs_fclose (f);
   if (error) {
-    ast3d_setactive_scene (old_scene);
     ast3d_free_world (scene);
     return error;
   }
-  calc_bbox ();
-  calc_normals ();
-  ast3d_setactive_scene (old_scene);
+  calc_bbox();
+  calc_normals();
+  ast3d_fixUV(NULL,0); // NOfixUV
   return ast3d_err_ok;
 }
 
@@ -551,33 +523,23 @@ int32 ast3d_load_motion (char *filename, c_SCENE *scene)
   ast3d_load_motion: loads motion data from file "filename"
                     into scene "scene".
 */
-  int32    (*loader)(afs_FILE *f) = NULL;
-  c_SCENE  *old_scene = ast3d_scene;
   afs_FILE     *f;
-  char     *s;
-  int32     i, error;
+  int32     error;
 
   if (!scene->world) return ast3d_err_notloaded;
-  for (i = 0; i < sizeof (ast3d_drivers) / sizeof (ast3d_drivers[0]); i++) {
-    s = strchr (filename, '.') + 1;
-    if (strucmp (s, ast3d_drivers[i].name) == 0)
-      loader = ast3d_drivers[i].load_motion;
-  }
-  if (!loader) return ast3d_err_badformat;
   if ((f = afs_fopen (filename, "rb")) == NULL) return ast3d_err_nofile;
   ast3d_setactive_scene (scene);
-  error = loader (f);
+  error = ast3d_load_motion_3DS(f);
   afs_fclose (f);
   if (error) {
-    ast3d_setactive_scene (old_scene);
     ast3d_free_motion (scene);
     return error;
   }
   ast3d_setframe (0);
-  ast3d_setactive_scene (old_scene);
   return ast3d_err_ok;
 }
 
+#if 0
 int32 ast3d_load_scene (char *filename, c_SCENE *scene)
 {
 /*
@@ -585,12 +547,12 @@ int32 ast3d_load_scene (char *filename, c_SCENE *scene)
                    into scene "scene".
 */
   int32 error;
-
-  if ((error = ast3d_load_world (filename, scene)) != ast3d_err_ok)
-    return error;
+  if ((error = ast3d_load_world(filename, scene))!=ast3d_err_ok)  return error;
   return ast3d_load_motion (filename, scene);
 }
+#endif
 
+#if 0
 int32 ast3d_save_scene (char *filename, c_SCENE *scene)
 {
 /*
@@ -617,6 +579,7 @@ int32 ast3d_save_scene (char *filename, c_SCENE *scene)
   if (error) return error;
   return ast3d_err_ok;
 }
+#endif
 
 int32 ast3d_free_world (c_SCENE *scene)
 {

@@ -145,7 +145,7 @@ static void SetupLightMode(void){
 
      glFogf(GL_FOG_START,scene->fog.fog_znear);
      glFogf(GL_FOG_END,scene->fog.fog_zfar);
-//  printf("fog znear/far:  %f  %f\n",scene->fog.fog_znear,scene->fog.fog_zfar);  
+//  printf("fog znear/far:  %f  %f\n",scene->fog.fog_znear,scene->fog.fog_zfar);
 
      glFogfv(GL_FOG_COLOR,scene->fog.color.rgb);
      glClearColor(ast3d_blend*scene->fog.color.rgb[0],

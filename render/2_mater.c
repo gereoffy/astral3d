@@ -6,18 +6,13 @@
 
 if(mat!=current_mat){
     current_mat=mat;
-    if(mat){
-//        printf("hello\n");
         /* mat -> current material struct */
-        if(mat->transparency || matflags&ast3d_mat_texturealpha || ast3d_blend<1){
+        if(mat->transparency || matflags&ast3d_mat_texturealpha || ast3d_blend<1.0){
           glEnable(GL_BLEND);
-          if(obj->additivetexture){
+          if(obj->additivetexture)
             glBlendFunc(GL_ONE, GL_ONE);
-//            printf("hello: GL_ONE rulez\n");
-          } else {
+          else
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//            printf("hello: GL_SRC_ALPHA sux\n"); 
-          }
         } else glDisable(GL_BLEND);
         if(matflags&ast3d_mat_texture){
           glEnable(GL_TEXTURE_2D);
@@ -87,29 +82,4 @@ if(mat!=current_mat){
 //        glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
 //        glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SINGLE_COLOR);
 #endif
-    } else {
-      /* Set up default material... */
-      GLfloat  ambient  [] = { 0.0, 0.0, 0.0, 1.0 };
-      GLfloat  diffuse  [] = { 1.0, 1.0, 1.0, 1.0 };
-      GLfloat  speculr  [] = { 1.0, 1.0, 1.0, 1.0 };
-      glDisable(GL_TEXTURE_2D); glDisable(GL_BLEND);
-#ifdef NO_LIGHTING
-        { int li;
-          for(li=0;li<lightno;li++){
-            c_LIGHT *l=lights[li];
-            LIGHTCOLOR(l->MatAmb, ambient,l->color.rgb);
-            LIGHTCOLOR(l->MatDiff,diffuse,l->color.rgb);
-            LIGHTCOLOR(l->MatSpec,speculr,l->color.rgb);
-            l->ambient=0;
-            specular=1; specular_mult=1.0; specular_coef=64.0;
-        } }
-        src_alpha=clip_255(ast3d_blend); //  src_alpha=255;
-        base_r=base_g=base_b=0.0;
-#else
-      glMaterialfv(GL_FRONT, GL_AMBIENT  ,ambient);
-      glMaterialfv(GL_FRONT, GL_DIFFUSE  ,diffuse);
-      glMaterialfv(GL_FRONT, GL_SPECULAR ,speculr);
-      glMaterialf (GL_FRONT, GL_SHININESS,1.0    );
-#endif
-    }
 }

@@ -104,7 +104,7 @@ if(!obj->morph.key){
              obj->pbbox.min.z< ast3d_scene->frustum.znear)
         ))){
 
-        int matflags=(obj->faces[0].pmat)?(obj->faces[0].pmat->flags):0;
+        int matflags=(obj->pmat)?(obj->pmat->flags):0;
 
         obj->flags|=ast3d_obj_visible|ast3d_obj_frustumcull;
 

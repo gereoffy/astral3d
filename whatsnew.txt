@@ -336,6 +336,15 @@ v3.4  00/01/01-05  by  A'rpi    - uj scriptrendszer!!!
   - 10-nel tobb fx (most 20 a max.) tamogatasa. hatar a csillagos sky-effect :)
   - kepek kezelese texture_st strukturaval -> meret+pixelsize megmarad!
   - minden beallitas, struktura a script2.c elejen
+  - [add]picture, [add]sprite, [add]colorbox  code egyszerusodott
+- 3dslib javitasok:
+  - fixUV mellett mostmar van fixU es fixV is.  NoFixUV megszuntetve.
+  - csak akkor szamol uvgrads-ot ha bumpmapos az obj. -> gyorsabb betoltes
+  - ast3d.c-bol kioltem sok felesleges dolgot (drivers struktura, save_scene stb.)
+  - kioltem belole a face-enkenti materialt -> a pmat atkerult a c_OBJECT-be
+  - minden objecten van material - amin nincs ahhoz hozzarendeli a
+    Default_MATERIAL-t amit az ast3d_init() hoz letre.
+    -> egy rakas if(mat) kiszedheto a render-bol
 
 
 TERVEK a 4.0-ba:

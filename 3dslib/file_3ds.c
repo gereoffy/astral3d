@@ -538,6 +538,8 @@ static int read_TRIMESH (afs_FILE *f)
   obj->vertexlights=0.0;
   obj->explode_speed=obj->explode_frame=0.0;
   obj->additivetexture=0;
+  obj->pmat = Default_MATERIAL;
+
   if(strncmp(obj->name,"PARTICLE",8)==0) obj->flags|=ast3d_obj_particle;
   obj->particle.np=obj->particle.maxnp=0;
   vec_zero (&obj->pivot);
@@ -603,8 +605,8 @@ static int read_FACELIST (afs_FILE *f)
     fc->pa = &obj->vertices[c[0]];
     fc->pb = &obj->vertices[c[1]];
     fc->pc = &obj->vertices[c[2]];
-    fc->mat = 0;
-    fc->pmat = NULL;
+//    fc->mat = 0;
+//    fc->pmat = NULL;
     fc->visible = 0;
 #if 0
     fc->flags = 0;
@@ -623,7 +625,8 @@ static int read_FACEMAT (afs_FILE *f)
 /*
   read_FACEMAT: Face material reader.
 */
-  c_FACE     *fc = ((c_OBJECT *)c_node)->faces;
+  c_OBJECT *obj = (c_OBJECT *)c_node;
+//  c_FACE     *fc = obj->faces;
   w_NODE     *node;
   c_MATERIAL *mat;
   word        n, nf;
@@ -633,11 +636,13 @@ static int read_FACEMAT (afs_FILE *f)
   ast3d_byname (c_string, &node);
   if (!node) return ast3d_err_undefined;
   mat = (c_MATERIAL *)node->object;
+//  if(obj->pmat) printf("WARNING: object has multiple materials!\n");
+  obj->pmat=mat;
 //  printf("Setting material %d to faces:",(int)mat);
   while (n-- > 0) {
     if (afs_fread (&nf, sizeof (nf), 1, f) != 1) return ast3d_err_badfile;
-    fc[nf].mat = mat->id;
-    fc[nf].pmat = mat;
+//    fc[nf].mat = mat->id;
+//    fc[nf].pmat = mat;
 //    printf(" %d",nf);
   }
 //  printf("\n");
@@ -714,9 +719,9 @@ static int read_FOGPARAMS (afs_FILE *f)
   fog->fog_zfar=(1-c[1])*t+c[0];
   fog->fog_znear=c[0]-(c[1]*t+c[0]);
 
-  printf("fog Znear/Zfar: %f  %f\n",fog->znear,fog->zfar);
-  printf("fog Dnear/Dfar: %f  %f\n",fog->fognear,fog->fogfar);  
-  printf("fog znear/far:  %f  %f\n",fog->fog_znear,fog->fog_zfar);  
+//  printf("fog Znear/Zfar: %f  %f\n",fog->znear,fog->zfar);
+//  printf("fog Dnear/Dfar: %f  %f\n",fog->fognear,fog->fogfar);  
+//  printf("fog znear/far:  %f  %f\n",fog->fog_znear,fog->fog_zfar);  
   
 //  fog->type|=ast3d_fog_fog;
   if (afs_fread (c, 3*2, 1, f) != 1) return ast3d_err_badfile;
@@ -845,9 +850,7 @@ static int read_TXTINFO (afs_FILE *f){
 
 static int read_MATERIAL (afs_FILE *f)
 {
-/*
-  read_MATERIAL: Material reader.
-*/
+/*  read_MATERIAL: Material reader.*/
   c_MATERIAL *mat;
 
   if (f) {} /* to skip the warning */
@@ -858,6 +861,24 @@ static int read_MATERIAL (afs_FILE *f)
   c_node = mat;
   ast3d_add_world (ast3d_obj_material, mat);
   return ast3d_err_ok;
+}
+
+c_MATERIAL* create_Default_MATERIAL (){
+  c_MATERIAL *mat;
+  if ((mat = (c_MATERIAL *)malloc (sizeof (c_MATERIAL))) == NULL) return NULL;
+  clear_mat (mat);
+  mat->id = c_id++;
+  mat->name="Default";
+  mat->shading=ast3d_mat_metal;
+  mat->flags=0;
+  mat->ambient.rgb[0]=  mat->ambient.rgb[1]=  mat->ambient.rgb[2]= 1.0F;
+  mat->diffuse.rgb[0]=  mat->diffuse.rgb[1]=  mat->diffuse.rgb[2]= 1.0F;
+//  mat->diffuse.rgb[1]=0;
+  mat->shininess=0.9;
+  mat->shin_strength=0.15;
+  c_node = mat;
+  ast3d_add_world (ast3d_obj_material, mat);
+  return mat;
 }
 
 static int read_MATNAME (afs_FILE *f)

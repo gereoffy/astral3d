@@ -3,7 +3,7 @@
 SRCS = ast3d.c camera.c file_3ds.c quatern.c spline.c
 OBJS = ast3d.o camera.o file_3ds.o quatern.o spline.o
 CC   = gcc
-CFLAGS = -g -Wall -mpentiumpro -pipe
+CFLAGS = -O2 -Wall -mpentiumpro -pipe
 
 .SUFFIXES: .c .o
 

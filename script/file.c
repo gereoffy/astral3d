@@ -328,10 +328,10 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 // 4:  fixUV [obj1 [obj2...]]
       if(cmdp->code==4){
         if(pdb==0)
-          ast3d_fixUV(NULL);
+          ast3d_fixUV(NULL,cmdp->type);
         else {
           int i;
-          for(i=1;i<=pdb;i++) ast3d_fixUV(p[i]);
+          for(i=1;i<=pdb;i++) ast3d_fixUV(p[i],cmdp->type);
         }
         return;
       }
@@ -354,7 +354,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         if(node->type != ast3d_obj_object) scrSyntaxH("Node is not object",cmd,1);
         current_object=(c_OBJECT *)(node->object);
         if(current_object->numfaces)
-          current_material=(current_object->faces[0].pmat);
+          current_material=(current_object->pmat);
         else  
           current_material=(c_MATERIAL *)NULL;
         return;

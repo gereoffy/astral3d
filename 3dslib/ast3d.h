@@ -280,10 +280,11 @@ typedef struct _c_VERTEX { /* vertex struct */
 typedef struct _c_FACE { /* face struct */
   int32      a, b, c;                      /* vertices of triangle    */
   int32      flags;                        /* face flags: ast3d_face_* */
-  int32      mat;                          /* face material           */
+//  int32      mat;                          /* face material           */
   c_VERTEX   *pa, *pb, *pc;                /* pointers to vertices    */
-  c_MATERIAL *pmat;                        /* pointer to material     */
-  c_VECTOR   norm, pnorm;                  /* face normal             */
+//  c_MATERIAL *pmat;                        /* pointer to material     */
+  c_VECTOR   norm;                         /* face normal             */
+//  c_VECTOR   pnorm;                        /* face normal             */
   float      D;                            /* distance from 0;0;0     */
   int        visible;                      /* visibility flag         */
   float u1,v1,u2,v2,u3,v3;                 /* texture coords          */
@@ -480,6 +481,7 @@ typedef struct _c_OBJECT { /* object struct */
   int32      flags;                      /* object flags: ast3d_obj_*  */
   c_VERTEX   *vertices;                  /* object vertices            */
   c_FACE     *faces;                     /* object faces               */
+  c_MATERIAL *pmat;                      /* pointer to material        */
   c_VECTOR   pivot;                      /* object pivot point         */
   c_VECTOR   translate;                  /* object translation vector  */
   c_VECTOR   scale;                      /* object scale vector        */
@@ -523,14 +525,16 @@ extern "C" {
 
   extern char ast3d_version[];
   extern char ast3d_copyright[];
+  extern c_MATERIAL *Default_MATERIAL;
 
 /*****************************************************************************
   library functions (astral 3d api)
 *****************************************************************************/
 
-  void ast3d_fixUV();
+void ast3d_fixUV(char *objname,int uvflag);
 /* ast3d_fixUV:  Build bugfixed texture U,V table for each face */
 
+  c_MATERIAL* create_Default_MATERIAL ();
 
   int32 ast3d_init (int32 flags);
 /*
