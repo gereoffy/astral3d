@@ -70,7 +70,7 @@ void paramblock2_uninit(node_st* node){
   paramblock2_list(node,NULL,"  ");
 }
 
-void* PB2_read_value(FILE* f,int* chunk_size,int type){
+void* PB2_read_value(afs_FILE* f,int* chunk_size,int type){
   if(type==0x10){
     // init bitmap
     PB2_bitmap* m=malloc(sizeof(PB2_bitmap));
@@ -98,7 +98,7 @@ void* PB2_read_value(FILE* f,int* chunk_size,int type){
   return NULL;
 }
 
-int paramblock2_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
+int paramblock2_chunk_reader(node_st *node,afs_FILE *f,int level,int chunk_id,int chunk_size){
 Class_ParamBlock2 *pb=node->data;
 
 //printf("### chunk id=%04X  size=%d\n",chunk_id,chunk_size);

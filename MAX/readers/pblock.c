@@ -4,24 +4,24 @@
 
 /*
 // Chunk IDs for loading/saving
-#define PB_COUNT_CHUNK			0x0001
-#define PB_PARAM_CHUNK			0x0002
-#define PB_INDEX_CHUNK			0x0003
-#define PB_ANIMATABLE_CHUNK		0x0004
-#define PB_VERSION_CHUNK		0x0005
-#define PB_FLOAT_CHUNK			(TYPE_FLOAT + 0x100)
-#define PB_INT_CHUNK			(TYPE_INT + 0x100)
-#define PB_RGBA_CHUNK			(TYPE_RGBA + 0x100)
-#define PB_POINT3_CHUNK			(TYPE_POINT3 + 0x100)
-#define PB_BOOL_CHUNK			(TYPE_BOOL + 0x100)
+#define PB_COUNT_CHUNK      0x0001
+#define PB_PARAM_CHUNK      0x0002
+#define PB_INDEX_CHUNK      0x0003
+#define PB_ANIMATABLE_CHUNK   0x0004
+#define PB_VERSION_CHUNK    0x0005
+#define PB_FLOAT_CHUNK      (TYPE_FLOAT + 0x100)
+#define PB_INT_CHUNK      (TYPE_INT + 0x100)
+#define PB_RGBA_CHUNK     (TYPE_RGBA + 0x100)
+#define PB_POINT3_CHUNK     (TYPE_POINT3 + 0x100)
+#define PB_BOOL_CHUNK     (TYPE_BOOL + 0x100)
 
-#define PB_TYPE_CHUNK			0x0200
-#define PB_TYPE_FLOAT_CHUNK		(PB_TYPE_CHUNK + TYPE_FLOAT)
-#define PB_TYPE_INT_CHUNK		(PB_TYPE_CHUNK + TYPE_INT)
-#define PB_TYPE_RGBA_CHUNK		(PB_TYPE_CHUNK + TYPE_RGBA)
-#define PB_TYPE_POINT3_CHUNK	(PB_TYPE_CHUNK + TYPE_POINT3)
-#define PB_TYPE_BOOL_CHUNK		(PB_TYPE_CHUNK + TYPE_BOOL)
-#define PB_TYPE_USER_CHUNK		(PB_TYPE_CHUNK + TYPE_USER)
+#define PB_TYPE_CHUNK     0x0200
+#define PB_TYPE_FLOAT_CHUNK   (PB_TYPE_CHUNK + TYPE_FLOAT)
+#define PB_TYPE_INT_CHUNK   (PB_TYPE_CHUNK + TYPE_INT)
+#define PB_TYPE_RGBA_CHUNK    (PB_TYPE_CHUNK + TYPE_RGBA)
+#define PB_TYPE_POINT3_CHUNK  (PB_TYPE_CHUNK + TYPE_POINT3)
+#define PB_TYPE_BOOL_CHUNK    (PB_TYPE_CHUNK + TYPE_BOOL)
+#define PB_TYPE_USER_CHUNK    (PB_TYPE_CHUNK + TYPE_USER)
 */
 
 
@@ -67,7 +67,7 @@ void paramblock_uninit(node_st* node){
 }
 
 
-int paramblock_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
+int paramblock_chunk_reader(node_st *node,afs_FILE *f,int level,int chunk_id,int chunk_size){
 Class_ParamBlock *pb=node->data;
 
 switch(chunk_id){

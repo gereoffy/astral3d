@@ -13,7 +13,7 @@ void lookat_uninit(node_st *node){
   printf("Lookat.axis = %d\n",lat->axis);
 }
 
-int lookat_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
+int lookat_chunk_reader(node_st *node,afs_FILE *f,int level,int chunk_id,int chunk_size){
   Class_LookAt *lat=node->data;
 //int subtype=classtab[node->classid].subtype;
 

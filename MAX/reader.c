@@ -1,40 +1,40 @@
-int int_reader(FILE *f,int* size){
+int int_reader(afs_FILE *f,int* size){
   int i;
   if((*size)<sizeof(int)){ printf("Bad file\n");return 0;}
-  fread(&i,sizeof(int),1,f);
+  afs_fread(&i,sizeof(int),1,f);
   *size-=sizeof(int);
   return i;
 }
 
-int word_reader(FILE *f,int* size){
+int word_reader(afs_FILE *f,int* size){
   short int i;
   if((*size)<sizeof(i)){ printf("Bad file\n");return 0;}
-  fread(&i,sizeof(i),1,f);
+  afs_fread(&i,sizeof(i),1,f);
   *size-=sizeof(i);
   return i;
 }
 
-int byte_reader(FILE *f,int* size){
+int byte_reader(afs_FILE *f,int* size){
   int i=0;
   if((*size)<1){ printf("Bad file\n");return 0;}
-  fread(&i,1,1,f);
+  afs_fread(&i,1,1,f);
   --(*size);
   return i;
 }
 
-float float_reader(FILE *f,int* size){
+float float_reader(afs_FILE *f,int* size){
   float i;
   if((*size)<sizeof(float)){ printf("Bad file\n");return 0;}
-  fread(&i,sizeof(float),1,f);
+  afs_fread(&i,sizeof(float),1,f);
   *size-=sizeof(float);
   return i;
 }
 
-char* string_reader(FILE *f,int* size){
+char* string_reader(afs_FILE *f,int* size){
   int i;
   int pos=0;
   for(i=0;i<*size;i++){
-    int c=fgetc(f);
+    int c=afs_fgetc(f);
     if(c) tempstr[pos++]=c;
   }
   tempstr[pos]=0;
@@ -42,13 +42,13 @@ char* string_reader(FILE *f,int* size){
   return tempstr;
 }
 
-char* string8_reader(FILE *f,int* size){
+char* string8_reader(afs_FILE *f,int* size){
   int i;
   int pos=0;
   int len=int_reader(f,size);
   if(len>*size){ printf("Text len>size\n");return "";}
   for(i=0;i<len;i++){
-    int c=fgetc(f);
+    int c=afs_fgetc(f);
     if(c>=32 && c<127) tempstr[pos++]=c;
   }
   *size-=len;
@@ -56,7 +56,7 @@ char* string8_reader(FILE *f,int* size){
   return tempstr;
 }
 
-void property_reader(FILE *f,int *size){
+void property_reader(afs_FILE *f,int *size){
   int p=0;
   while(*size>0){
     printf("\n%3d. '%s' =",p++,string8_reader(f,size));
@@ -65,12 +65,12 @@ void property_reader(FILE *f,int *size){
   }
 }
 
-void dump_chunk_data(FILE *f,int *size){
+void dump_chunk_data(afs_FILE *f,int *size){
   while(*size>=4){
     unsigned char data[4];
     int *intp=(int*)data;
     float *floatp=(float*)data;
-    fread(data,4,1,f); *size-=4;
+    afs_fread(data,4,1,f); *size-=4;
     if(*intp >= -100000 && *intp <= 100000) printf(" %d",*intp); else
     if(*floatp >= -100000 && *floatp <= 100000 && fabs(*floatp)>0.00001) printf(" %f",*floatp); else
     printf(" (%d %d %d %d)",data[0],data[1],data[2],data[3]);
@@ -78,7 +78,7 @@ void dump_chunk_data(FILE *f,int *size){
 }
 
 // Olyasmi mint a printf() de a parametereket a file-bol olvassa be:
-void format_chunk_data(FILE *f,int *chunk_size,char *s){
+void format_chunk_data(afs_FILE *f,int *chunk_size,char *s){
             while(*s){
               int c=*s++;
               if(c==92){
@@ -92,7 +92,7 @@ void format_chunk_data(FILE *f,int *chunk_size,char *s){
               if(c=='%'){
                 c=*s++;
                 switch(c){
-                  case '%': putchar(c);
+//                  case '%': putchar(c);
                   case 'f': printf("%f",float_reader(f,chunk_size));break;
                   case 'i': printf("%d",int_reader(f,chunk_size));break;
                   case 'w': printf("%d",word_reader(f,chunk_size));break;

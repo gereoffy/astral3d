@@ -23,17 +23,17 @@
 //               node reader
 //========================================================================//
 
-void node_chunk_reader(FILE *f,node_st *node,int level){
+void node_chunk_reader(afs_FILE *f,node_st *node,int level){
 unsigned short int chunk_id=0;
 unsigned int chunk_size=0;
 int recurse_flag=0;
-int pos=ftell(f);
+int pos=afs_ftell(f);
 int endpos;
 int i;
 class_st* nodeclass=NULL;
 
-if(fread(&chunk_id,2,1,f)!=1) return;
-if(fread(&chunk_size,4,1,f)!=1) return;
+if(afs_fread(&chunk_id,2,1,f)!=1) return;
+if(afs_fread(&chunk_size,4,1,f)!=1) return;
 if(chunk_size&0x80000000){ chunk_size&=0x7fffffff; recurse_flag=1;}
 endpos=pos+chunk_size; chunk_size-=6;
 
@@ -44,7 +44,7 @@ if(recurse_flag){
 //  if(chunk_id==0x2300)
 //    while(ftell(f)<endpos) hierarchy_chunk_reader(f,node,level+1);
 //  else
-    while(ftell(f)<endpos) node_chunk_reader(f,node,level+1);
+    while(afs_ftell(f)<endpos) node_chunk_reader(f,node,level+1);
   return;
 }
 
@@ -60,7 +60,7 @@ switch(chunk_id){
     int n=chunk_size/4;
     node->refdb=n;
     node->reflist=malloc(sizeof(int)*(n+extra_refs));
-    fread(node->reflist,4,n,f);
+    afs_fread(node->reflist,4,n,f);
     for(i=0;i<n;i++){
       int ref=node->reflist[i];
       printf("  Reference to %d: ",ref);
@@ -119,23 +119,23 @@ switch(chunk_id){
 #endif
     }
 }
-while(ftell(f)<endpos) fgetc(f); // HACK
+while(afs_ftell(f)<endpos) afs_fgetc(f); // HACK
 
 }
 
-void node_reader(FILE *f,int nodeno){
+void node_reader(afs_FILE *f,int nodeno){
 unsigned short int chunk_id=0;
 unsigned int chunk_size=0;
 int recurse_flag=0;
-int pos=ftell(f);
+int pos=afs_ftell(f);
 int endpos;
 int i;
 char *nodename="UNKNOWN";
 node_st *node=&nodes[nodeno];
 class_st* nodeclass=NULL;
 
-if(fread(&chunk_id,2,1,f)!=1) return;
-if(fread(&chunk_size,4,1,f)!=1) return;
+if(afs_fread(&chunk_id,2,1,f)!=1) return;
+if(afs_fread(&chunk_size,4,1,f)!=1) return;
 if(chunk_size&0x80000000){ chunk_size&=0x7fffffff; recurse_flag=1;}
 endpos=pos+chunk_size; chunk_size-=6;
 
@@ -150,7 +150,7 @@ printf("\nNode #%d: %s (%d)\n",nodeno,nodename,chunk_size);
 
 if(!recurse_flag){
   printf("WARNING! Non-recursive node!\n");
-  for(i=0;i<chunk_size;i++) fgetc(f);
+  for(i=0;i<chunk_size;i++) afs_fgetc(f);
   return;
 }
 
@@ -167,7 +167,7 @@ if(strcmp(nodename,"ParamBlock")==0){
 }
 */
 
-while(ftell(f)<endpos) node_chunk_reader(f,node,0);
+while(afs_ftell(f)<endpos) node_chunk_reader(f,node,0);
 
 if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 
@@ -188,12 +188,12 @@ if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 #include "update.c"
 
 
-int load_scene(Scene *scene,FILE *configfile,FILE *classdirfile,FILE *f){
+int load_scene(Scene *scene,afs_FILE *configfile,afs_FILE *classdirfile,afs_FILE *f){
 
-while(!feof(configfile)) config_reader(scene,configfile,0);
+while(!afs_feof(configfile)) config_reader(scene,configfile,0);
 printf("frames: %d - %d   current: %d\n",scene->start_frame,scene->end_frame,scene->current_frame);
 
-while(!feof(classdirfile)) class_dir_reader(classdirfile,0);
+while(!afs_feof(classdirfile)) class_dir_reader(classdirfile,0);
 
 init_classreaders();
 read_classdef();
@@ -203,12 +203,12 @@ nodes=scene->nodes=malloc(sizeof(node_st)*MAX_NODES);
 
 { unsigned short int chunk_id=0;
   unsigned int chunk_size=0;
-  fread(&chunk_id,2,1,f);fread(&chunk_size,4,1,f);
+  afs_fread(&chunk_id,2,1,f);afs_fread(&chunk_size,4,1,f);
   if((chunk_id&0xFFF0)!=0x2000 || !(chunk_size&0x80000000)){
     printf("Not 'Scene' file\n");exit(1);
   }
   chunk_size&=0x7fffffff;
-  while(ftell(f)<chunk_size) node_reader(f,nodeno++);
+  while(afs_ftell(f)<chunk_size) node_reader(f,nodeno++);
 }
 printf("\n%d nodes readed\n",nodeno);
 scene->nodeno=nodeno;

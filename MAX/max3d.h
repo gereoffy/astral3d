@@ -4,7 +4,7 @@
 #include "mesh.h"
 #include "track.h"
 
-#define PRINT_CHUNKS
+//#define PRINT_CHUNKS
 #define MAX_CLASS 512
 #define MAX_NODES 2048
 
@@ -44,7 +44,7 @@ typedef struct {
   short type;    // class type
   short subtype; // class subtype
   void (*class_init)(node_st *node);
-  int (*class_chunk_reader)(node_st *node,FILE *f,int level,int chunk_id,int chunk_size);
+  int (*class_chunk_reader)(node_st *node,afs_FILE *f,int level,int chunk_id,int chunk_size);
   void (*class_uninit)(node_st *node);
 // Help
   chelp_st* chelp;

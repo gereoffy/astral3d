@@ -51,7 +51,7 @@ int main(int argc,char* argv[]){
 
     // Load Scene:
     afs_init("",AFS_TYPE_FILES);
-    of=OLE2_Open(fopen((argc>1)?argv[1]:"Mesh/map1a.max","rb"));
+    of=OLE2_Open(afs_fopen((argc>1)?argv[1]:"Mesh/map1a.max","rb"));
     if(!of){ printf("File not found!\n");exit(1);}
     f1=afs_open_OLE2(of,"ClassDirectory3");
     if(!f1) f1=afs_open_OLE2(of,"ClassDirectory2");

@@ -3,15 +3,15 @@
 //==========================================================================
 
 
-#define EDGE_A		(1<<0)
-#define EDGE_B		(1<<1)
-#define EDGE_C		(1<<2)
-#define EDGE_ALL	(EDGE_A|EDGE_B|EDGE_C)
+#define EDGE_A    (1<<0)
+#define EDGE_B    (1<<1)
+#define EDGE_C    (1<<2)
+#define EDGE_ALL  (EDGE_A|EDGE_B|EDGE_C)
 
-#define FACE_HIDDEN	(1<<3)
-#define HAS_TVERTS	(1<<4)
-#define FACE_WORK	(1<<5) // used in various algorithms
-#define FACE_STRIP	(1<<6)
+#define FACE_HIDDEN (1<<3)
+#define HAS_TVERTS  (1<<4)
+#define FACE_WORK (1<<5) // used in various algorithms
+#define FACE_STRIP  (1<<6)
 
 void mesh_init(node_st *node){
   Class_EditableMesh *em=malloc(sizeof(Class_EditableMesh));
@@ -27,7 +27,7 @@ void mesh_uninit(node_st *node){
   Mesh_CalcNormals(mesh);
 }
 
-int mesh_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
+int mesh_chunk_reader(node_st *node,afs_FILE *f,int level,int chunk_id,int chunk_size){
   Class_EditableMesh *em=node->data;
   Mesh *mesh=&em->mesh;
 

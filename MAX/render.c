@@ -1,17 +1,25 @@
 #define FPS 1800
 
-#define INLINE inline
-
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef __GNUC__
+#include <windows.h>
+#define INLINE _inline
+#define M_PI 3.14159265
+#else
+#define INLINE inline
+#endif
+
 #include <math.h>
 #include <string.h>
+
 
 #include "../agl/agl.h"
 //#include <GL/glut.h>
 
 #include "../afs/afs.h"
-#include "../afs/afsmangle.h"
+//#include "../afs/afsmangle.h"
 #include "../timer/timer.h"
 #include "../loadmap/loadmaps.h"
 
@@ -99,7 +107,7 @@ void MAX_draw_scene(Scene *scene,float frame){
         
         if(strncmp(n->name,"Torus Knot",10)==0){
           float theta=0.00152*frame;
-          Class_TorusKnot *knot=mesh;
+          Class_TorusKnot *knot=(Class_TorusKnot *)mesh;
           aglTexture(scene->texture3_id);
           glColor3f(1,0.9,0.6);
 //          printf("Knot particles: %d\n",knot->basecurve_segs);
@@ -248,7 +256,7 @@ Scene* LoadMAXScene(char *filename){
 //  scene->nodes=NULL; scene->nodeno=0;
 
     // Load Scene:
-    of=OLE2_Open(fopen(filename,"rb"));
+    of=OLE2_Open(afs_fopen(filename,"rb"));
     if(!of){ printf("File not found!\n");return 0;}
     f1=afs_open_OLE2(of,"ClassDirectory3");
     if(!f1) f1=afs_open_OLE2(of,"ClassDirectory2");

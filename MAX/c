@@ -11,4 +11,5 @@ cat << EOF
 
 
 EOF
-gcc -O3 -c -Wall render.c
+# gcc -O3 -c -Wall render.c
+gcc $OPTFLAGS -c -Wall render.c

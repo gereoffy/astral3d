@@ -28,14 +28,14 @@ int i;
 //char* classdata[MAX_CLASS]; // Class data (id)
 char tempstr[8192];
 
-void class_dir_reader(FILE *f,int level){
+void class_dir_reader(afs_FILE *f,int level){
 unsigned short int chunk_id=0;
 unsigned int chunk_size=0;
 int recurse_flag=0;
-int pos=ftell(f);
+int pos=afs_ftell(f);
 int endpos;
-if(fread(&chunk_id,2,1,f)!=1) return;
-if(fread(&chunk_size,4,1,f)!=1) return;
+if(afs_fread(&chunk_id,2,1,f)!=1) return;
+if(afs_fread(&chunk_size,4,1,f)!=1) return;
 if(chunk_size&0x80000000){ chunk_size&=0x7fffffff; recurse_flag=1;}
 endpos=pos+chunk_size; chunk_size-=6;
 if(recurse_flag){
@@ -46,7 +46,7 @@ if(recurse_flag){
     classtab[classdb].class_uninit=NULL;
     classtab[classdb].chelp=NULL;
   }
-  while(ftell(f)<endpos) class_dir_reader(f,level+1);
+  while(afs_ftell(f)<endpos) class_dir_reader(f,level+1);
   if(chunk_id==0x2040){
     printf("Class %04X: %s\n",classdb,classtab[classdb].name);
     ++classdb;
@@ -57,7 +57,7 @@ if(recurse_flag){
     // Class name
     int pos=0;
     for(i=0;i<chunk_size;i++){
-      int c=fgetc(f); // skip data
+      int c=afs_fgetc(f); // skip data
       if(c) tempstr[pos++]=c;
     }
     tempstr[pos]=0;
@@ -66,11 +66,11 @@ if(recurse_flag){
   if(chunk_id==0x2060){
     // Class data
     classtab[classdb].data=malloc(chunk_size);
-    fread(classtab[classdb].data,chunk_size,1,f);
+    afs_fread(classtab[classdb].data,chunk_size,1,f);
   } else {
     // Unknown
-    for(i=0;i<chunk_size;i++) fgetc(f);
+    for(i=0;i<chunk_size;i++) afs_fgetc(f);
   }
 }
-if(ftell(f)!=endpos) printf("filepos error!\n");
+if(afs_ftell(f)!=endpos) printf("filepos error!\n");
 }

@@ -98,7 +98,7 @@ char* init_LookAt(node_st *node){
   return NULL;
 }
 
-char* update_Node(node_st *node){
+char* update__Node(node_st *node){
   Class_Node *n=node->data;
 //  printf("updating Node '%s'\n",n->name);
   if(n->orient_mat){
@@ -148,7 +148,7 @@ char* init_Node(node_st *node){
   mat_from_tm(n->tm_mat,&n->tm);
 //  mat_from_tm(tempmat,&n->tm);mat_inverse(n->tm_mat,tempmat);
 //  printf("TM_mat:\n");mat_print(n->tm_mat);
-  node->update=update_Node;
+  node->update=update__Node;
   n->mesh=NULL;
   if(classtype_by_node(object)==CLASSTYPE_MESH){
     n->mesh=object->data;

@@ -25,7 +25,7 @@ void nodeclass_uninit(node_st *node){
   print_tm(&n->tm);
 }
 
-int nodeclass_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
+int nodeclass_chunk_reader(node_st *node,afs_FILE *f,int level,int chunk_id,int chunk_size){
   Class_Node *n=node->data;
 //int subtype=classtab[node->classid].subtype;
 

@@ -6,47 +6,47 @@
 // --- Flag bits for keys -------------------------------
 
 // General flags
-#define IKEY_SELECTED	(1<<0)
-#define IKEY_XSEL		(1<<1)
-#define IKEY_YSEL		(1<<2)
-#define IKEY_ZSEL		(1<<3)
-#define IKEY_FLAGGED	(1<<13)
-#define IKEY_TIME_LOCK	(1<<14)
+#define IKEY_SELECTED (1<<0)
+#define IKEY_XSEL   (1<<1)
+#define IKEY_YSEL   (1<<2)
+#define IKEY_ZSEL   (1<<3)
+#define IKEY_FLAGGED  (1<<13)
+#define IKEY_TIME_LOCK  (1<<14)
 
 // TCB specific key flags
-#define TCBKEY_QUATVALID	(1<<4) // When this bit is set the angle/axis is derived from the quat instead of vice/versa
+#define TCBKEY_QUATVALID  (1<<4) // When this bit is set the angle/axis is derived from the quat instead of vice/versa
 
 // Bezier specific key flags
-#define BEZKEY_XBROKEN		(1<<4) // Broken means not locked
-#define BEZKEY_YBROKEN		(1<<5)
-#define BEZKEY_ZBROKEN		(1<<6)
+#define BEZKEY_XBROKEN    (1<<4) // Broken means not locked
+#define BEZKEY_YBROKEN    (1<<5)
+#define BEZKEY_ZBROKEN    (1<<6)
 
 // The in and out types are stored in bits 7-13
-#define BEZKEY_NUMTYPEBITS	3
-#define BEZKEY_INTYPESHIFT	7
-#define	BEZKEY_OUTTYPESHIFT	(BEZKEY_INTYPESHIFT+BEZKEY_NUMTYPEBITS)
-#define BEZKEY_TYPEMASK		7
+#define BEZKEY_NUMTYPEBITS  3
+#define BEZKEY_INTYPESHIFT  7
+#define BEZKEY_OUTTYPESHIFT (BEZKEY_INTYPESHIFT+BEZKEY_NUMTYPEBITS)
+#define BEZKEY_TYPEMASK   7
 
 // Bezier tangent types
-#define BEZKEY_SMOOTH	0
-#define BEZKEY_LINEAR	1
-#define BEZKEY_STEP		2
-#define BEZKEY_FAST		3
-#define BEZKEY_SLOW		4
-#define BEZKEY_USER		5
+#define BEZKEY_SMOOTH 0
+#define BEZKEY_LINEAR 1
+#define BEZKEY_STEP   2
+#define BEZKEY_FAST   3
+#define BEZKEY_SLOW   4
+#define BEZKEY_USER   5
 
-#define NUM_TANGENTTYPES	6
+#define NUM_TANGENTTYPES  6
 
 // This key is interpolated using arclength as the interpolation parameter
-#define BEZKEY_CONSTVELOCITY	(1<<15)
+#define BEZKEY_CONSTVELOCITY  (1<<15)
 
 // Track flags
-#define TFLAG_CURVESEL			(1<<0)
-#define TFLAG_RANGE_UNLOCKED	(1<<1)
-#define TFLAG_LOOPEDIN			(1<<3)
-#define TFLAG_LOOPEDOUT			(1<<4)
-#define TFLAG_COLOR				(1<<5)	// Set for Bezier Point3 controlers that are color controllers
-#define TFLAG_HSV				(1<<6)	// Set for color controls that interpolate in HSV
+#define TFLAG_CURVESEL      (1<<0)
+#define TFLAG_RANGE_UNLOCKED  (1<<1)
+#define TFLAG_LOOPEDIN      (1<<3)
+#define TFLAG_LOOPEDOUT     (1<<4)
+#define TFLAG_COLOR       (1<<5)  // Set for Bezier Point3 controlers that are color controllers
+#define TFLAG_HSV       (1<<6)  // Set for color controls that interpolate in HSV
 
 */
 
@@ -141,7 +141,7 @@ void track_uninit(node_st *node){
 
 //#define READKEYS(tipus) track->numkeys=chunk_size/sizeof(tipus);track->keys=malloc(track->numkeys*sizeof(tipus));fread(track->keys,sizeof(tipus),track->numkeys,f);track->keytype=chunk_id;
 
-INLINE void read_keys(Track *track,FILE *f,int *chunk_size,int key_size){
+INLINE void read_keys(Track *track,afs_FILE *f,int *chunk_size,int key_size){
   int n=(*chunk_size)/(8+key_size);
   int i;
   char *k;
@@ -152,11 +152,11 @@ INLINE void read_keys(Track *track,FILE *f,int *chunk_size,int key_size){
   for(i=0;i<n;i++){
     track->frames[i]=int_reader(f,chunk_size);
     track->keyflags[i]=int_reader(f,chunk_size);
-    fread(k+i*key_size,key_size,1,f); *chunk_size -= key_size;
+    afs_fread(k+i*key_size,key_size,1,f); *chunk_size -= key_size;
   }
 }
 
-int track_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
+int track_chunk_reader(node_st *node,afs_FILE *f,int level,int chunk_id,int chunk_size){
 int subtype=classtab[node->classid].subtype;
 Track *track=node->data;
 // (subtype&15): key element  1=float 2=color 3=pos 4=rot 5=scale
@@ -248,12 +248,12 @@ switch(chunk_id){
   // ----------- track params
   case 0x3002: track->flags=int_reader(f,&chunk_size);
      printf("  Track flags: %d =",track->flags);
-#define TFLAG_CURVESEL			(1<<0)
-#define TFLAG_RANGE_UNLOCKED	(1<<1)
-#define TFLAG_LOOPEDIN			(1<<3)
-#define TFLAG_LOOPEDOUT			(1<<4)
-#define TFLAG_COLOR				(1<<5)	// Set for Bezier Point3 controlers that are color controllers
-#define TFLAG_HSV				(1<<6)	// Set for color controls that interpolate in HSV
+#define TFLAG_CURVESEL      (1<<0)
+#define TFLAG_RANGE_UNLOCKED  (1<<1)
+#define TFLAG_LOOPEDIN      (1<<3)
+#define TFLAG_LOOPEDOUT     (1<<4)
+#define TFLAG_COLOR       (1<<5)  // Set for Bezier Point3 controlers that are color controllers
+#define TFLAG_HSV       (1<<6)  // Set for color controls that interpolate in HSV
        if(track->flags & TFLAG_CURVESEL) printf(" CURVESEL");
        if(track->flags & TFLAG_RANGE_UNLOCKED) printf(" RANGE_UNLOCKED");
        if(track->flags & TFLAG_LOOPEDIN) printf(" LOOPEDIN");
