@@ -1,9 +1,8 @@
-#include <math.h>
-#include <stdio.h>
-#include "ast3d.h"
-#include "ast3di.h"
+/* Optimized by A'rpi/Astral */
 
-void vec_make (float x, float y, float z, c_VECTOR *out)
+#define LOCAL INLINE static
+
+LOCAL void vec_make (float x, float y, float z, c_VECTOR *out)
 {
 /*
   vec_make: create vector (out = [x,y,z]).
@@ -13,7 +12,7 @@ void vec_make (float x, float y, float z, c_VECTOR *out)
   out->z = z;
 }
 
-void vec_zero (c_VECTOR *out)
+LOCAL void vec_zero (c_VECTOR *out)
 {
 /*
   vec_zero: zero vector (out = [0,0,0]).
@@ -23,7 +22,7 @@ void vec_zero (c_VECTOR *out)
   out->z = 0.0;
 }
 
-void vec_copy (c_VECTOR *a, c_VECTOR *out)
+LOCAL void vec_copy (c_VECTOR *a, c_VECTOR *out)
 {
 /*
   vec_copy: vector copy (out = a).
@@ -33,7 +32,7 @@ void vec_copy (c_VECTOR *a, c_VECTOR *out)
   out->z = a->z;
 }
 
-void vec_print (c_VECTOR *a)
+LOCAL void vec_print (c_VECTOR *a)
 {
 /*
   vec_print: print vector on stdout.
@@ -41,64 +40,51 @@ void vec_print (c_VECTOR *a)
   printf ("x: %9.3f y: %9.3f z: %9.3f\n", a->x, a->y, a->z);
 }
 
-void vec_add (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
+LOCAL void vec_add (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
 {
 /*
   vec_add: vector addition (out = a+b).
 */
-  c_VECTOR temp;
-
-  temp.x = a->x + b->x;
-  temp.y = a->y + b->y;
-  temp.z = a->z + b->z;
-  vec_copy (&temp, out);
+  out->x = a->x + b->x;
+  out->y = a->y + b->y;
+  out->z = a->z + b->z;
 }
 
-void vec_sub (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
+LOCAL void vec_sub (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
 {
 /*
   vec_sub: vector substraction (out = a-b).
 */
-  c_VECTOR temp;
-
-  temp.x = a->x - b->x;
-  temp.y = a->y - b->y;
-  temp.z = a->z - b->z;
-  vec_copy (&temp, out);
+  out->x = a->x - b->x;
+  out->y = a->y - b->y;
+  out->z = a->z - b->z;
 }
 
-void vec_mul (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
+LOCAL void vec_mul (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
 {
 /*
   vec_mul: vector multiplication (out = a*b).
 */
-  c_VECTOR temp;
-
-  temp.x = a->x * b->x;
-  temp.y = a->y * b->y;
-  temp.z = a->z * b->z;
-  vec_copy (&temp, out);
+  out->x = a->x * b->x;
+  out->y = a->y * b->y;
+  out->z = a->z * b->z;
 }
 
-void vec_scale (c_VECTOR *a, float s, c_VECTOR *out)
+LOCAL void vec_scale (c_VECTOR *a, float s, c_VECTOR *out)
 {
 /*
   vec_scale: vector multiplication by a scalar.
 */
-  c_VECTOR temp;
-
-  temp.x = a->x * s;
-  temp.y = a->y * s;
-  temp.z = a->z * s;
-  vec_copy (&temp, out);
+  out->x = a->x * s;
+  out->y = a->y * s;
+  out->z = a->z * s;
 }
 
-void vec_rescale (c_VECTOR *a, float s, c_VECTOR *out)
+LOCAL void vec_rescale (c_VECTOR *a, float s, c_VECTOR *out)
 {
 /*
   vec_scale: vector multiplication by a scalar.
 */
-  c_VECTOR temp;
   float    len;
 
   len = (a->x*a->x + a->y*a->y + a->z*a->z);
@@ -109,26 +95,22 @@ void vec_rescale (c_VECTOR *a, float s, c_VECTOR *out)
     return;
   }
   s *= (1.0 / len);
-  temp.x = a->x * s;
-  temp.y = a->y * s;
-  temp.z = a->y * s;
-  vec_copy (&temp, out);
+  out->x = a->x * s;
+  out->y = a->y * s;
+  out->z = a->z * s;
 }
 
-void vec_negate (c_VECTOR *a, c_VECTOR *out)
+LOCAL void vec_negate (c_VECTOR *a, c_VECTOR *out)
 {
 /*
   vec_negate: vector negation (out = -a).
 */
-  c_VECTOR temp;
-
-  temp.x = -a->x;
-  temp.y = -a->y;
-  temp.z = -a->z;
-  vec_copy (&temp, out);
+  out->x = -a->x;
+  out->y = -a->y;
+  out->z = -a->z;
 }
 
-int32 vec_equal (c_VECTOR *a, c_VECTOR *b)
+LOCAL int32 vec_equal (c_VECTOR *a, c_VECTOR *b)
 {
 /*
   vec_equal: vector compare.
@@ -136,30 +118,31 @@ int32 vec_equal (c_VECTOR *a, c_VECTOR *b)
   return (a->x == b->x && a->y == b->y && a->z == b->z);
 }
 
-float vec_length (c_VECTOR *a)
+LOCAL float vec_length (c_VECTOR *a)
 {
 /*
   vec_length: computes vector magnitude.
 */
   float len;
-
-  len = sqrt (a->x*a->x + a->y*a->y + a->z*a->z);
-  if (len == 0.0) len = 1.0;
-  return (len);
+  len = (a->x*a->x + a->y*a->y + a->z*a->z);
+  if (len == 0.0) return 1.0;
+  return sqrt(len);
 }
 
-float vec_distance (c_VECTOR *a, c_VECTOR *b)
+LOCAL float vec_distance (c_VECTOR *a, c_VECTOR *b)
 {
 /*
   vec_distance: computes distance between two vectors.
 */
-  c_VECTOR v;
-
-  vec_sub (a, b, &v);
-  return (vec_length (&v));
+  float len;
+#define SQR(a) ((a)*(a))
+  len = (SQR(a->x-b->x)+SQR(a->y-b->y)+SQR(a->z-b->z));
+#undef SQR
+  if (len == 0.0) return 1.0;
+  return sqrt(len);
 }
 
-float vec_dot (c_VECTOR *a, c_VECTOR *b)
+LOCAL float vec_dot (c_VECTOR *a, c_VECTOR *b)
 {
 /*
   vec_dot: computes dot product of two vectors.
@@ -170,15 +153,15 @@ float vec_dot (c_VECTOR *a, c_VECTOR *b)
   return (a->x*b->x + a->y*b->y + a->z*b->z) * mag;
 }
 
-float vec_dotunit (c_VECTOR *a, c_VECTOR *b)
+LOCAL float vec_dotunit (c_VECTOR *a, c_VECTOR *b)
 {
 /*
-  vec_dotunit: computes dot product of two vectors.
+  vec_dotunit: computes dot product of two unit vectors.
 */
   return (a->x*b->x + a->y*b->y + a->z*b->z);
 }
 
-void vec_cross (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
+LOCAL void vec_cross (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
 {
 /*
   vec_cross: computes cross product of two vectors.
@@ -191,56 +174,45 @@ void vec_cross (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
   vec_copy (&temp, out);
 }
 
-void vec_midpoint (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
+LOCAL void vec_midpoint (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out)
 {
 /*
   vec_midpoint: computes middle point of two vectors.
 */
-  c_VECTOR temp;
-
-  vec_add (a, b, &temp);
-  vec_scale (&temp, 0.5, &temp);
-  vec_copy (&temp, out);
+  out->x = 0.5*(a->x + b->x);
+  out->y = 0.5*(a->y + b->y);
+  out->z = 0.5*(a->z + b->z);
 }
 
-void vec_lerp (c_VECTOR *a, c_VECTOR *b, float alpha, c_VECTOR *out)
+LOCAL void vec_lerp (c_VECTOR *a, c_VECTOR *b, float alpha, c_VECTOR *out)
 {
 /*
   vec_lerp: linear interpolation of two vectors.
 */
-  c_VECTOR temp;
-
 #define _LERP(a,l,h) ((l)+(((h)-(l))*(a)))
-  temp.x = _LERP (alpha, a->x, b->x);
-  temp.y = _LERP (alpha, a->y, b->y);
-  temp.z = _LERP (alpha, a->z, b->z);
+  out->x = _LERP (alpha, a->x, b->x);
+  out->y = _LERP (alpha, a->y, b->y);
+  out->z = _LERP (alpha, a->z, b->z);
 #undef _LERP
-  vec_copy (&temp, out);
 }
 
-void vec_combine (c_VECTOR *a, c_VECTOR *b, float as, float bs,
+LOCAL void vec_combine (c_VECTOR *a, c_VECTOR *b, float as, float bs,
                   c_VECTOR *out)
 {
 /*
   vec_combine: compute linear combination of two vectors.
 */
-  c_VECTOR temp;
-
-  temp.x = (as * a->x) + (bs * b->x);
-  temp.y = (as * a->y) + (bs * b->y);
-  temp.z = (as * a->z) + (bs * b->z);
-  vec_copy (&temp, out);
+  out->x = (as * a->x) + (bs * b->x);
+  out->y = (as * a->y) + (bs * b->y);
+  out->z = (as * a->z) + (bs * b->z);
 }
 
-void vec_normalize (c_VECTOR *a, c_VECTOR *out)
+LOCAL void vec_normalize (c_VECTOR *a, c_VECTOR *out)
 {
 /*
   vec_normalize: vector normalization.
 */
-  float    len;
-  c_VECTOR temp;
-
-  len = vec_length (a);
+  float len = sqrt (a->x*a->x + a->y*a->y + a->z*a->z);
   if (len == 0.0) {
     out->x = 0.0;
     out->y = 0.0;
@@ -248,9 +220,11 @@ void vec_normalize (c_VECTOR *a, c_VECTOR *out)
     return;
   }
   len = 1.0 / len;
-  temp.x = a->x * len;
-  temp.y = a->y * len;
-  temp.z = a->z * len;
-  vec_copy (&temp, out);
+  out->x = a->x * len;
+  out->y = a->y * len;
+  out->z = a->z * len;
 }
+
+#undef LOCAL
+
 

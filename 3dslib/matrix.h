@@ -1,8 +1,6 @@
+/* Optimized by A'rpi/Astral */
 
-#include <math.h>
-#include <stdio.h>
-#include "ast3d.h"
-#include "ast3di.h"
+#define LOCAL INLINE static
 
 static c_MATRIX Tidentity = {
   {1, 0, 0, 0},
@@ -10,7 +8,7 @@ static c_MATRIX Tidentity = {
   {0, 0, 1, 0},
 };
 
-void mat_zero (c_MATRIX out)
+LOCAL void mat_zero (c_MATRIX out)
 {
 /*
   mat_zero: clear matrix.
@@ -22,7 +20,7 @@ void mat_zero (c_MATRIX out)
       out[i][j] = 0.0;
 }
 
-void mat_identity (c_MATRIX out)
+LOCAL void mat_identity (c_MATRIX out)
 {
 /*
   mat_idenity: make identity matrix.
@@ -34,7 +32,7 @@ void mat_identity (c_MATRIX out)
       out[i][j] = Tidentity[i][j];
 }
 
-void mat_copy (c_MATRIX a, c_MATRIX out)
+LOCAL void mat_copy (c_MATRIX a, c_MATRIX out)
 {
 /*
   mat_copy: matrix copy.
@@ -46,7 +44,7 @@ void mat_copy (c_MATRIX a, c_MATRIX out)
       out[i][j] = a[i][j];
 }
 
-void mat_print (c_MATRIX a)
+LOCAL void mat_print (c_MATRIX a)
 {
 /*
   mat_print: print matrix on stdout.
@@ -59,34 +57,30 @@ void mat_print (c_MATRIX a)
           a[Z][X], a[Z][Y], a[Z][Z], a[Z][W]);
 }
 
-void mat_add (c_MATRIX a, c_MATRIX b, c_MATRIX out)
+LOCAL void mat_add (c_MATRIX a, c_MATRIX b, c_MATRIX out)
 {
 /*
   mat_add: matrix addition.
 */
   int16    i, j;
-  c_MATRIX temp;
   for (i = 0; i < 3; i++)
     for (j = 0; j < 4; j++)
-      temp[i][j] = a[i][j]+b[i][j];
-  mat_copy (temp, out);
+      out[i][j] = a[i][j]+b[i][j];
 }
 
-void mat_sub (c_MATRIX a, c_MATRIX b, c_MATRIX out)
+LOCAL void mat_sub (c_MATRIX a, c_MATRIX b, c_MATRIX out)
 {
 /*
   mat_sub: matrix substraction.
 */
   int16    i, j;
-  c_MATRIX temp;
 
   for (i = 0; i < 3; i++)
     for (j = 0; j < 4; j++)
-      temp[i][j] = a[i][j] - b[i][j];
-  mat_copy (temp, out);
+      out[i][j] = a[i][j] - b[i][j];
 }
 
-void mat_mul (c_MATRIX a, c_MATRIX b, c_MATRIX out)
+LOCAL void mat_mul (c_MATRIX a, c_MATRIX b, c_MATRIX out)
 {
 /*
   mat_mul: matrix multiplication.
@@ -108,7 +102,7 @@ void mat_mul (c_MATRIX a, c_MATRIX b, c_MATRIX out)
   mat_copy (temp, out);
 }
 
-void mat_transpose (c_MATRIX a, c_MATRIX out)
+LOCAL void mat_transpose (c_MATRIX a, c_MATRIX out)
 {
 /*
   mat_transpose: transpose matrix.
@@ -124,7 +118,7 @@ void mat_transpose (c_MATRIX a, c_MATRIX out)
   mat_copy (temp, out);
 }
 
-int32 mat_inverse (c_MATRIX a, c_MATRIX out)
+LOCAL int32 mat_inverse (c_MATRIX a, c_MATRIX out)
 {
 /*
   mat_inverse: inverse matrix calculation (non-singular).
@@ -148,7 +142,7 @@ int32 mat_inverse (c_MATRIX a, c_MATRIX out)
   return ast3d_err_ok;
 }
 
-int32 mat_invscale (c_MATRIX a, c_MATRIX out)
+LOCAL int32 mat_invscale (c_MATRIX a, c_MATRIX out)
 {
 /*
   mat_invscale: inverse matrix scale.
@@ -171,7 +165,7 @@ int32 mat_invscale (c_MATRIX a, c_MATRIX out)
   return ast3d_err_ok;
 }
 
-int32 mat_normalize (c_MATRIX a, c_MATRIX out)
+LOCAL int32 mat_normalize (c_MATRIX a, c_MATRIX out)
 {
 /*
   mat_normalize: normalize matrix.
@@ -190,7 +184,7 @@ int32 mat_normalize (c_MATRIX a, c_MATRIX out)
   return ast3d_err_ok;
 }
 
-void mat_toeuler (c_MATRIX mat, c_VECTOR *out)
+LOCAL void mat_toeuler (c_MATRIX mat, c_VECTOR *out)
 {
 /*
   mat_toeuler: convert rotation matrix to euler angles.
@@ -211,7 +205,7 @@ void mat_toeuler (c_MATRIX mat, c_VECTOR *out)
    }
 }
 
-void mat_pretrans (c_VECTOR *v, c_MATRIX mat, c_MATRIX out)
+LOCAL void mat_pretrans (c_VECTOR *v, c_MATRIX mat, c_MATRIX out)
 {
 /*
   mat_pretrans: create a pre-translation matrix.
@@ -228,7 +222,7 @@ void mat_pretrans (c_VECTOR *v, c_MATRIX mat, c_MATRIX out)
   mat_copy (temp, out);
 }
 
-void mat_settrans (c_VECTOR *v, c_MATRIX out)
+LOCAL void mat_settrans (c_VECTOR *v, c_MATRIX out)
 {
 /*
   mat_settrans: create a translation matrix.
@@ -239,7 +233,7 @@ void mat_settrans (c_VECTOR *v, c_MATRIX out)
   out[Z][W] = v->z;
 }
 
-void mat_setscale (c_VECTOR *v, c_MATRIX out)
+LOCAL void mat_setscale (c_VECTOR *v, c_MATRIX out)
 {
 /*
   mat_setscale: create a scale matrix.
@@ -250,7 +244,7 @@ void mat_setscale (c_VECTOR *v, c_MATRIX out)
   out[Z][Z] = v->z;
 }
 
-void mat_rotateX (float ang, c_MATRIX out)
+LOCAL void mat_rotateX (float ang, c_MATRIX out)
 {
 /*
   mat_rotateX: create rotation matrix around X axis.
@@ -266,7 +260,7 @@ void mat_rotateX (float ang, c_MATRIX out)
   out[Z][Z] =  cosx;
 }
 
-void mat_rotateY (float ang, c_MATRIX out)
+LOCAL void mat_rotateY (float ang, c_MATRIX out)
 {
 /*
   mat_rotateY: create rotation matrix around Y axis.
@@ -282,7 +276,7 @@ void mat_rotateY (float ang, c_MATRIX out)
   out[Z][Z] =  cosy;
 }
 
-void mat_rotateZ (float ang, c_MATRIX out)
+LOCAL void mat_rotateZ (float ang, c_MATRIX out)
 {
 /*
   mat_rotateZ: create rotation matrix around Z axis.
@@ -298,7 +292,7 @@ void mat_rotateZ (float ang, c_MATRIX out)
   out[Y][Y] =  cosz;
 }
 
-void mat_mulvec (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
+LOCAL void mat_mulvec (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
 {
 /*
   mat_mulvec: multiply a vector by matrix (out = [a]*b)
@@ -311,7 +305,19 @@ void mat_mulvec (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
   vec_copy (&temp, out);
 }
 
-void mat_mulnorm (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
+LOCAL void mat_mulvec2 (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
+{
+/*
+  mat_mulvec: multiply a vector by matrix (out = [a]*b)
+  must be out!=b
+*/
+  out->x = b->x*a[X][X] + b->y*a[X][Y] + b->z*a[X][Z] + a[X][W];
+  out->y = b->x*a[Y][X] + b->y*a[Y][Y] + b->z*a[Y][Z] + a[Y][W];
+  out->z = b->x*a[Z][X] + b->y*a[Z][Y] + b->z*a[Z][Z] + a[Z][W];
+}
+
+
+LOCAL void mat_mulnorm (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
 {
 /*
   mat_mulnorm: multiply a normal by matrix (out = [a]*b)
@@ -323,3 +329,42 @@ void mat_mulnorm (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
   temp.z = b->x*a[Z][X] + b->y*a[Z][Y] + b->z*a[Z][Z];
   vec_copy (&temp, out);
 }
+
+LOCAL void mat_mulnorm2 (c_MATRIX a, c_VECTOR *b, c_VECTOR *out)
+{
+/*
+  mat_mulnorm: multiply a normal by matrix (out = [a]*b)
+  must be out!=b
+*/
+  out->x = b->x*a[X][X] + b->y*a[X][Y] + b->z*a[X][Z];
+  out->y = b->x*a[Y][X] + b->y*a[Y][Y] + b->z*a[Y][Z];
+  out->z = b->x*a[Z][X] + b->y*a[Z][Y] + b->z*a[Z][Z];
+}
+
+LOCAL void mat_inverse_v02 (c_MATRIX mat, c_MATRIX out)
+{
+/*
+  mat_inverse: create inverse matrix.
+*/
+  float Det;
+
+  out[X][X]=mat[Y][Y]*mat[Z][Z]-mat[Y][Z]*mat[Z][Y];       //matrix 1. oszlopa
+  out[Y][X]=mat[Y][Z]*mat[Z][X]-mat[Y][X]*mat[Z][Z]; 
+  out[Z][X]=mat[Y][X]*mat[Z][Y]-mat[Z][X]*mat[Y][Y]; 
+
+  Det=1/(out[X][X]*mat[X][X]+out[Y][X]*mat[X][Y]+out[Z][X]*mat[X][Z]);
+
+  out[X][X]*=Det;out[Y][X]*=Det;out[Z][X]*=Det;
+
+  out[X][Y]=(mat[Z][Y]*mat[X][Z]-mat[X][Y]*mat[Z][Z])*Det; //matrix 2. oszlopa
+  out[Y][Y]=(mat[X][X]*mat[Z][Z]-mat[X][Z]*mat[Z][X])*Det;
+  out[Z][Y]=(mat[X][Y]*mat[Z][X]-mat[X][X]*mat[Z][Y])*Det;
+
+  out[X][Z]=(mat[X][Y]*mat[Y][Z]-mat[Y][Y]*mat[X][Z])*Det; //matrix 3. oszlopa
+  out[Y][Z]=(mat[Y][X]*mat[X][Z]-mat[X][X]*mat[Y][Z])*Det;
+  out[Z][Z]=(mat[X][X]*mat[Y][Y]-mat[Y][X]*mat[X][Y])*Det;
+}
+
+
+#undef LOCAL
+
