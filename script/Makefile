@@ -48,5 +48,6 @@ script.o: /usr/include/sys/time.h /usr/include/bits/time.h ../mp3lib/mp3.h
 script.o: /usr/include/GL/gl.h /usr/include/GL/glu.h ../3dslib/ast3d.h
 script.o: ../timer/timer.h ../blob/blob.h ../fdtunnel/fdtunnel.h
 script.o: ../spline/spline.h ../smoke/smoke.h ../sinpart/sinpart.h
-script.o: ../render/render.h ../afs/afs.h ../loadmap/loadmaps.h scr_var.c
-script.o: scr_event.c scr_file.c scr_init.c vars.h scr_draw.c scr_exec.c
+script.o: ../greets/greets.h ../render/render.h ../afs/afs.h
+script.o: ../loadmap/loadmaps.h scr_var.c scr_event.c scr_file.c scr_init.c
+script.o: vars.h scr_draw.c scr_exec.c

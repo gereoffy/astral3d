@@ -73,7 +73,14 @@ fx_struct *fx=current_fx;
   *fx_ptr_fd_rad_speed = &fx->fdtunnel.rad_speed[current_fdtunnel];
   *fx_ptr_fd_rad_szog = &fx->fdtunnel.rad_szog[current_fdtunnel];
   *fx_ptr_fd_rad_amp = &fx->fdtunnel.rad_amp[current_fdtunnel];
+
   *fx_ptr_loop_scene = &fx->loop_scene;
+
+  *fx_ptr_greets_blend_speed = &fx->greets.blend_speed;
+  *fx_ptr_greets_move_speed = &fx->greets.move_speed;
+  *fx_ptr_greets_rot_speed = &fx->greets.rot_speed;
+  *fx_ptr_greets_dist = &fx->greets.dist;
+  *fx_ptr_greets_scale = &fx->greets.scale;
 
   *fx_ptr_sinpart_ox = &fx->sinpart.ox;
   *fx_ptr_sinpart_oy = &fx->sinpart.oy;
@@ -196,11 +203,11 @@ fx_struct *fx=current_fx;
 
       if(strcmp(p[0],"light")==0){                                     //light
         if(pdb!=2) scrFatal("light: Missing or too many operands!");
+        if(!(fx->type==FXTYPE_SCENE && fx->scene)) scrFatal("light: current FX is not scene!");
         scene=fx->scene; ast3d_setactive_scene(scene); FindCameras(scene);
         current_light=atoi(p[1]);
-        if(current_light<0 || current_light>=lightno)
-          scrFatal("light: Invalid light number!");
-        printf("Selected LIGHT: %d\n",current_light);
+        if(current_light<0 || current_light>=lightno) scrFatal("light: Invalid light number!");
+//        printf("Selected LIGHT: %d\n",current_light);
         *light_ptr_corona_scale = &lights[current_light]->corona_scale;
         *light_ptr_attenuation0 = &lights[current_light]->attenuation[0];
         *light_ptr_attenuation1 = &lights[current_light]->attenuation[1];
@@ -314,6 +321,19 @@ fx_struct *fx=current_fx;
         fx->smoke.additive=atoi(p[6]);
         fx->smoke.speed_x=0.1267836262;
         fx->smoke.speed_y=0.3425663672;
+        return;
+      }
+
+      // greets texture x y xs ys additive
+      if(strcmp(p[0],"greets")==0){
+        if(pdb!=7) scrFatal("greets: Missing or too many operands!");
+        fx->type=FXTYPE_GREETS;
+        fx->greets.texture=scrGetVar_int(p[1]);
+        fx->greets.x=(float)atoi(p[2])/512.0F;
+        fx->greets.y=(float)atoi(p[3])/512.0F;
+        fx->greets.xs=(float)atoi(p[4])/512.0F;
+        fx->greets.ys=(float)atoi(p[5])/512.0F;
+        fx->greets.additive=atoi(p[6]);
         return;
       }
 

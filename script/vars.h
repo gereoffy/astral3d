@@ -41,6 +41,12 @@ SCR_FLOAT_PTR(fx_ptr_fd_rad_speed,"fdtunnel_rad_speed");
 SCR_FLOAT_PTR(fx_ptr_fd_rad_amp,"fdtunnel_rad_amp");
 SCR_FLOAT_PTR(fx_ptr_fd_rad_szog,"fdtunnel_rad_szog");
 
+SCR_FLOAT_PTR(fx_ptr_greets_blend_speed,"greets_blend_speed");
+SCR_FLOAT_PTR(fx_ptr_greets_move_speed,"greets_move_speed");
+SCR_FLOAT_PTR(fx_ptr_greets_rot_speed,"greets_rot_speed");
+SCR_FLOAT_PTR(fx_ptr_greets_dist,"greets_dist");
+SCR_FLOAT_PTR(fx_ptr_greets_scale,"greets_scale");
+
 SCR_FLOAT_PTR(fx_ptr_sinpart_ox,"sinpart_ox");
 SCR_FLOAT_PTR(fx_ptr_sinpart_oy,"sinpart_oy");
 SCR_FLOAT_PTR(fx_ptr_sinpart_oz,"sinpart_oz");

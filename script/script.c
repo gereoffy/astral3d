@@ -25,6 +25,7 @@
 #include "../spline/spline.h"
 #include "../smoke/smoke.h"
 #include "../sinpart/sinpart.h"
+#include "../greets/greets.h"
 
 #include "../render/render.h"
 #include "../afs/afs.h"

@@ -10,6 +10,7 @@
 #define FXTYPE_SPLINESURFACE 5
 #define FXTYPE_SMOKE 6
 #define FXTYPE_SINPART 7
+#define FXTYPE_GREETS 8
 
 typedef struct {
   int type;        /* 0=linear  1=sinus */
@@ -42,6 +43,7 @@ typedef struct {
   fx_smoke_struct smoke;
   fx_sinpart_struct sinpart;
   fx_fdtunnel_struct fdtunnel;
+  fx_greets_struct greets;
   /* 3DS player: */
   c_SCENE *scene;
   int loop_scene;
@@ -147,6 +149,12 @@ int zbuf_flag=0;
 //      printf("Playing SMOKE for fx #%d\n",f);
 //      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
       draw_smoke(fx->frame,&fx->smoke);
+    }
+
+    if(fx->type==FXTYPE_GREETS){
+//      printf("Playing SMOKE for fx #%d\n",f);
+//      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      draw_greets(fx->frame,&fx->greets);
     }
 
     if(fx->type==FXTYPE_SINPART){

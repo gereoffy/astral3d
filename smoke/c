@@ -1,7 +1,3 @@
 
 gcc -c -g -Wall smoke.c -o smoke.o
 
-cd ..
-./demo.sh
-cd smoke
-
