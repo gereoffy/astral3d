@@ -1,6 +1,6 @@
 // #define SHOW_UNKNOWN_CHUNKS
-#define SHOW_CHUNK_TREE
-#define SHOW_CHUNK_NAMES
+//#define SHOW_CHUNK_TREE
+//#define SHOW_CHUNK_NAMES
 
 #include <string.h>
 #include <stdlib.h>
@@ -474,7 +474,7 @@ static int read_RGBF (afs_FILE *f){
     rgb->rgb[0] = c[0];
     rgb->rgb[1] = c[1];
     rgb->rgb[2] = c[2];
-    printf("Load.color %f %f %f\n",c[0],c[1],c[2]);
+//    printf("Load.color %f %f %f\n",c[0],c[1],c[2]);
   }
   return ast3d_err_ok;
 }
@@ -563,7 +563,7 @@ static int read_TRIMESH (afs_FILE *f)
   obj->vert_visible=NULL;
   obj->face_visible=NULL;
   obj->smoothing=NULL;
-  obj->flags = ast3d_obj_lmapmake;
+  obj->flags = 0; //ast3d_obj_lmapmake;
   obj->bumpdepth=0.005;
   obj->enable_zbuffer=1;
   obj->vertexlights=0.0;
@@ -571,6 +571,7 @@ static int read_TRIMESH (afs_FILE *f)
 //  obj->additivetexture=0;
   obj->pmat = Default_MATERIAL;
   obj->lightmap_id=0;
+  obj->hair_len=0.0;
 
   if(strncmp(obj->name,"PARTICLE",8)==0) obj->flags|=ast3d_obj_particle;
   obj->particle.np=obj->particle.maxnp=0;
@@ -725,7 +726,7 @@ static int read_TRMATRIX (afs_FILE *f){
   if (afs_fread (pivot, sizeof (pivot), 1, f) != 1) return ast3d_err_badfile;
   vec_make (pivot[0], pivot[1], pivot[2], &piv);
   vec_swap (&piv);
-  printf("TRMATRIX.PIVOT: %f %f %f\n",piv.x,piv.y,piv.z);
+//  printf("TRMATRIX.PIVOT: %f %f %f\n",piv.x,piv.y,piv.z);
   mat_swap (mat);
   mat_invscale (mat, mat2);
 //  mat_inverse_v02(mat, mat2);
@@ -790,6 +791,7 @@ static int read_LIGHT (afs_FILE *f)
   light->attenuation[0]=1.0;
   light->attenuation[1]=0.0;
   light->attenuation[2]=0.0;
+  light->lightmap_calc_normal=1;
   
   vec_make (c[0], c[1], c[2], &light->pos);
   vec_swap (&light->pos);
@@ -824,7 +826,7 @@ static int read_INNER_RANGE(afs_FILE *f){
   c_LIGHT *light = (c_LIGHT *)c_node;
   if (afs_fread (&c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   light->inner_range=c;
-  printf("Light inner range: %f\n",c);
+//  printf("Light inner range: %f\n",c);
   return ast3d_err_ok;
 }
 
@@ -833,14 +835,14 @@ static int read_OUTER_RANGE(afs_FILE *f){
   c_LIGHT *light = (c_LIGHT *)c_node;
   if (afs_fread (&c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   light->outer_range=c;
-  printf("Light outer range: %f\n",c);
+//  printf("Light outer range: %f\n",c);
   return ast3d_err_ok;
 }
 
 static int read_LIGHT_ATTEN(afs_FILE *f){
   c_LIGHT *light = (c_LIGHT *)c_node;
   light->attenuate=1;
-  printf("Light attenuation\n");
+//  printf("Light attenuation\n");
 
   // 1/(a0+d*a1+d*d*a2)
 //  light->attenuation[0]=light->inner_range;
@@ -1310,7 +1312,7 @@ static int read_TRACKPIVOT (afs_FILE *f)
   if (afs_fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
   vec_make (pos[0], pos[1], pos[2], &obj->pivot);
   vec_swap (&obj->pivot);
-  printf("TRACKPIVOT: %f %f %f\n",obj->pivot.x,obj->pivot.y,obj->pivot.z);
+//  printf("TRACKPIVOT: %f %f %f\n",obj->pivot.x,obj->pivot.y,obj->pivot.z);
   for (i = 0; i < obj->numverts; i++) vec_sub (&obj->vertices[i].vert, &obj->pivot, &obj->vertices[i].vert);
   return ast3d_err_ok;
 }

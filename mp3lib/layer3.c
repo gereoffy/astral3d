@@ -506,8 +506,12 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
           numbits += num0 * 6;
         }
         else {
+#if 0
           *scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
           *scf++ = 0; *scf++ = 0; *scf++ = 0;
+#else
+          scf += 6;
+#endif
         }
 
         if(!(scfsi & 0x4)) {
@@ -516,8 +520,12 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
           numbits += num0 * 5;
         }
         else {
+#if 0
           *scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
           *scf++ = 0; *scf++ = 0;
+#else
+          scf += 5;
+#endif
         }
 
         if(!(scfsi & 0x2)) {
@@ -526,8 +534,12 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
           numbits += num1 * 5;
         }
         else {
+#if 0
           *scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
           *scf++ = 0; *scf++ = 0;
+#else
+          scf += 5;
+#endif
         }
 
         if(!(scfsi & 0x1)) {
@@ -536,8 +548,12 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
           numbits += num1 * 5;
         }
         else {
+#if 0
           *scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
           *scf++ = 0; *scf++ = 0;
+#else
+          scf += 5;
+#endif
         }
       }
 
@@ -2023,7 +2039,7 @@ static void III_hybrid(real fsIn[SBLIMIT][SSLIMIT],real tsOut[SSLIMIT][SBLIMIT],
 static int do_layer3(struct frame *fr,int single)
 {
   int gr, ch, ss,clip=0;
-  int scalefacs[39]; /* max 39 for short[13][3] mode, mixed: 38, long: 22 */
+  int scalefacs[2][39]; /* max 39 for short[13][3] mode, mixed: 38, long: 22 */
   struct III_sideinfo sideinfo;
   int stereo = fr->stereo;
   int ms_stereo,i_stereo;
@@ -2067,30 +2083,30 @@ static int do_layer3(struct frame *fr,int single)
       struct gr_info_s *gr_info = &(sideinfo.ch[0].gr[gr]);
       long part2bits;
       if(fr->lsf)
-        part2bits = III_get_scale_factors_2(scalefacs,gr_info,0);
+        part2bits = III_get_scale_factors_2(scalefacs[0],gr_info,0);
       else
-        part2bits = III_get_scale_factors_1(scalefacs,gr_info);
-      if(III_dequantize_sample(hybridIn[0], scalefacs,gr_info,sfreq,part2bits))
+        part2bits = III_get_scale_factors_1(scalefacs[0],gr_info);
+      if(III_dequantize_sample(hybridIn[0], scalefacs[0],gr_info,sfreq,part2bits))
         return clip;
     }
     if(stereo == 2) {
       struct gr_info_s *gr_info = &(sideinfo.ch[1].gr[gr]);
       long part2bits;
       if(fr->lsf) 
-        part2bits = III_get_scale_factors_2(scalefacs,gr_info,i_stereo);
+        part2bits = III_get_scale_factors_2(scalefacs[1],gr_info,i_stereo);
       else
-	part2bits = III_get_scale_factors_1(scalefacs,gr_info);
+	part2bits = III_get_scale_factors_1(scalefacs[1],gr_info);
       if(ms_stereo) {
-        if(III_dequantize_sample_ms(hybridIn,scalefacs,gr_info,sfreq,part2bits))
+        if(III_dequantize_sample_ms(hybridIn,scalefacs[1],gr_info,sfreq,part2bits))
           return clip;
       }
       else {
-        if(III_dequantize_sample(hybridIn[1],scalefacs,gr_info,sfreq,part2bits))
+        if(III_dequantize_sample(hybridIn[1],scalefacs[1],gr_info,sfreq,part2bits))
           return clip;
       }
 
       if(i_stereo)
-        III_i_stereo(hybridIn,scalefacs,gr_info,sfreq,ms_stereo,fr->lsf);
+        III_i_stereo(hybridIn,scalefacs[1],gr_info,sfreq,ms_stereo,fr->lsf);
 
 
       if(ms_stereo || i_stereo || (single == 3) ) {

@@ -124,6 +124,8 @@ float Amin=(obj->A)/2048.0;
   }
 
 //  obj->lm_xs=256; obj->lm_ys=128; // !!!!!!!!
+  printf("Generating UV-s for obj '%s'  xs=%d  ys=%d\n",
+    obj->name, obj->lm_xs,obj->lm_ys);
   recurse_lightmap_uv(&obj->faces[0],2,2,obj->lm_xs-4,obj->lm_ys-2);
 }
 

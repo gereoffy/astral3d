@@ -86,6 +86,7 @@ VAR_LIGHT(scrTYPE_float,"attenuation1",attenuation[1]);
 VAR_LIGHT(scrTYPE_float,"attenuation2",attenuation[2]);
 VAR_LIGHT(scrTYPE_float,"light_zbuffer",use_zbuffer);
 VAR_LIGHT(scrTYPE_float,"light_enabled",enabled);
+VAR_LIGHT(scrTYPE_int,"lightmap_calc_normal",lightmap_calc_normal);
 
 #undef VAR_LIGHT
 
@@ -113,6 +114,9 @@ VAR_OBJ(scrTYPE_float,"part_dieratio",particle.dieratio);
 VAR_OBJ(scrTYPE_float,"part_agrav",particle.agrav);
 VAR_OBJ(scrTYPE_float,"part_colordecrement",particle.colordecrement);
 VAR_OBJ(scrTYPE_int  ,"part_sizelimit",particle.sizelimit);
+
+// hair
+VAR_OBJ(scrTYPE_float,"hair_length",hair_len);
 
 #undef VAR_OBJ
 

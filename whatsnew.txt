@@ -554,6 +554,19 @@ v3.c  00/03/06-09 by A'rpi  - lightmap
   na ebben az a poen, hogy a comment vegen \ van, ami a fos cnek azt jelenti
   hogy a komment a kovetkezo sorban folytatodik...
 
+v3.d  00/04/xx by A'rpi  - System Apoc demo miatti valtoztatasok
+- scriptbol lehet kapcsolni melyik obj-re rakjon lightmapot
+- lightmap bug fixed: a file_3ds beallitotta az lmapmake flag-et minden objre
+- keyframed light colornal Y/Z (azaz zold/kek) fel volt cserelve
+- scriptbe par uj valtozo es parancs
+- hair effekt, egyelore nem hajlik de igy se rossz (lasd. hernyo.scr)
+- mp3lib javitas: layer3.c mostmar jol jatssza le a VBR fileokat is
+- loadtexture optimalizalas: a gyakori specialis esetekre kulon remix rutin
+  eleg jo, mert az apocorig.scr lefutasakor csak 2 generic remix volt, a tobbi
+  spec eset.
+- afs3-ba: kiirja a file neveket megnyitaskor (AFS_OPEN es AFS_NOTF)
+    d apoc.scr | grep AFS_ | sort | uniq > files.txt
+  igy egyszeruen kiszurhetok lesznek a nem hasznalt texturak!
 
 TERVEK a 4.0-ba:
 - particlesys dt=0.015-ot fixelni!!

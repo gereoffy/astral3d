@@ -92,10 +92,10 @@ static void calc_bbox (){
         obj->bbox.p[i].y= (i&2) ? obj->bbox.max.y : obj->bbox.min.y;
         obj->bbox.p[i].z= (i&4) ? obj->bbox.max.z : obj->bbox.min.z;
       }
-      printf("bbox: %f %f %f\n",
-          (obj->bbox.max.x+obj->bbox.min.x)/2,
-          (obj->bbox.max.y+obj->bbox.min.y)/2,
-          (obj->bbox.max.z+obj->bbox.min.z)/2);
+//      printf("bbox: %f %f %f\n",
+//          (obj->bbox.max.x+obj->bbox.min.x)/2,
+//          (obj->bbox.max.y+obj->bbox.min.y)/2,
+//          (obj->bbox.max.z+obj->bbox.min.z)/2);
     }
 }
 

@@ -22,7 +22,6 @@
     c_VECTOR n,nA,nyadd,nxadd;
     int v,vend;
     float uA,uB,uAyadd,uByadd;
-    int u;
     float xsize=f->lu3-f->lu1;
     float ysize=f->lv3-f->lv1;
     if(xsize<1) xsize=1; else xsize=1.0/xsize;

@@ -77,7 +77,7 @@ static void optimize_vertex (c_OBJECT *obj){
     }
     free(obj->vertices); obj->vertices=newvert;
     obj->numverts=j;
-    printf("OPTVERT: %d new vertices created!\n",j);
+//    printf("OPTVERT: %d new vertices created!\n",j);
   }
 }
 
@@ -86,7 +86,7 @@ static void optimize_vertex (c_OBJECT *obj){
 //  for (i = 0; i < obj->numverts; i++) obj->vertices[i].opt_tmp=0;
 
 //  putchar('3');fflush(stdout);
-  printf("optimvert: %d of %d vertices optimized!\n",(int)opt,(int)obj->numverts);
+//  printf("optimvert: %d of %d vertices optimized!\n",(int)opt,(int)obj->numverts);
 }
 
 #undef HASH_FV

@@ -90,6 +90,7 @@ afs_FILE* afs_fopen(char *filename,char *mode){
  int i,j;
  for(j=fs_db-1;j>=0;j--){
   afs=&filesystems[j];
+
   if(afs->type==AFS_TYPE_DAT || afs->type==AFS_TYPE_PAK){
    for(i=0;i<afs->file_db;i++)
     if(strcmp(afs->dir[i].name,filename)==0){
@@ -105,9 +106,11 @@ afs_FILE* afs_fopen(char *filename,char *mode){
         if(1!=fread(f->ptr,f->size,1,afs->file)) return NULL;
       }
 //      printf("AFS: Open file %s (size=%d)\n",filename,f->size);
+      printf("\nAFS_OPEN %s\n",filename);
       return f;
     }
   }
+
   if(afs->type==AFS_TYPE_FILES){
     FILE *f;
     char name[256];
@@ -119,11 +122,13 @@ afs_FILE* afs_fopen(char *filename,char *mode){
       p->pos=0;
       if(1!=fread(p->ptr,p->size,1,f)) return NULL;
       fclose(f);
+      printf("\nAFS_OPEN %s\n",filename);
       return p;
     }
   }
  }
 // fprintf(stderr,"AFS: File not found: %s\n",filename);
+      printf("\nAFS_NOTF %s\n",filename);
  return NULL;
 }
 
@@ -136,6 +141,7 @@ FILE* afs_fopen2(char *filename,char *mode){
    for(i=0;i<afs->file_db;i++)
     if(strcmp(afs->dir[i].name,filename)==0){
       fseek(afs->file,afs->base+afs->dir[i].pos,SEEK_SET);
+      printf("\nAFS_OPEN %s\n",filename);
       return afs->file;
     }
   }
@@ -143,10 +149,14 @@ FILE* afs_fopen2(char *filename,char *mode){
     FILE *f;
     char name[256];
     strcpy(name,afs->path);strcat(name,filename);
-    f=fopen(name,mode); if(f) return f;
+    f=fopen(name,mode); if(f){
+      printf("\nAFS_OPEN %s\n",filename);
+      return f;
+    }
   }
  }
 // fprintf(stderr,"AFS: File not found: %s\n",filename);
+      printf("\nAFS_NOTF %s\n",filename);
  return NULL;
 }
 

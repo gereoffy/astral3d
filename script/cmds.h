@@ -18,6 +18,7 @@ V("load_scene",scrCLASS_global, 2,0, 2,2); P_NEW(1);
 
 // 3:  scene scene_var
 V("scene",scrCLASS_fx, 3,0, 1,1); P_SCENE(1);
+V("scene_cont",scrCLASS_fx,3,1, 1,1); P_SCENE(1);
 
 // 4:  fixUV [obj1 [obj2...]]
 V("fixUV",scrCLASS_scene, 4,3, 0,-1);

@@ -3,8 +3,8 @@
 SRCS = render.c particle.c
 OBJS = render.o particle.o
 CC   = gcc
-# CFLAGS = -g -Wall
-CFLAGS = -O2 -mpentiumpro -pipe
+CFLAGS = -g -Wall
+# CFLAGS = -O2 -mpentiumpro -pipe
 
 .SUFFIXES: .c .o
 

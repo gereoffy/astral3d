@@ -327,9 +327,11 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       if(cmdp->code==3){
         scene=scrGetPtr(pvar[1],fx);
 //        printf("Setting up scene %s to FX\n",p[1]);
-        FX_RESET(fx);
-        fx->type=FXTYPE_SCENE;fx->scene=scene;
+        if(cmdp->type==0){
+          FX_RESET(fx);
 //        fx->frame=0;
+        }
+          fx->type=FXTYPE_SCENE;fx->scene=scene;
         ast3d_setactive_scene(scene);
         ast3d_setactive_camera(scene->cam);
         return;
@@ -580,6 +582,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 //===============================================================================
 // 23:  lightmap [xsize ysize]
       if(cmdp->code==23){
+        printf("lmapmafe for %s\n",current_object->name);
         current_object->flags|=ast3d_obj_lmapmake;
         make_lightmap_uv(current_object,pval[1],(pval[2]>0)?pval[2]:pval[1]);
         return;

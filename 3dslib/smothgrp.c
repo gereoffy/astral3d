@@ -68,7 +68,7 @@ if(next_vert != obj->numverts){
     obj->faces[i].pb = &newverts[obj->faces[i].b];
     obj->faces[i].pc = &newverts[obj->faces[i].c];
   }
-  printf("Smoothing: new: %d  old: %ld\n",next_vert,obj->numverts);
+//  printf("Smoothing: new: %d  old: %ld\n",next_vert,obj->numverts);
 
   free(obj->vertices);
   obj->vertices=newverts;

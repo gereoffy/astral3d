@@ -155,6 +155,35 @@ PROF_END(prof_3d_specmap);
 
 glDisable(GL_CULL_FACE);
 
+if(obj->hair_len!=0.0){
+  int i;
+  float len=-obj->hair_len;
+  aglTexture(obj->pmat->texture_id);
+  aglZbuffer(AGL_ZBUFFER_RW);
+  aglBlend(AGL_BLEND_NONE);
+  glColor3f(1,1,1);
+  glBegin(GL_LINES);
+  for(i=0;i<obj->numverts;i++){
+    c_VERTEX *v=&obj->vertices[i];
+//    float c=v->pnorm.z;
+//    glColor3f(c,c,c);
+//    glColor3f(c,c*0.5,c*0.2);
+    glTexCoord2f(v->u,v->v);
+    glVertex3f(v->pvert.x,v->pvert.y,v->pvert.z);
+    glVertex3f(v->pvert.x+len*v->pnorm.x,
+               v->pvert.y+len*v->pnorm.y,
+               v->pvert.z+len*v->pnorm.z);
+#if 0
+    printf("H: %f %f %f",v->pvert.x,v->pvert.y,v->pvert.z);
+    printf("  tgt: %f %f %f\n",
+               v->pvert.x+len*v->pnorm.x,
+               v->pvert.y+len*v->pnorm.y,
+               v->pvert.z+len*v->pnorm.z);
+#endif
+  }
+  glEnd();
+}
+
 PROF_END(prof_3d_draw);
 
 }}}

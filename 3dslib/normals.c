@@ -41,7 +41,7 @@ static void calc_objnormals (c_OBJECT *obj)
   }
 
   obj->A=A;  
-  printf("A=%f   avg=%f   sqrt=%f\n",A,A/(float)obj->numfaces,sqrt(A/(float)obj->numfaces));
+//  printf("A=%f   avg=%f   sqrt=%f\n",A,A/(float)obj->numfaces,sqrt(A/(float)obj->numfaces));
   
 }
 

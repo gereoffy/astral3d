@@ -117,6 +117,10 @@ if(l->flags&ast3d_light_attenuation){
 /* -------------------- ATTENUATION or SPOT ------------------------- */
 
               float atten=1.0f/(l->attenuation[0]+dist*(l->attenuation[1]+dist*l->attenuation[2]));
+//              if(l->attenuate){
+//                atten=1.0f-(dist-l->inner_range)/(l->outer_range-l->inner_range);
+//                if(atten>1) atten=1;
+//              } else atten=1.0f/(l->attenuation[0]+dist*(l->attenuation[1]+dist*l->attenuation[2]));
               if(atten>0.008){
                 float diff,spec;
                 len=1.0/dist;
@@ -142,7 +146,7 @@ if(l->flags&ast3d_light_attenuation){
                   b+=diff*(l->MatDiff[2]);
                 }
 
-		if(specular)
+		if(specular){
                 /* specular-map u,v */
                 if(matflags&ast3d_mat_specularmap && li==0)
                 { float len2;
@@ -174,8 +178,9 @@ if(l->flags&ast3d_light_attenuation){
                     }
                   }
                 }
+                } // if(specular)
 
-              }
+              } // atten>0
             
 } else {
 /* -------------------- SIMPLE Positional LIGHT ------------------------- */

@@ -72,7 +72,7 @@ if(uvflag&2){ PREUV(v1,v2,v3); MINMAX(v1,v2,v3); FIXUV(v1); FIXUV(v2); FIXUV(v3)
 
     } // for
 
-    printf("Fixed %d UVs, faces=%ld\n",x,obj->numfaces);
+//    printf("Fixed %d UVs, faces=%ld\n",x,obj->numfaces);
 
     if( uvflag&4 || 
         (obj->pmat && obj->pmat->bump.file)

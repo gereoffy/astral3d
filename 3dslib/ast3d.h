@@ -329,6 +329,7 @@ typedef struct _c_LIGHT { /* light struct */
   int ambient;
   float inner_range,outer_range;
   int attenuate;
+  int lightmap_calc_normal;
 //  float specular_limit,specular_coef,specular_mult;
 } c_LIGHT;
 
@@ -426,6 +427,7 @@ typedef struct _c_OBJECT { /* object struct */
   float A;                          /* teljes felulet */
   int lightmap_id;
   int lightmap_xsize,lightmap_ysize;
+  float hair_len;
 } c_OBJECT;
 
 typedef struct _w_NODE { /* world node */

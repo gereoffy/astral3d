@@ -21,7 +21,7 @@
               float atten;
               if(l->attenuate){
                 atten=1.0f-(dist-l->inner_range)/(l->outer_range-l->inner_range);
-                if(atten<0) atten=0; else
+//                if(atten<0) atten=0; else
                 if(atten>1) atten=1;
               } else atten=1.0f/(l->attenuation[0]+dist*(l->attenuation[1]+dist*l->attenuation[2]));
               if(atten>0.008){
@@ -39,8 +39,9 @@
                   if(dot<l->CosFalloff) continue; // atten=0;
                   if(dot<l->CosHotspot) atten*=pow((dot+1.0-(l->CosHotspot)),l->SpotExp);
                 }
-                diff=1.0f;
-                diff=(n.x*x+n.y*y+n.z*z)*len;
+                diff=(l->lightmap_calc_normal)?(n.x*x+n.y*y+n.z*z)*len:1.0f;
+//                diff=1.0f;
+//                diff=(n.x*x+n.y*y+n.z*z)*len;
                 if(diff<0 && matflags&(ast3d_mat_transparent|ast3d_mat_twosided)) diff=-diff;
                 if(diff>0.004){
                   /* Diffuse */

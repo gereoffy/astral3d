@@ -1,5 +1,7 @@
 /* light.c:  Setup lights and cameras    (C) 1999 Astral */
 
+//#define SHOW_NODES
+
 unsigned int lightmap=0;
 
 static INLINE unsigned char clip_255(float x){
@@ -20,18 +22,24 @@ int FindCameras(c_SCENE *scene){
   for (node = scene->world; node; node=node->next){
     if (node->type == ast3d_obj_camera){
       c_CAMERA *c=(c_CAMERA *)node->object;
+#ifdef SHOW_NODES
       printf("CAMERA #%d: %s\n",camno,c->name);
+#endif
       if(camno<MAX_CAMNO) cameras[camno++]=c;
       if(strcmp(c->name,"Camera01")==0) cam=c;
     }
     if (node->type == ast3d_obj_light){
       c_LIGHT *c=(c_LIGHT *)node->object;
-      printf("LIGHT #%d: %s\n",lightno,c->name);
+//#ifdef SHOW_NODES
+//      printf("LIGHT #%d: %s\n",lightno,c->name);
+//#endif
       if(lightno<MAX_LIGHTNO) lights[lightno++]=c;
     }
     if (node->type == ast3d_obj_object) {
       c_OBJECT *obj = (c_OBJECT *)node->object;
+#ifdef SHOW_NODES
       printf("OBJECT #%d: %s  vert=%d  face=%d\n",objno++,obj->name,(int)obj->numverts,(int)obj->numfaces);
+#endif
     }
   }
   if(!cam && camno) cam=cameras[0];
