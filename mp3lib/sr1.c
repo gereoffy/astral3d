@@ -1,4 +1,9 @@
+
+#ifdef __GNUC__
 #define LOCAL static inline
+#else
+#define LOCAL static _inline
+#endif
 
 #include        <stdlib.h>
 #include        <stdio.h>

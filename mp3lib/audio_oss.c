@@ -144,18 +144,18 @@ int MP3_Play(char *filename){
   if(!MP3_file) return 0;
   
   MP3_Init(MP3_file);
+  {  struct sigaction sa;
+     sa.sa_handler=sig_handler;
+     sa.sa_flags=SA_RESTART;
+     sigemptyset(&sa.sa_mask);
+     sigaction(SIGALRM, &sa, NULL);
+  }
   {  struct itimerval it;
      it.it_interval.tv_sec=0;
      it.it_interval.tv_usec=10000;
      it.it_value.tv_sec=0;
      it.it_value.tv_usec=10000;
      setitimer(ITIMER_REAL,&it,NULL);
-  }
-  {  struct sigaction sa;
-     sa.sa_handler=sig_handler;
-     sa.sa_flags=SA_RESTART;
-     sigemptyset(&sa.sa_mask);
-     sigaction(SIGALRM, &sa, NULL);
   }
   return 1;
 }
@@ -181,22 +181,6 @@ int MP3_OpenDevice(char *devname){
 void MP3_CloseDevice(){
   audio_close(&ai);
 }
-
-#if 0
-
-int main(){
-FILE *f;
-  f=fopen("/2/mindgoa.mp3","rb");
-    if(!MP3_OpenDevice(NULL)){ printf("Can't open audio device\n");exit(1);}
-      MP3_Play(f);
-        getchar();
-      MP3_Stop();
-    MP3_CloseDevice();
-  fclose(f);
-return 0;
-}
-
-#endif
 
 
 

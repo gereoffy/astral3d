@@ -1,0 +1,12 @@
+Multiplatform 'background' MP3 player library v2.0
+ (C) -1998 Michael Hipp & Oliver Fromme (MPG123 player)
+ (C)  1998 GyikSoft of ESP-team  (TSRMP3 player)
+ (C)  1999 A'rpi of Astral (MP3LIB)
+Description:
+  Plays MP3 file in background, but you can access
+  current frame position via MP3_frame variable.
+  It's ideal for DEMOs and intros.
+Supported platforms:
+  LINUX (OSS driver)
+  WIN 9x/NT
+See mp3.h for details...
