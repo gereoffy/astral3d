@@ -1306,7 +1306,7 @@ static int ChunkReaderWorld (afs_FILE *f, long p, word parent)
   int     n, i, error;
 
   c_chunk_last = parent;
-  while ((pc = ftell (f)) < p) {
+  while ((pc = afs_ftell (f)) < p) {
     if (read_CHUNK (f, &h) != 0) return ast3d_err_badfile;
     c_chunk_curr = h.chunk_id;
     n = -1;
@@ -1315,17 +1315,17 @@ static int ChunkReaderWorld (afs_FILE *f, long p, word parent)
         n = i;
         break;
       }
-    if (n < 0) fseek (f, pc + h.chunk_size, SEEK_SET);
+    if (n < 0) afs_fseek (f, pc + h.chunk_size, SEEK_SET);
     else {
       pc = pc + h.chunk_size;
       if ((error = world_chunks[n].func (f)) != 0) return error;
       if (world_chunks[n].sub)
         if ((error = ChunkReaderWorld (f, pc, h.chunk_id)) != 0)
           return error;
-      fseek (f, pc, SEEK_SET);
+      afs_fseek (f, pc, SEEK_SET);
       c_chunk_prev = h.chunk_id;
     }
-    if (ferror (f)) return ast3d_err_badfile;
+//    if (ferror (f)) return ast3d_err_badfile;
   }
   return ast3d_err_ok;
 }
@@ -1340,7 +1340,7 @@ static int ChunkReaderKey (afs_FILE *f, long p, word parent)
   int     n, i, error;
 
   c_chunk_last = parent;
-  while ((pc = ftell (f)) < p) {
+  while ((pc = afs_ftell (f)) < p) {
     if (read_CHUNK (f, &h) != 0) return ast3d_err_badfile;
     c_chunk_curr = h.chunk_id;
     n = -1;
@@ -1349,16 +1349,16 @@ static int ChunkReaderKey (afs_FILE *f, long p, word parent)
         n = i;
         break;
       }
-    if (n < 0) fseek (f, pc + h.chunk_size, SEEK_SET);
+    if (n < 0) afs_fseek (f, pc + h.chunk_size, SEEK_SET);
     else {
       pc = pc + h.chunk_size;
       if ((error = key_chunks[n].func (f)) != 0) return error;
       if (key_chunks[n].sub)
         if ((error = ChunkReaderKey (f, pc, h.chunk_id)) != 0) return error;
-      fseek (f, pc, SEEK_SET);
+      afs_fseek (f, pc, SEEK_SET);
       c_chunk_prev = h.chunk_id;
     }
-    if (ferror (f)) return ast3d_err_badfile;
+//    if (ferror (f)) return ast3d_err_badfile;
   }
   return ast3d_err_ok;
 }
@@ -1377,12 +1377,12 @@ int32 ast3d_load_mesh_3DS (afs_FILE *f)
   long length;
 
   c_id = 0;
-  fseek (f, 0, SEEK_END);
-  length = ftell (f);
-  fseek (f, 28L, SEEK_SET);
+  afs_fseek (f, 0, SEEK_END);
+  length = afs_ftell (f);
+  afs_fseek (f, 28L, SEEK_SET);
   if (afs_fread (&version, sizeof (byte), 1, f) != 1) return ast3d_err_badfile;
   if (version < 2) return ast3d_err_badver; /* 3DS 3.0+ supported */
-  fseek (f, 0, SEEK_SET);
+  afs_fseek (f, 0, SEEK_SET);
   return ChunkReaderWorld (f, length, 0);
 }
 
@@ -1396,11 +1396,11 @@ int32 ast3d_load_motion_3DS (afs_FILE *f)
   long length;
 
   c_id = -1;
-  fseek (f, 0, SEEK_END);
-  length = ftell (f);
-  fseek (f, 28L, SEEK_SET);
+  afs_fseek (f, 0, SEEK_END);
+  length = afs_ftell (f);
+  afs_fseek (f, 28L, SEEK_SET);
   if (afs_fread (&version, sizeof (byte), 1, f) != 1) return ast3d_err_badfile;
   if (version < 2) return ast3d_err_badver; /* 3DS 3.0+ supported */
-  fseek (f, 0, SEEK_SET);
+  afs_fseek (f, 0, SEEK_SET);
   return ChunkReaderKey (f, length, 0);
 }
