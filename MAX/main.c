@@ -223,7 +223,9 @@ if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 int main(int argc,char* argv[]){
 FILE *f;
 
-f=fopen((argc>1)?argv[1]:"classdirectory3","rb");if(!f) return 1;
+f=fopen((argc>1)?argv[1]:"classdirectory3","rb");
+if(!f) f=fopen((argc>1)?argv[1]:"classdirectory2","rb");
+if(!f) return 1;
 while(!feof(f)) class_dir_reader(f,0);
 fclose(f);
 
@@ -236,7 +238,7 @@ f=fopen((argc>2)?argv[2]:"scene","rb");if(!f) return 1;
 { unsigned short int chunk_id=0;
   unsigned int chunk_size=0;
   fread(&chunk_id,2,1,f);fread(&chunk_size,4,1,f);
-  if(chunk_id!=0x2004 || !(chunk_size&0x80000000)){
+  if((chunk_id&0xFFF0)!=0x2000 || !(chunk_size&0x80000000)){
     printf("Not 'Scene' file\n");exit(1);
   }
   chunk_size&=0x7fffffff;
