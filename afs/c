@@ -1,0 +1,6 @@
+#! /bin/sh
+echo "Compiling afs..."
+
+gcc -O2 -c -g -Wall unesplib.c
+gcc -O2 -c -g -Wall afs3.c
+

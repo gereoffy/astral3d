@@ -1,0 +1,37 @@
+Astral's current OpenGL 3DS Player Engine supports:
+
+- Full material editor support (almost)
+  - Texture1
+  - Texture2
+  - Opacity (transparency per pixel)
+  - Reflection maps
+  - Masking, amountof values
+  - Ambient,Diffuse,Specular,Shinines
+  - Transparency
+  - S (submenu)
+    - Negate
+- Full 3ds Keyframer support
+  - Hierarchy
+    - Light
+    - Object
+    - Camera 
+  - Lights
+    - Omni
+      - Position
+      - Color
+    - Spot
+      - Position
+      - Target
+      - Color
+      - Roll
+  - Objects
+    - Position
+    - Scale
+    - Rotate
+    - Morph
+    - Hide
+  - Camera
+    - Position
+    - Target
+    - Roll
+    - Fov 

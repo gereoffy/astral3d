@@ -1,0 +1,288 @@
+Astral Script System 2.0  - belsô használatra!   (C) 1999.10.3. by A'rpi/Astral
+========================
+Alapvetôen 3 féle parancstípus létezik:
+1. globális parancsok, változók
+   az aktuális effekttôl, scene-tôl függetlenül használható
+2. effekt/scene parancsok, változók
+   a kiválasztott effekt (scene) típusát, paramétereit befolyásolják
+3. light változók
+   a kiválasztott fényforrás paramétereit befolyásolják
+----------------
+1. Globális parancsok:
+======================
+Ide tartoznak a betöltô, engine vezérlô parancsok:
+
+- ; <megjegyzés>
+  Bármikor bárhova írható megjegyzés, pontosvesszô után.
+  (a megj. a sor végéig tart, több sorosnál minden sor elejére kell!)
+- load_scene <változó> <név>
+  Betölti a <név> nevû .3DS file-t, és hozzárendeli a <változó>-hoz,
+  ezután csak a <változó>-val hivatkozhatunk rá (nem a file-névvel)!
+  Pl.:  load_scene part1 proba.3ds
+  A változó neve tetszôleges lehet, de nem lehet parancsnév vagy korábban
+  definált változónév. Ebbôl követekzik hogy minden .3ds-t másik változóba
+  kell betölteni, akkor is ha a régire már nincs szükség!
+
+- loadpic <változó> <név>           
+  Kép betöltése. A kép egyenlôre csak truecolor lehet, RAW vagy JPG formátumú.
+  Pl.:  loadpic logo1 astral18.jpg
+  A kép méretei 2 hatványa kell legyen, tehát 64x64, 128x128, 256x256
+  vagy 512x512 méretû lehet!!!  (Ez késôbb sem fog változni, legfeljebb az
+  engine képes lesz betöltéskor átkonvertálni)
+  A képre a késôbbiekben (az effektekben) a <változó> névvel hivatkozhatunk.
+
+- loadRGBA <változó> <név> <név2>
+  Hasonló a loadpic-hez, de ez nem RGB, hanem RGBA képet tölt be, azaz
+  alphamap-et (átlátszósági maszk) is tölt be. A <név> a kép, a <név2>
+  az alphamap neve. A 2 kép mérete meg kell egyezzen!
+  Pl.:  loadpic logo1 astral18.jpg a18maszk.raw
+  Az alphamap 256 szürkeskálás vagy truecolor lehet, utóbbi esetben csak
+  a zöld komponenst veszi figyelembe. fekete=opaque (nem átlátszó),
+  fehér/zöld=transparent (teljesen átlátszó).
+
+- start_music <név>
+  Betölti és elindítja a <név> nevû zenét. Jelenleg csak az MP3 támogatott!
+  Célszerû a betöltések (load...) után írni.
+  Nosound esetén a pattern-re szinkronizálás még nem mûködik!!!
+
+- stop_music
+  Leállítja a zenét - ha épp szól. különben nem csinál semmit.
+
+- write <szöveg>    és   writeln <szöveg>
+  Kiírja az üzenetablakba a <szöveg>-et. A writeln soremelést is csinál!
+  A legegyszerûbb script:
+     writeln Hello world! :)
+     end
+
+  Vagy ahol pl. hasznos:
+     write Loading scene 1...
+     load_scene part1 proba.3ds
+     writeln OK!
+
+- play <esemény> [<esemény2...>]
+  Elkezdi játszani a beállított effekteket, addig amíg a megadott esemény(ek)
+  be nem következik. Ha nem adunk meg egy eseményt se akkor az ESC lenyomásáig
+  megy. Ha több esemény van megadva akkor az elsô teljesülésekor hagyja abba
+  és folytatja a script következô sorával.
+  Az esemény típusa 6 (2x3) féle lehet:       # = decimális szám
+    #s       # másodpercen keresztül megy
+    -#s      a #-adik másodpercig megy
+    #f       # frame-t játszik le
+    -#f      a #-adik frame-ig megy
+    #p       # pattern-t játszik le
+    -#p      a #-adik patternig megy
+  Pl:   play 3s       ; 3 másodpercig megy
+        play -1180p   ; a 1180-adik pattern-ig (mp3 frame-ig) játszik
+  Lásd még a "szinkronizálás" részt!
+
+- end
+  Demó vége (leállítja a zenét és kilép. Ugyanaz mint az ESC billentyûnél.
+
+2. Effekt parancsok:
+====================
+A demó effektekbôl épül fel. (nagy felfedezés:))
+Jelenleg _egyidejûleg_ max. 10 effekt támogatott, 0..9-ig számozva.
+Minden effektnek van típusa, blend (átlátszóság) értéke, frame (pozíció)
+és fps (frame/sec, azaz sebesség) értéke. Ezen felül vannak speciális,
+csak bizonyos effekteknél érvényes változók.
+A változók/parancsok mindig a _kiválasztott_ effektre vonatkoznak: egy
+effektet kiválasztani úgy lehet, hogy beírjuk a sor elejére az effekt számát
+és egy kettôspontot. Ha rögtön utána (még abban a sorban) jön egy utasítás,
+akkor az csak arra érvényes, különben minden utasításra a következô effekt
+váltásig.  (nem ilyen bonyolult ahogy leírtam:))
+Na erre visszatérünk ha leírtam milyen utasítások vannak.
+
+Effekt típusok:
+---------------
+- scene <változó>
+  Az effekt típusát .3DS player-re állítja, az aktális scene-t pedig
+  a <változó>-ba betöltött 3DS-re.
+  Pl:  load_scene part1 proba.3ds
+       1: scene part1
+  ez betölti a proba.3ds-t a part1 változóba, majd az 1-es számú effektet
+  beállítja hogy ezt a 3ds-t játssza!
+
+- blob
+  Az effekt típusát blob-ra állítja. :)
+
+- picture <változó>
+  Az effekt típusát kép megjelenítésére állítja. A <változó>-ba betöltött
+  kép fullscreen-re lesz skálázva, tehát mérettôl függetlenül 640x480-ra
+  (vagy akármekkorára) lesz konvertálva.
+  MEGJEGYZÉS: MOST NEM IGAZÅN MÿKÖDIK!
+  Használd helyette a "sprite <változó> 0 480 640 0" parancsot!!!
+
+- sprite <változó> <x1> <y1> <x2> <y2>
+  Az effekt típusát kép megjelenítésére állítja. A <változó>-ba betöltött
+  kép az x1;y1 - x2;y2 téglalapba lesz skálázva, konvertálva.
+  Megj: y=0 a képernyô alja, y=480 a képe. teteje!!
+
+- addsprite <változó> <x1> <y1> <x2> <y2>
+  Ugyanaz mint a sprite, de a blend érték nem befolyásolja a mögötte levô
+  effektet. Lásd késôbb a blend-nél!
+
+- fdtunnel
+  Egyelôre nem mûködik :(  Kölönben fdtunnel-re állítaná az effektet :))
+
+Effektek átlátszósága:
+----------------------
+  A kiválasztott effekt átlátszóságát a "blend" változó értéke határozza meg.
+Értéke 0..1 közt változhat, 0=teljesen átlátszó (azaz ki van kapcsolva),
+1=nem átlátszó, 0.5=félig átlátszó stb.
+Az "1=nem átlátszó" esethez annyi megjegyzést, hogy inkább úgy értendô hogy
+az effekt normálisan látszik, tehát nincsen lekeverve. ui. lehet egy átlátszó
+test egy 3d scenen, vagy egy alphamap-os kép ami mindenképp átlátszó
+valamennyire...  Ahogy az adott effekt blend-je egyre nagyobb (egyer kevésbé
+átlátszó), a mögötte levô effekt nyílván egyre kevésbé látszik (mintha annak
+a blend-ját csökkentenénk). Ez alól kivétel az addsprite, ami feliratok
+rárakásához készült, és nem sötétíti le a mögötte levô dolgokat.
+  A "blend" egy változó, értéket többféle módon kaphat. Vagy közvetlenül:
+pl. "blend=0.3" vagy "blend 0.3", vagy pedig a "fade" utasítással:
+- fade <változó> <kezdôérték> <végérték> <idôtartam>
+A fade a megadott változó értékét a kezdôértékrôl a végértékre változtatja
+folyamatosan, megadott idô alatt. Pl. a kiválasztott effekt felkeverése
+0-ról 1-re 3 másodperc alatt:  fade blend 0 1 3
+  Az effektek az effekt számának sorrendjében rajzolódnak ki, ha blend
+értékük nem 0. Azaz kikapcsolni effektet úgy lehet hogy blend=0 :)
+Az az effekt lesz "leghátul" aminek legkisebb a száma. A sorrend azért
+fontos, mert az elôl levô képek takarhatják a mögöttük levôt.
+Nézzünk egy egyszerû példát!
+Van egy test.3ds amin egy kis object forog, egy hatter.jpg ami a háttérkép,
+és egy astral.raw ami egy kis logo ami a 3D object elôtt fog megjelenni.
+Akkor a script:
+  load_scene test test.3ds         ; a 3DS scene betöltése
+  loadpic hatter hatter.jpg        ; a háttérkép betöltése
+  loadpic logo astral.raw          ; a logó kép betöltése
+  start_music megesz.mp3           ; Itt indul a demo! zene indítása
+  1: sprite hatter 0 480 640 0     ; 1-es effekt: háttérkép
+  2: scene test                    ; 2-es effekt: 3D
+  3: sprite logo 100 300 300 100   ; 3-as effekt: kis logó
+  3: fade blend 0 1 5              ; a 3-as effekt keverése 0-ból 1-be 5s alatt
+  play
+Próbáld ki!!
+Aki kipróbálta, tapasztalhatta hogy minden szép és jó, de ahogy jelenik meg
+a kis logó, mögötte eltûnik a háttér és a 3D object is! Igen, mert a sima
+"sprite" utasítás automatikusan lekeveri maga mögött a hátteret. Cseréljük
+le addsprite-ra és máris jó lesz! Másik lehetôség hogy alphamap-os logót
+töltünk be (ahol ki van maszkolva a háttér):
+  loadRGBA hatter hatter.jpg hatterm.raw
+Meg lehet próbálkozni a maszknak is ugyanazt adni mint a kép, néha így is
+jól néz ki, és nem kell külön maszkot rajzolni:
+  loadRGBA hatter hatter.jpg hatter.jpg
+
+Szinkronizálás:
+---------------
+Elérkeztünk a kényes ponthoz. Ez az ami miatt érdemes scriptet használni
+a code módosítgatása helyett!
+Az alapvetô kérdés, hogy mire szinkronizáljunk, és hogyan.
+- Idôre? Sok esetben nehézkes lehet, fôleg ha a zene jellemzô részeivel
+  szeretnénk szinkronban maradni. Hogyan: abszolút vagy relatív?
+  Ha abszolút (azaz a demó kezdetéhez képest adjuk meg a váltások helyét)
+  akkor egy effekt áthelyezésével írhatunk át mindent! Ha relatív, akkor
+  pedig a zenére szinkron. lesz qrva nehéz...
+- Frame-re? [frame alatt azt a számot értem, amit az effektek és a 3D studio,
+  tehát az elméleti képkocka sorszámot, ami azért elméleti, mert gyorsabb
+  ill. lassabb gépen más lenne, de hogy gépfüggetlen legyen, ezért mi
+  szabjuk meg]  Nagyon elônyös az effektek szinkronizálásához (pl. ha
+  beállítjuk hogy a 999-edig frame-ig játssza az 1000 framebôl álló
+  3DS filet, akkor véletlen se lépjük túl, függetlenül a sebességtôl!)
+  de igencsak szívás így zenére szinkronizálni egy egész demót: ha egy
+  effekt sebességét megváltoztatjuk, az összes késôbbi effektnek
+  elcsúszik a frame értéke!
+- Patternre? azaz zenei pozicióra?  Nyilvánvaló legjobb módja a zenére
+  szinkronizálásnak, de erre lehetetlen effekteket szinkronizálni, mivel
+  másodpercenként MP3 esetén csak 38-szor változik, azaz ideális esetben
+  is max 38fps-el menne a demó, különben pedig akadozna...
+Tehát a megoldás: lehetôséget nyújtani mindhárom változóra való
+szinkronizálásra, akár abszolút akár relatív módon! Sôt, ezen felül a
+frame, fps és time értéke bármikor átírható menet közben.
+Megjegyzés: delta frame = delta time * fps
+Azaz a frame és time között csak akkor áll fennt egyértelmû kapcsolat, ha
+az fps-t sosem változtatjuk meg a demó közben!!!
+  Ennek megfelelôen a demóban van egy globális time, és effektenként egy
+frame és egy fps változó. Az egyes effektek mindig a frame-ra vannak
+szinkronizálva, sebességük így az fps-tôl függ. A váltások (lásd. a "play"
+parancsnál) pedig szinkronizálhatók time-ra, frame-ra (bármelyikre!) és
+pattern-re (zene pozició) is! Effektben ugrálni (pl. dobütésre visszatekerni
+az elejére vagy pl. elôreugrani 100 framet) a frame értékének változtatásával
+lehet. A pattern értéke nem változtatható (az MP3 player változtatja),
+csak a play-t lehet rá szinkronizálni!
+Az elôbbi példa script kicsit módosítva:
+  load_scene test test.3ds         ; a 3DS scene betöltése "test"-be
+  loadpic hatter hatter.jpg        ; a háttérkép betöltése
+  loadpic logo astral.raw          ; a logó kép betöltése
+  start_music megesz.mp3           ; Itt indul a demo! zene indítása
+  play -5p                         ; várunk az 5-ös patternig (zene kezdete)
+  1: sprite hatter 0 480 640 0     ; 1-es effekt: háttérkép megjelenik
+  play 2s                          ; várunk 2 másodpercig (háttér látszik csak)
+  2:                               ; 2-es effekt kiválasztása!
+  scene test                       ; 2-es effekt: 3D
+  fps=20                           ; 2-es effekt: 20 frame / sec
+  fade blend 0 1 5                 ; 3D test 5 sec alatt megjelenik
+  play -518p                       ; várunk a dobütésig (zenében 518. pattern)
+  3: sprite logo 100 300 300 100   ; 3-as effekt: kis logó megjelenik
+  2: play -199f                    ; 2-es effekt 199-edik frame-jeig várunk
+  2: frame=100                     ; 2-es effekt újraindul 100-as frametól
+  2: play -180f                    ; 2-es effekt vége elôtt 20 frame-el megáll
+  2: fade blend 1 0 1              ; 2-es effekt lekeverése 1 sec alatt (20f)
+
+Ez nem csak azért tanulságos, mert mindenféle idôzítési mód látható benne,
+hanem mert az effekt-kiválasztás 2 féle módja is látható:
+Amikor a sor elején az utasítás elôtt ott van pl. a 2:, az azt jelenti hogy
+az az utasítás a 2-es effektre vonatkozik. Amikor viszonta  2: után
+nincs semmi abban a sorban, az a defaultot állítaj át, tehát utána minden
+olyan utasítás ami elôtt nincs külön megadva melyikre vonatkozik, az arra fog!
+Tehát az utolsó 4 sor elejérôl a 2:-ok elhagyhatóak!
+Másrészt amikor a play-ban frame-ra szinkrinizálunk, akkor meg kell adni hogy
+melyik effekt frame-jára! Mivel ez effektenként különbözô lehet...
+
+Egyéb effektenkénti változók:
+=============================
+- directional_lighting <0|1>
+  A fényszámolás módját állítja be, 1=gyorsabb de bénább
+  Csak scene típusú effektnél van jelentôsége!
+- fixUV
+  Az aktuális scene textúra koordinátáit kijavítja. Nem jól mûködik
+  facemapping (teljes textúra ráfeszítav 1-2 facera) esetén.
+  Csak scene típusú effektnél mûködik!
+- vlimit=szám
+  A BLOB isolevel-jét (méretét) adja meg. default=200000
+  Hatásos fade-val kombinálva:  fade vlimit 200000 120000 4
+- line_blob=<0|1>
+  A BLOB típusát: 0=felület / 1=drótváz állítja be.
+
+3. light változók:
+==================
+A fényforrások paramétereit állítják be.
+Fényforrás kiválasztása:  "light #"  ahol # a fény száma 0-tól számozva.
+
+A kiválasztott fényforrásokra a következô paraméetrek állíthatóak:
+- light_zbuffer=<0|1>
+  Számoljon-e zbuffer-t a fényekre - azaz a fény belemehete- a tárgyba.
+  default=1
+- attenuation0=<szám>      ; constant
+  attenuation1=<szám>      ; linear
+  attenuation2=<szám>      ; quadratic
+  Fényszámolás polinom paraméterei. Ha constant van akkor akárhol van a
+  fény ugyanúgy világítaj meg, ha quadratic, akkor ahogy távolodik a fény
+  a tárgytól egyre csökken a fényerô...
+  default: a0=1  a1=0  a2=0
+- corona_scale=<szám>
+  A fényforrás képének nagyítása. Åltalában jó a default=1, de ha extra nagy
+  fényeket akarunk vagy valamiért rosszul van skálázva a scene, akkor ez kell.
+
+pl.:
+    2: scene part1
+    2: light 0
+    corona_scale=5
+    light_zbuffer=0
+    attenuation0=0
+    attenuation2=0.001
+
+Na ennyit egyelôre a scriptrendszerrôl.
+Ha bármi kérdésed van, vagy valamiben nem látod a logikát (pedig van!:))
+akkor mailto: arpi@banki1.banki.hu, vagy IRC: Arpi_AST  #demoscene, #scene
+
+A'rpi of Astral
+
+

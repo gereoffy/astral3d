@@ -1,0 +1,12 @@
+#! /bin/sh
+echo "Compiling MP3..."
+
+gcc -Wall -O3 -c sr1.c
+gcc -Wall -O2 -c audio_oss.c
+rm -f libMP3.a
+ar rc libMP3.a audio_oss.o sr1.o
+rm -f *.o
+
+gcc -Wall test.c -o test -L. -lMP3 -lm
+
+

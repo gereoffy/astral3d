@@ -1,0 +1,263 @@
+ASTRAL OpenGL HARDWARE ACCELERATED 3D ENGINE'S LOG FILE
+MODIFICATIONAL RIGHTS : Strepto, Arpi.
+(c) Copyright 1999, AstraL
+
+v1.0 modified by : Arpi & Strepto.
+
+- Atlatszo vagy alphas texturaju objectecnel a facekat bytesortoljuk avg z 
+  szerint asztan hatulrol elore rajzoljuk hogy a Z-buffer ne bugzon, igy a 
+  test hatulja is latszik.
+- Atmosphere loader teljes implementacioja.
+  ! ez azert igy nem igaz ! --A'rpi
+  Csak a FOG-ot tolti be, es az ENABLE flag-eket, de a tobbi parametert meg nem.
+- Sphere mapping.(Mint az envmap csak szebb :) )
+
+v1.1 modified by : Strepto.
+
+- Morph nem ment ha atlatszo vagy alpha volt az object mapja mert render.c 
+  (TRANSFORM VERTEX COORDS) ben a forgatasnal ujra forgatta az objectet az 
+  eredeti coordinatak szerint.
+- Fogos scenek elszalltak mert render.c (SetupLightMode) ben mert scenebol
+  vetted az adatokat kozben az activescenebol kell = ast3d_scene pl : 
+  scene->fog.fognear helyett ast3d_scene->fog.fognear.
+  ! nem igaz ! --A'rpi
+- Nem mukodott az envmap (ha az envmap multitexturaja atlatszo vagy alphas 
+  volt) mert az envmap renderelo csinalt visibility checket ami nem ment at
+  mert atlatszo testeknel nem fut le a pretranszformacios backface cull ami 
+  beallitja a  visibility  flageket. Ezert  egyenlore a  pretranszformacios 
+  backface cullt visza raktam hiszen atlatszo testeknel nyugodtan flagelheti 
+  a backfacekat attol meg megy a sortolas.
+- Ast3d.c ben a do_tranformnal elszallhatott a morph mert elirtam 
+  for(i=0;i<num_verts;i++)faces[i].visible=TRUE    - helytelen
+  for(i=0;i<num_verts;i++)vertices[i].visible=TRUE - helyes
+  asszem ertheto mert ha tobb a vertex mint a face akkor valyon hova ir?
+  ! a vajon az pontos j :) --A'rpi
+
+v1.2 modified by Strepto&Arpi:     99.09.13.
+
+- mat->matflags atirva mat->flags-ra
+- uj matflag: ast3d_mat_transparent (akor TRUE, ha van opacitymap vagy 
+  a transparency>0)
+- ast3d.c: visibility check csak opaque (!transparent) testnel van
+- ast3d_scene -> scene visszairva  TESZTELNI!
+- boundingbox min,max helyett p[8], a pmin,pmax-ot p-bol szamolja
+- obj->flags-hoz ast3d_obj_inside, bbox alapjan allitja be
+- mat->flags ast3d_mat_twosided-et is figyelembe veszi (ha benne vagyunk)
+- ha transparent: 2sided fenyek
+- frustrum culling
+- birdshow bug fixed!!! 
+     keys = n;
+     while (n-- > 0) {
+       if (keys == n-1) angle = pos[0]; else angle += pos[0];
+  Ez volt, pedig  if (keys == n+1)... lenne a helyes!!!
+  Javitva, nem igy, hanem elejen angle=0, itt pedig az if() helyett 
+  csak angle+=pos[0];  (igy gyorsabb)
+
+v1.3 modified by Arpi:     99.09.19.
+- map loader kicsit atszervezve, ezutan kulon object: load_map.o(bj)
+- JPEG support  (libjpeg-et hasznalja, jpeg betomorites kiszedve belole)
+- 3dslib nem inicializalta a mask map-okat (neha szemet map-okat akart betolteni)
+- LINUX: MP3 player support    (music-lx.o(bj))
+- LINUX: mp3 player javitva (szam vegen lefagyott)
+- LINUX: timer support (timer-lx.o(bj)), FPS kiiras 5 sec-enkent
+- LINUX: ESC-re kilep, glutIdleFunc modositva
+- 3dslib/matrix.h-ban mat_sub, mat_add rutinokbol a temp-et kiszedtem!!
+
+v1.4 modified by Arpi:     99.09.22.
+- script support
+- uj timer: gettimeofday()-el
+- mp3 player atirva, audio sample player + mp3 decoder
+
+v1.5 partycoding   99.09.24.   by Astral :)
+- blend allithato scene-enkent
+- ast3d_blend muxik vegre (blendeli az egesz framet), kiveve backfaces
+- lightcorona nem bugzik fog-nal (disable fog)
+  lightc. ugyanolyan szinu mint a feny
+- lights[] tomb a feny_...[] helyett...
+  script tamogatas corona_scale, attenuation{0-2}, light_zbuffer -re
+- 64x64 .. 512x512 texturak tamogatasa
+- texture koordinatak bugoznak, fixed!!!!!
+
+v1.6 bugfixing    99.09.30-   by A'rpi
+- clax bugok: object, vertex es face strukturak nem voltak korrekten
+  inicializalva (pl. face.pmat nem volt NULL-ozva, es ha kesobb nem 
+  definaltak ra materialt, akkor random helyre mutatott, lasd. fog.3ds!!!)
+- ESP-s filesystem  (afs2.c)
+
+v1.7 sajat fenyszamolas  99/10/5-7
+- opengl helyett sajat feny szamolas, MESA alapjan
+  egyelore minden feny POSITIONAL es szamol attenuation-t, SPOT me'g nincs.
+  speculart akkor szamol ah mat->shading=phong, kulonben csak amb+diff
+- specular nagyon megoptimalva (spec=diff+nz)
+- ambient szine = mat->ambient.color * (c_AMBIENT *)ambient->color
+
+v1.8 code cleanup   99/10/7-   by A'rpi
+- chevy bugzas oka: 
+     if(obj->faces[i].visible || obj->flags&ast3d_obj_inside || matflags&ast3d_mat_twosided){
+  e helyett:
+     if(obj->faces[i].visible || obj->flags&ast3d_obj_inside){
+- uj object flag bevezetese: ast3d_obj_allvisible
+  akkor TRUE, ha nem csinalt visibility checket, mert minden face/vertice
+  latszik. igy a render.c leegyszerusodik es atlathatobb lesz:
+    if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){ ... }
+  minden visibility dolog a clax/ast3d.c-ben lesz ezutan.  
+* FONTOS!!! a vertices[].visible-t a render.c kell FALSE-ra allitsa, a tobbit
+    (obj.visible, faces[].visible) a clax vegzi!!!
+- object.visible csak akkor TRUE, ha nem HIDDEN, tehat render.c nem kell nezze
+  a HIDDEN flageket. CLAX javitva hogy igy legyen :) es kulonben ne is
+  visibilitycheckeljen.
+- render.c: vertex transform-nal a morph checket (morphnal nem kell forgatni
+  mert a morpholo mar forgatott) kiraktam a cikluson kivulre...
+- render.c: ha nem transparent, allvisible es nem twosided, akkor hasznal
+  csak opengl-es backface cullingot (pl. morph miatt)
+- megjegyzes: matflags&ast3d_mat_transparent akkor TRUE, ha 
+   - atlatszo az object (transparency >0)  vagy
+   - van alphamap
+  csak ott hasznal Z-Sort-ot ahol matflags&ast3d_mat_transparent!
+- glTexCoord+glNormal+glVertex -ek kiszedve -> triangle.c -be
+  uj fuggvenyek:
+    inline void ast3d_DrawGLTriangle_texture(c_FACE *f);
+    inline void ast3d_DrawGLTriangle_envmap(c_FACE *f);
+    inline void ast3d_DrawGLTriangle_spheremap(c_FACE *f);
+  -> kicsit attekinthetobb (es kisebb:)) lett a render.c vege
+- chevy texturajan azert nem volt specular, mert metal shading volt
+  beallitva ra... de az uvegen sincs :(
+- metal shading support: kozelitessel, de egesz turhetoen nez ki.
+  amugy meg -> metal1.3ds
+  azert jo lenne tudni a 3DS metal shading kepletet...
+- SpotLight support. Mostmar korrekt a FallOff es HotSpot szerint!!!
+  (jo sokat szivtam vele...)  
+  A FallOff annak a kupnak a kupszoge (nem felkupszog!!) amin kivul mar
+  feketeseg van, a HotSpot pedig annak a szoge amin belul teljes a fenyero.
+  A 2 kozt kell interpolalni valahogy, most exp()-el van megoldva.
+
+v1.81 code cleanup   99/10/11-   by A'rpi
+- code szetszedve, kulon konyvtarban afs, render
+- triangle.c-ben _gouraud filler, ez nem ad at textura koordinatat
+  a render.c ezt hivja ha nincs textura
+  -> chevy 3.9fps-rol 4.4fps-re gyorsult
+- render/linux.c lefordul es muxik jol!!!!!
+  meg a durva.3ds es a brutal.3ds is megy vele, raadasul gyorsan!
+- render.c-bol "kioptimalizaltam" par "felesleges" valtozot :)
+  egyedul a 'scene' es 'ambient' maradt meg globalisnak, a node, obj, cam, stb nem!
+  A 'cam' helyett ezutan csak a 'scene->cam' hasznalhato.
+  A FindCameras() kiirja a talalt node-kat (light/camera/object).
+  A SetupLightMode() feltolti a light[]-ot, igy nem kell FindCameras() minden
+  frame elott, csak 1x betolteskor.  
+- loadmaps.c szetszedve 2 reszre, a loadmaps.c-ben maradtak alap dolgok
+  (clip_255, load_simple_map stb), a render/loadmat.c-ben pedig a LoadMaterials()
+- FindCameras-t es LoadMaterials-t 'scene' parameterrel kell hivni, igy nem
+  kell scene=... a hivas elott, es tisztabb es szarazabb erzes... :)
+- Forrasfile-ok elrendezve, render.c szetbontva.
+  Minden konyvtarban van egy 'c' nevu script ami leforditja a tartalmat!
+  A fokonyvtarban csak a play-lin.c play-win.c demo-lin.c demo-win.c
+  es a hozza tartozo EXE-k es makefile-ok lesznek!
+
+v1.82 code cleanup   99/10/15   by A'rpi
+- scriptrendszer letisztazva, draw_scene kiszedve kulon fileba.
+  script/ konyvtart tartalma script.o-ba fordul, igy nem kell ujraforditani
+  ha a render vagy a 3dslib modosul!
+- blob.c mindenestul -> blob/ konyvtarban, mostantol a DrawBlob() csinal mindent
+  Blob parameterei (alpha_level es line_blob) eddig global valtozo volt,
+  most FX-enkent allithato! (lehet tobb kulonbozo blobot egyszerre:)))
+- window_w, window_h es a resize() atkerult render.c-bol a foprogiba!!!
+- glutos dolgok kiszedve mindenhonnan, csak a foprogiban (demo.c) van.
+- demo.c lefordul!!!!!!!! es mukodik!!!!!! :)
+- glut es glu beleforditva a demoba, igy csak 30k-val nagyobb a demo
+  (mivel csak azt ford. bele amit hasznal, az meg nem sok), es nem kell
+  libglu se libglut hogy fusson!
+- minden konyvtarban van 'c' script ami lefordit mindent jol... rm -f -el :)
+  gyokerben van make-all.sh meg clean.sh, elso mindent lefordit, utobbi
+  letorli a forditassal eloallitott fileokat (obj, lib, exe)
+  Az UTIL/c eloszor general sources.txt-t majd ezeket konvertalja DOS->UNIX!
+- new: DOCS/dirinfo.txt - melyik konyvtar/file micsoda
+  DOCS/OLVASS.EL-t es script.txt-t toroltem, mert mar egyaltalan nem aktualis
+- Makefile a 3dslib, render es loadmap konyvtarakhoz (make dep;make;make clean)
+
+v1.9   99/10/16-17   by A'rpi
+- frustum culling framenkent (csak ha az object kilog a frustumbol,
+  ha az egesz benne van, akkor nem!  (ast3d_obj_frustumcull))
+- ast3d.c szetszedve, do_trans.c es visibchk.c
+- visibchk.c: uj modszer: nem akkor visible ha dot<0 hanem ha dot<sin(FOV)!
+  FOV erteke:  
+    v1: camera->fov  -> jo, de lassu
+    v2: MAX(abs(bbox.minx,bbox.maxx),abs(bbox.miny,bbox.maxy)) / bboz.minz
+        -> nem igazan jo, es lassu
+    v3: origobol bbox kozepebe mutato vektor es a Z tengely szoge
+        -> nem bugzik, es gyorsabb is!
+- config.h MEGSZUNTETVE, helyette az INLINE makro az ast3d.h-ban van!
+
+!!-- strepto elvitte a forrast! --!!
+
+v1.91   99/10/17   by A'rpi
+- bugfix: atlatszo testek blendelesnel random facek hatterben...
+  hogyha frustum culling bekapcsolva: neha sokkal tobb ilyen random
+  face, neha kevesebb.
+  Oka: ast3d_obj_inside flag. nem hasznaltuk, de bekavart az allvisible
+  flag-ba, az meg a frustum cullingon keresztul a visibilitybe... SUXXXXXXXX!
+- rulez: mexunt a part2.3ds-nel is a bugzas frustum cullingnal!
+- new: akkor is csinal opengl-es backface cullingot, ha nem ast3d_obj_allvisible
+  -> gyorsult 2.3ds tole 45.3->47 fps, es sokkal szebb blendeleskor, mert
+  a "random" facekat eltunteni, ami a forgatas elotti visib. checken
+  atcsuszott, de valojaban hatrafele nez.
+- YEAH! minden ALPHA demo part legalabb 25fps-el m1 linuxon!!!
+  Sot, az unreal szoba 100-al, a 4inone 90-el, a part2 30-al!
+  A chevy 4.4fps korul van. Egesz jol m1 az ast_logo.3ds es a durva.3ds is.
+
+v1.92   99/10/21   by A'rpi
+- AFS v3.0: tamogatja a FILES (sima, igazi file-ok kulon), DAT (tomoritetlen
+  fileok osszepakolva egy .DAT fileba) es a PAK (ESP-vel tomoritett file-ok
+  egy .PAK fileba pakolva) formatumokat, akar tobbet is egyszerre.
+  Tovabba sima fileok eseten meg lehet adni egy konyvtarat amihez kepest
+  a filenevek vonatkoznak, igy nem kell a gyokerbe szorni a cuccost.
+  hivasa: afs_init(namepath, type);
+    namepath: .DAT vagy .PAK file neve, vagy path ha kulonallo file-ok
+    type: AFS_TYPE_FILES, AFS_TYPE_DAT vagy AFS_TYPE_PAK   
+  Tervek: - kesobbiekben pl .ZIP file-ok tamogatasa (AFS_TYPE_ZIP).
+          - script fogja betolteni (mount-olni) ezeket
+
+v1.93   99/10/22  by A'rpi
+- Egyeztetve windows-os verzioval (demo.zip).
+- Automatikus INLINE es windows.h:
+  #ifdef __GNUC__
+    linux rulez
+  #else
+    windows nemrulez
+  #endif
+  Nem tudom hogy windowsos gcc-vel (lgcc/djgpp) muxik-e...
+  se azt hogy egcs-vel meg pgcc-vel linux alatt...
+
+v2.0  99/11/5  by Strepto & A'rpi
+- Bugzas volt morfnal azt hittuk hogy a frustum rossz de nem csak az object
+  fordult ki. Morfnal gl_cullface kell es akkor nem bugzik.
+- Inverz matrixos pretrans face cull tokeletes az uj matrix inverteremmel --
+  Sterpto.
+- Optimaltuk ast3d.c ben az ast3d_update fugvenyben az obj_matrix eloallitasat
+  uj fuggveny csinal mindent qt_make_objmat.
+
+v2.1  99/11/6  by Strepto 
+- Win recompile, warning volt loadmaps ban map_id -k nek unsigned intnek kell
+  lenni nem int-nek [ OpenGL doksi is irja ;) ].
+  Linkeles script miatt leallt : MP3-nal mp3win konyvtarat kell megadni mp3lin
+  helyett! > Modify + recompile script!
+
+v2.2 99/11/9  
+- by strepto: Lightmap tamogatas, 3ds-ben selfillum mapkent kell beallitani!
+- by A'rpi: Specular phongmap tamogatas (3ds-ben specularmap)
+Code mixed!!!!!
+
+
+BUGZ:
+- texturak fejjel lefele
+- winfos alatt ha tul sok a textura akkor nem tolti be mindet
+  (fclose() hianyzik???)
+
+KELL MEG:
+- optimalt directional lighting attenuation nelkul, normal forgatas nelkul
+- Texture manager!!!!!!
+- nosound-al is menjen a demo!!!!!!
+- tobb fenyforras parametereinek 1ideju allitasa!  (bitmaszk kell light-nal)
+- gyorstekeres scriptrendszerbe
+- bug: chevy szelvedojen nincs specular!  -- specularmap-al van!!!!!
+- Morfnal pretrans face cull  -- megbeszeltuk hogy nem eri meg
+

@@ -1,0 +1,4 @@
+#! /bin/sh
+echo "Compiling script..."
+
+gcc -c -Wall -O2 script.c

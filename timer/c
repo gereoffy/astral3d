@@ -1,0 +1,4 @@
+#! /bin/sh
+echo "Compiling timer..."
+
+gcc -O2 -Wall -c timer-lx.c

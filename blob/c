@@ -1,0 +1,4 @@
+#! /bin/sh
+echo "Compiling blob..."
+
+gcc -c -g -O2 blob.c
