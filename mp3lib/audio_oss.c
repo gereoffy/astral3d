@@ -137,13 +137,14 @@ static struct audio_info_struct ai;
 
 static void sig_handler(int signum){ if(!MP3_eof)audio_play_MP3(&ai);}
 
-int MP3_Play(char *filename){
+int MP3_Play(char *filename,int pos){
   MP3_eof=0;
-  MP3_frames=0;
+  MP3_frames=pos;
   MP3_file=fopen(filename,"rb");
   if(!MP3_file) return 0;
+//  if(pos>0) fseek(MP3_file,pos,SEEK_SET);
   
-  MP3_Init(MP3_file);
+  MP3_Init(MP3_file,pos);
   {  struct sigaction sa;
      sa.sa_handler=sig_handler;
      sa.sa_flags=SA_RESTART;

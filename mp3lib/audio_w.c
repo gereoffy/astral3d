@@ -68,7 +68,7 @@ int audio_play_samples(struct audio_info_struct *ai,unsigned char *buf,int len){
 }
 
 static void play_frames(){
-       if(!MP3_eof) while(nBlocks<MAX_BLOCKS){
+       while(!MP3_eof && nBlocks<MAX_BLOCKS){
          int len=MP3_DecodeFrame(buffer,-1); 
 //         ++MP3_frames;
          if(len>0) audio_play_samples(&ai,buffer,len); else MP3_eof=1;
@@ -112,7 +112,7 @@ int audio_open(struct audio_info_struct *ai){
    if(ai->rate == -1) return(0);
 
    if(!waveOutGetNumDevs()) {
-       MessageBox(NULL, "No audio devices present!", "No music...", MB_OK);
+//       MessageBox(NULL, "No audio devices present!", "No music...", MB_OK);
        return 0;
    }
 
@@ -142,7 +142,7 @@ int audio_open(struct audio_info_struct *ai){
            case WAVERR_SYNC:
                errmsg="The device is synchronous."; break;
        }
-       MessageBox(NULL, errmsg, "No music...", MB_OK);
+//       MessageBox(NULL, errmsg, "No music...", MB_OK);
        return 0;
    }
 
@@ -180,22 +180,32 @@ int MP3_OpenDevice(char *devname){
   return audio_open(&ai);
 }
 
-int MP3_Play(char *filename){
-  MP3_file=fopen("alpha2.mp3","rb");
+int MP3_Play(char *filename,int pos){
+  MP3_file=fopen(filename,"rb");
   if(!MP3_file) return 0;
-  MP3_Init(MP3_file);
-  MP3_eof=0; MP3_frames=20;
+//  if(pos>0) fseek(MP3_file,pos,SEEK_SET);
+  MP3_Init(MP3_file,pos);
+  MP3_eof=0; MP3_frames=20+pos;
   play_frames();  // fill the buffer
   return 1;
 }
 
 void MP3_Stop(){
   MP3_eof=1;  // stop decoding frames by the interrupt
-  if(MP3_file) fclose(MP3_file);
+//  if(MP3_file) fclose(MP3_file);
 }
 
 void MP3_CloseDevice(){
+int i=0;
+  printf("Flushing audio buffers...\n");
+  MP3_eof=1;
+  while(nBlocks>0){
+    printf("%5d   %d\n",i,nBlocks);
+    Sleep(100);
+  };
+  printf("Closing audio device...\n");
   audio_close(&ai);
+  printf("Closed.\n");
 }
 
 #if 0

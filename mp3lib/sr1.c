@@ -324,8 +324,9 @@ init_resync:
 /******************************************************************************/
 
 static int tables_done_flag=0;
+int MP3_SkipFrames=0;
 
-void MP3_Init(FILE *fd){
+void MP3_Init(FILE *fd,int pos){
   if(!tables_done_flag){ 
     make_decode_tables(outscale);
     fr.synth=synth_1to1;
@@ -338,15 +339,27 @@ void MP3_Init(FILE *fd){
   mp3_file=fd;
   oldhead = 0;
   firsthead = 0;
+//
+   while(pos>0){
+     if(!read_frame(&fr))return;
+     --pos;
+   }
 }
 
 int MP3_DecodeFrame(unsigned char *hova,short single){
    pcm_sample = hova;
    pcm_point = 0;
    if(!read_frame(&fr))return(0);
+#if 0
+   while(MP3_SkipFrames>0){
+     if(!read_frame(&fr))return(0);
+     --MP3_SkipFrames;
+   }
+   MP3_SkipFrames=0;
+#endif
    if(single==-2){ set_pointer(512); return(1); }
    do_layer3(&fr,single);
-   return(pcm_point);
+   return(pcm_point?pcm_point:2);
 }
 
 /******************************************************************************/
