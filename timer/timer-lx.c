@@ -14,6 +14,14 @@ float GetTimer(){
   return (s*0.000001);
 }  
 
+// Returns current time in microseconds
+int uGetTimer(){
+  struct timeval tv;
+  struct timezone tz;
+  gettimeofday(&tv,&tz);
+  return (int)(tv.tv_usec+1000000*tv.tv_sec);
+}  
+
 static float RelativeTime=0.0;
 
 // Returns time spent between now and last call in seconds

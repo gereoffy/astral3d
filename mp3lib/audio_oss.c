@@ -137,11 +137,11 @@ static struct audio_info_struct ai;
 
 static void sig_handler(int signum){ if(!MP3_eof)audio_play_MP3(&ai);}
 
-void MP3_Play(char *filename){
+int MP3_Play(char *filename){
   MP3_eof=0;
   MP3_frames=0;
   MP3_file=fopen(filename,"rb");
-  if(!MP3_file) return;
+  if(!MP3_file) return 0;
   
   MP3_Init(MP3_file);
   {  struct itimerval it;
@@ -157,6 +157,7 @@ void MP3_Play(char *filename){
      sigemptyset(&sa.sa_mask);
      sigaction(SIGALRM, &sa, NULL);
   }
+  return 1;
 }
 
 void MP3_Stop(){

@@ -257,11 +257,40 @@ v2.4 99/11/20  by Strepto & A'rpi
 - loadmaps.c is texturemanagert hasznal + kis optim loadtxtr.c-ben
 - 3_light.c optim. specularmap-nal
 
+v2.5 99/11/25-26  by A'rpi
+- Profiling support:  prof.h
+  ha nem kell akkor _CSAK_ a prof.h elejen a #define PROFILING-et szedd ki!!!
+  Lenyege: meri az egyes programreszek futasi idejet (microsec-ben), es 
+  kilepeskor kiirja az idoket, meg %-osan is kiirja.
+  Problema: chevy-nel (5b.3ds) eleg nagy meresi hibak vannak, pl. 2 
+  reszmuvelet ideje osszeadva fele annyi mint egyutt merve a ketto...
+  oka: nagyon sok kis object van, es mivel objectenkent vannak merve
+  az idok, a kis pontatlansagok megsokszorozodnak :(
+- Scriptsystem: scr_init.c atirva makrosra, speci script valtozok mostantol
+  a vars.h-ban vannak definalva makrokkal.
+  Effekt es light-fuggo valtozokat a scr_exec.c-be is be kell irni!!!
+- Scriptbe: 'picture pic_id' parancs is mukodik jol (fullscreen sprite)
+- mar nosound-al is megy!  (adk_mp3_frame=rel_time*44100/1152)
+- keves face-re nem kell pretrans-cull!!! (chevy...)
+  => a chevy lassul tole, a tobbi meg semmit se valtozik. -> kiszedve :(
+
 KELL MEG:
-- optimalt directional lighting attenuation nelkul, normal forgatas nelkul
-- nosound-al is menjen a demo!!!!!!
+- uj picture formatum (xsize,ysize,alpha_flag,hany db texturabol,tomb ID-knek)
+- scriptbol vezerelheto lassu texturabetoltes (3ds play kozben tolti le
+  oket egyenkent)
+- 2D effektek
+- animalt texturak (FLI/FLC?)
+- camera valtas scriptbol, scriptsys forras (foleg scr_exec.c) letisztazasa
 - tobb fenyforras parametereinek 1ideju allitasa!  (bitmaszk kell light-nal)
+- commandline opciok: window/fullscreen, felbontas, mipmap on/off, fps
 - gyorstekeres scriptrendszerbe
+- optimalt directional lighting attenuation nelkul, normal forgatas nelkul
+- lighting optimalizalasa, a renderelesi ido 20-35%-a ezzel megy el
+- multitextura  (textura+lightmap esetre legalabb)
+- morph transzformaciot attenni render.c-be! meg a pre-trans cull-t is!
+
+EGYEB:
 - bug: chevy szelvedojen nincs specular!  -- specularmap-al van!!!!!
-- Morfnal pretrans face cull  -- megbeszeltuk hogy nem eri meg
+- Morfnal pretrans face cull  -- megbeszeltuk hogy nem lehet, mert az
+  interpolalt normalok szarok, es a D-t is kene interpolalni
 

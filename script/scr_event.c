@@ -1,5 +1,7 @@
 // ====================== EVENT handler ===============================
 float adk_time=0.0;
+float adk_mp3_frame=0.0;
+#define MP3_FRAMES (nosound?adk_mp3_frame:(MP3_frames))
 
 #define scrEVENTframe   1
 #define scrEVENTtime    2
@@ -17,7 +19,7 @@ int scrTestEvent(scrEventStruct* event){
 //  t=GetRelativeTime(); adk_time+=t;adk_frame+=adk_fps*t;
   if(event->type&scrEVENTframe && event->frame<event->frameptr[0]) return 1;
   if(event->type&scrEVENTtime && event->time<adk_time) return 1;
-  if(event->type&scrEVENTpattern && event->pattern<MP3_frames) return 1;
+  if(event->type&scrEVENTpattern && event->pattern<MP3_FRAMES) return 1;
   return 0;
 }
 
@@ -45,7 +47,7 @@ int i;
     s[slen]=0;
     event->type|=scrEVENTpattern;
     i=str2int(s);
-    event->pattern=(i<0)?(-i):(i+MP3_frames);
+    event->pattern=(i<0)?(-i):(i+MP3_FRAMES);
 //    printf("Event:  pattern value=0x%x\n",event->pattern);
     return scrEVENTpattern;
   }

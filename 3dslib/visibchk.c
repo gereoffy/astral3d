@@ -22,9 +22,9 @@
         for (i = 0; i < obj->numfaces; i++){
           c_VECTOR *vec=&obj->faces[i].norm;
           if(cit.x*vec->x+cit.y*vec->y+cit.z*vec->z >= obj->faces[i].D){
-            obj->faces[i].pa->visible=1;
-            obj->faces[i].pb->visible=1;
-            obj->faces[i].pc->visible=1;
+            obj->faces[i].pa->visible=
+            obj->faces[i].pb->visible=
+            obj->faces[i].pc->visible=
             obj->faces[i].visible=1;
             continue;
           }

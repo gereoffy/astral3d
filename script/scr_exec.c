@@ -1,9 +1,7 @@
 // ====================== Script interpreter ===============================
 
 // initialized by scr_init.c
-int scr_playing=0;
 scrEventStruct scr_playing_event;
-int nosound=0;
 int current_light=0;
 
 GLvoid scrExec(){
@@ -15,10 +13,7 @@ byte* p[20];
 fx_struct *fx=current_fx;
 
   if(scr_playing){
-    if(!scrTestEvent(&scr_playing_event)){
-//      glutPostRedisplay();
-      return;
-    }
+    if(!scrTestEvent(&scr_playing_event))  return;  /* !!!!!!!!!!!!!! */
     scr_playing=0;
   }
 
@@ -28,7 +23,7 @@ fx_struct *fx=current_fx;
   /* ------------- PARSE COMMAND PARAMETERS ------------------ */    
   i=0;
 
-  /* cut off fx label */
+  /* cut the fx-label */
   if(sor[1]==':' && sor[0]>='0' && sor[0]<('0'+FX_DB)){
     int fxnum=sor[0]-'0';
 //    printf("Setting up current FX to #%d\n",fxnum);
@@ -38,15 +33,15 @@ fx_struct *fx=current_fx;
     if(sor[i]==0){ current_fx=fx;return; }
   }
 
-  /* update virtual variables */
+  /* update special variables */
   *fx_ptr_frame = &fx->frame;
   *fx_ptr_fps = &fx->fps;
   *fx_ptr_blend = &fx->blend;
   *fx_ptr_vlimit = &fx->vlimit;
   *fx_ptr_blob_alpha = &fx->blob_alpha;
   *fx_ptr_line_blob = &fx->line_blob;
-  if(fx->scene){
-    *scene_ptr_directional_lighting = & fx->scene->directional_lighting;
+  if(fx->type==FXTYPE_SCENE && fx->scene){
+    *scene_ptr_directional_lighting = &fx->scene->directional_lighting;
   }
 
 //    i=0;
@@ -79,13 +74,13 @@ fx_struct *fx=current_fx;
         return;
       }
       if(n->type==scrTYPE_scene){
-        scrFatal("You cannot redefine scene so, use command: LoadScene");
+        scrFatal("Scene variables are NOT redefinable!");
       }
       printf("EXEC: unknown type variable: %s\n",p[0]);
     }else{
-      /* -------------------- COMMAND ---------------------- */
+      /* -------------------- COMMANDS ---------------------- */
 
-      if(strcmp(p[0],"load_scene")==0){                              //loadscene
+      if(strcmp(p[0],"load_scene")==0){                            //loadscene
         if(pdb<3) scrFatal("load_scene: Missing operands!");
         if(scrSearchVar(p[1])){
           printf("error: scene=%s %s\n",p[1],p[2]);
@@ -113,7 +108,7 @@ fx_struct *fx=current_fx;
         return;
       }
 */
-      if(strcmp(p[0],"scene")==0){                                  //scene
+      if(strcmp(p[0],"scene")==0){                                     //scene
         if(pdb!=2) scrFatal("scene: Missing or too many operands!");
         scene=scrGetVar_scene(p[1]);
         if(!scene)scrFatal("Reference to undefined scene!");
@@ -124,6 +119,7 @@ fx_struct *fx=current_fx;
         ast3d_setactive_camera(scene->cam);
         return;
       }
+
 //      if(strcmp(p[0],"camera")==0){                                 //camera
 //        if(pdb!=2) scrFatal("Missing or too many operands!");
 //        if(!a3d_setactive_camera(p[2]))scrFatal("Camera not found");
@@ -131,25 +127,25 @@ fx_struct *fx=current_fx;
 //      }
 
 
-      if(strcmp(p[0],"fixUV")==0){                                //fixUV
+      if(strcmp(p[0],"fixUV")==0){                                     //fixUV
         scene=fx->scene; ast3d_setactive_scene(scene);
         ast3d_fixUV();
         return;
       }
-      if(strcmp(p[0],"SortFaces")==0){                            //tstrip
+      if(strcmp(p[0],"SortFaces")==0){                             //tri.strip
 #ifdef TRIANGLE_STRIP
         scene=fx->scene; ast3d_setactive_scene(scene);
         ast3d_SortFaces();
 #endif
         return;
       }
-      if(strcmp(p[0],"light")==0){                                //light
+
+      if(strcmp(p[0],"light")==0){                                     //light
         if(pdb!=2) scrFatal("light: Missing or too many operands!");
         scene=fx->scene; ast3d_setactive_scene(scene); FindCameras(scene);
         current_light=atoi(p[1]);
-        if(current_light<0 || current_light>=lightno){
+        if(current_light<0 || current_light>=lightno)
           scrFatal("light: Invalid light number!");
-        }
         *light_ptr_corona_scale = &lights[current_light]->corona_scale;
         *light_ptr_attenuation0 = &lights[current_light]->attenuation[0];
         *light_ptr_attenuation1 = &lights[current_light]->attenuation[1];
@@ -158,14 +154,14 @@ fx_struct *fx=current_fx;
         return;
       }
 
-      if(strcmp(p[0],"blob")==0){                                  //scene
+      if(strcmp(p[0],"blob")==0){                                    //fx=blob
 //        if(pdb!=2) scrFatal("scene: Missing or too many operands!");
         fx->type=FXTYPE_BLOB;
         fx->vlimit=200000;
         return;
       }
 
-      if(strcmp(p[0],"fdtunnel")==0){                              //scene
+      if(strcmp(p[0],"fdtunnel")==0){                               //fx=scene
         if(pdb!=3) scrFatal("fdtunnel: Missing or too many operands!");
         fx->type=FXTYPE_FDTUNNEL;
         fx->texture1=scrGetVar_int(p[1]);
@@ -173,21 +169,21 @@ fx_struct *fx=current_fx;
         return;
       }
 
-      if(strcmp(p[0],"picture")==0){
+      if(strcmp(p[0],"picture")==0){                              //fx=picture
         int id=scrGetVar_int(p[1]);
         if(pdb!=2) scrFatal("picture: Missing or too many operands!");
         if(id<1) scrFatal("picture: Variable not found!");
         fx->type=FXTYPE_PICTURE;
         fx->pic.type=0;
-        fx->pic.x1=-320;
-        fx->pic.y1=-320;
-        fx->pic.x2=320;//window_w;
-        fx->pic.y2=320;//window_h;
+        fx->pic.x1=0;
+        fx->pic.y1=480; //window_h;
+        fx->pic.x2=640; //window_w;
+        fx->pic.y2=0;
         fx->pic.id=id;
         return;
       }
 
-      if(strcmp(p[0],"sprite")==0){
+      if(strcmp(p[0],"sprite")==0){                                //fx=sprite
         int id=scrGetVar_int(p[1]);
         if(pdb!=6) scrFatal("sprite: Missing or too many operands!");
         if(id<1) scrFatal("sprite: Variable not found!");
@@ -201,7 +197,7 @@ fx_struct *fx=current_fx;
         return;
       }
 
-      if(strcmp(p[0],"addsprite")==0){
+      if(strcmp(p[0],"addsprite")==0){                          //fx=addsprite
         int id=scrGetVar_int(p[1]);
         if(pdb!=6) scrFatal("addsprite: Missing or too many operands!");
         if(id<1) scrFatal("addsprite: Variable not found!");
@@ -215,7 +211,7 @@ fx_struct *fx=current_fx;
         return;
       }
 
-      if(strcmp(p[0],"loadpic")==0){
+      if(strcmp(p[0],"loadpic")==0){                                 //loadpic
         int id;
         if(pdb!=3) scrFatal("loadpic: Missing or too many operands!");
         if(scrSearchVar(p[1]))scrFatal("Picture_ID var redefinition!");
@@ -224,7 +220,7 @@ fx_struct *fx=current_fx;
         scrCreateVar_int(p[1],id,NULL);
         return;
       }
-      if(strcmp(p[0],"loadRGBA")==0){
+      if(strcmp(p[0],"loadRGBA")==0){                               //loadRGBA
         int id;
         if(pdb!=4) scrFatal("loadRGBA: Missing or too many operands!");
         if(scrSearchVar(p[1]))scrFatal("RGBA Picture_ID var redefinition!");
@@ -234,7 +230,7 @@ fx_struct *fx=current_fx;
         return;
       }
 
-      if(strcmp(p[0],"fade")==0){                                //fade
+      if(strcmp(p[0],"fade")==0){                                       //fade
         int f;
         if(pdb!=5) scrFatal("fade: Missing or too many operands!");
         n=scrSearchVarT(p[1],scrTYPE_float);
@@ -262,6 +258,7 @@ fx_struct *fx=current_fx;
         if(pdb>1) printf(p[1]);
         return;
       }
+
       if(strcmp(p[0],"play")==0){                                   //play
         scr_playing_event.type=0;
         scr_playing_event.frameptr=&(fx->frame);
@@ -273,18 +270,21 @@ fx_struct *fx=current_fx;
         scr_playing=1;
         return;
       }
+
       if(strcmp(p[0],"start_music")==0){                            //mp3 play
         if(pdb<2)scrFatal("No file name specified!");
+	adk_mp3_frame=0;
         if(nosound) return;
         MP3_Stop();
-        MP3_Play(p[1]);
+        if(!MP3_Play(p[1])) nosound=1;
         return;
       }
-      if(strcmp(p[0],"stop_music")==0){                             //xm stop
+      if(strcmp(p[0],"stop_music")==0){                             //mp3 stop
         if(nosound) return;
         MP3_Stop();
         return;
       }
+
       printf("EXEC: unknown command: %s\n",p[0]);scrFatal(0);
     }
 

@@ -10,6 +10,12 @@ _inline float GetTimer(){
   return (float)timeGetTime() * 0.001;
 }  
 
+// Returns current time in microseconds
+_inline int uGetTimer(){
+  return timeGetTime() * 1000;
+}  
+
+
 static float RelativeTime=0.0;
 
 // Returns time spent between now and last call in seconds

@@ -3,6 +3,7 @@
 cd render;make;cd ..
 cd 3dslib;make;cd ..
 cd loadmap;make;cd ..
+cd script;make;cd ..
 
 echo "Compiling DEMO"
 

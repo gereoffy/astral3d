@@ -141,12 +141,15 @@ static void do_transform ()
 #endif
 
 
-    if(!(matflags&(ast3d_mat_transparent|ast3d_mat_twosided))){
+#ifdef PRETRANS_CULL_FACELIMIT
+    if(obj->numfaces>PRETRANS_CULL_FACELIMIT)
+#endif
+      if(!(matflags&(ast3d_mat_transparent|ast3d_mat_twosided))){
         /* Not all vertices/faces are visible, visibility depends on
            faces[i].visible and vertices[i].visible flags! */
         obj->flags&=~ast3d_obj_allvisible;
 #include "visibchk.c"
-    } // if !transparent
+      } // if !transparent
 
 
 } // if(numfaces && in frustum)

@@ -82,7 +82,6 @@ int main(int argc,char* argv[]){
      printf("GLU_VERSION: %s\n", (char *) gluGetString(GLU_VERSION));
      printf("GLU_EXTENSIONS: %s\n", (char *) gluGetString(GLU_EXTENSIONS));
      printf("GLUT_API_VERSION: %d\n", GLUT_API_VERSION);
-			 
 #endif
 
 
@@ -109,11 +108,14 @@ int main(int argc,char* argv[]){
 
 //    ast3d_init (ast3d_transform | ast3d_hierarchy | ast3d_domorph);
 
+#if 0
     if(!MP3_OpenDevice(NULL)){ printf("Can't open audio device\n");exit(1);}
-//    if(!MP3_OpenDevice(NULL)){ 
-//      printf("Cannot open SOUND device...\n"); 
-//      nosound=1;
-//    }
+#else
+    if(!MP3_OpenDevice(NULL)){ 
+      printf("Cannot open SOUND device... silence suxx!\n");
+      nosound=1;
+    }
+#endif
     InitTimer();
     blob_init();
     scrInit();

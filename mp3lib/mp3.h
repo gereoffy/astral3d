@@ -7,7 +7,7 @@ extern int MP3_eof;
 extern int MP3_frames;
 
 extern int  MP3_OpenDevice(char *devname);
-extern void MP3_Play(char *filename);
+extern int  MP3_Play(char *filename);
 extern void MP3_Stop();
 extern void MP3_CloseDevice();
 

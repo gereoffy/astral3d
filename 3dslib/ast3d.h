@@ -1,18 +1,23 @@
 #ifndef _AST3D_H_
 #define _AST3D_H_
 
-//#define INLINE inline
+/* ---------------- Configuration ------------------ */
+
+/* If enabled, uses frustum culling for faces */
+#define FRUSTUM_CULL
+
+// #define TRIANGLE_STRIP
+
+/* Minimum face number for pre-trans backface culling */
+// #define PRETRANS_CULL_FACELIMIT 2
+
+/* ------------------------------------------------- */
 
 #ifdef __GNUC__
 #define INLINE __inline__
 #else
 #define INLINE _inline
 #endif
-
-/* If enabled, uses frustum culling for faces */
-//#define FRUSTUM_CULL
-
-// #define TRIANGLE_STRIP
 
 #define ast3d_VERSION 0.10
 #ifndef M_PI

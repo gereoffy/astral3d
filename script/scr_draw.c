@@ -29,14 +29,17 @@ typedef struct {
   float blend;
   float fps;
   float frame;
-  float vlimit;      /* BLOB */
+  /* BLOB: */
+  float vlimit;    
   float blob_alpha;
   int line_blob;
-  c_SCENE *scene;    /* 3DS player */
-  pic_struct pic;    /* PIC */
-  unsigned int texture1,texture2;  /* FDtunnel textures */
+  /* 3DS player: */
+  c_SCENE *scene;
+  /* PIC: */
+  pic_struct pic;
+  /* FDtunnel textures: */
+  unsigned int texture1,texture2;
 } fx_struct;
-
 
 fx_struct fxlist[FX_DB];
 fx_struct *current_fx=&fxlist[0];
@@ -50,6 +53,7 @@ int f;
     fx->fps=25.0;
     fx->frame=0.0;
     fx->scene=NULL;
+    fx->texture1=fx->texture2=0;
   }
 }
 
@@ -59,6 +63,7 @@ float rel_time=GetRelativeTime();
 int f;
 int zbuf_flag=0;
   adk_time+=rel_time;
+  adk_mp3_frame+=rel_time*(44100.0F/1152.0F);
 
   /* Update faders */
   for(f=0;f<MAX_FADER;f++) if(fader[f].ptr){
@@ -90,7 +95,7 @@ int zbuf_flag=0;
       draw3dsframe(); 
       { float frame,frames;
         ast3d_getframes(&frame,&frames);
-        if(fx->frame>frames) fx->frame=fx->frame-frames+frame;
+        if(fx->frame>=frames) fx->frame=fx->frame-frames+frame;
         if(fx->frame<0) fx->frame=0; // HACK?
       }
       continue;
@@ -103,7 +108,7 @@ int zbuf_flag=0;
       if(!fx->line_blob)
         if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
       DrawBlob(fx->frame,fx->line_blob,fx->vlimit,fx->blob_alpha);
-   }
+    }
 
     if(fx->type==FXTYPE_FDTUNNEL){
 //      printf("Playing FDTUNNEL for fx #%d\n",f);
@@ -140,7 +145,7 @@ int zbuf_flag=0;
       else  
         glColor4f(1.0,1.0,1.0,fx->blend);
       glDisable(GL_CULL_FACE);
-   	  glBegin(GL_QUADS);
+      glBegin(GL_QUADS);
         glTexCoord2f(0.0f,0.0f);
         glVertex2f(fx->pic.x1,fx->pic.y1);
         glTexCoord2f(1.0f,0.0f);

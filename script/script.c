@@ -8,15 +8,16 @@
 #ifdef __GNUC__
 #include <sys/time.h>
 #include <sys/types.h>
+#include "../mp3lib/mp3.h"
 #else
 #include <windows.h>
+#include "../mp3win/mp3.h"
 #endif
 
 #include <GL/gl.h>
 #include <GL/glu.h>
 
 #include "../3dslib/ast3d.h"
-#include "../mp3lib/mp3.h"
 #include "../timer/timer.h"
 #include "../blob/blob.h"
 #include "../fdtunnel/fdtunnel.h"
@@ -45,6 +46,9 @@ char* hiba;
 float str2float(char *s){ return atof(s);}
 
 extern void ExitDemo();
+
+int scr_playing=0;
+int nosound=0;
 
 #include "scr_var.c"
 #include "scr_event.c"
