@@ -1,0 +1,33 @@
+Hogy kene a modifier-eket implementalni
+=======================================
+
+Kell egyszer egy kozos sturktura, es egy speci minden modifierhez.
+A kozos:
+
+typedef struct {
+  Matrix mat;      // a Map() elotti tr. matrix
+  Matrix invmat;   // a Map() utani tr. matrix
+  int active;      // flag, ha 1 akkor kell csak meghivni. Update() allitja be.
+  void Update(Modifier *mod);  // keyframer alapjan updateli a valtozokat
+  void Map(Modifier *mod,Point3 *out,Point3 *in);
+  void *data; // Modifier-fuggo parameterek
+} Modifier;
+
+Egy mesh teljes transzformacioja 1 modofier eseten:
+Modifier modifier=mesh->modifier;
+modifier->Update(modifier);
+for(i=0;i<mesh->numverts;i++){
+  P=mesh->vertices[i].p;
+  if(modifier->active){
+    mat_mulvec(P1,P,modifier->mat);
+    modifier->Map(modifier,P2,P1);
+    mat_mulvec(P3,P2,modifier->invmat);
+  } else P3=P;
+  mat_mulvec(P4,P3,n->objmat);
+  mat_mulvec(P5,P4,camera->invmat);
+  mesh->vertices[i].tp=P5;
+}
+Ezt persze szejjel lehet optimalizalni, egyreszt spec esetekre, masreszt
+a tobbszoros matrix-szorzasokat ossze lehet vonni.
+
+

@@ -125,6 +125,15 @@ typedef struct {
   float* WarpFreq;
 } Class_TorusKnot;
 
+//============================= Modifiers ===================================
+
+typedef struct {
+  int doBias; // flag
+  float bias;
+
+
+} Class_TwistDeformer;
+
 //================================== Node ===================================
 
 typedef struct {

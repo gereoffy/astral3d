@@ -2,98 +2,70 @@
 #define ABS(x)   (((x) >= 0) ? (x) : -(x))
 #define BIGFLOAT	float(999999)
 
-#define PB_ANGLE	0
-#define PB_BIAS		1
-#define PB_AXIS		2
-#define PB_DOREGION	3
-#define PB_FROM		4
-#define PB_TO		5
+#define PB_TWIST_ANGLE	0
+#define PB_TWIST_BIAS		1
+#define PB_TWIST_AXIS		2
+#define PB_TWIST_DOREGION	3
+#define PB_TWIST_FROM		4
+#define PB_TWIST_TO		5
 
-TwistDeformer::TwistDeformer(
-		TimeValue t, ModContext &mc,
+void setup_TwistDeformer(Class_TwistDeformer *twist,float t,
 		float angle, int naxis, float bias,
 		float from, float to, int doRegion,
-		Matrix3& modmat, Matrix3& modinv) 
-	{	
+		Matrix tm){
+    
+Matrix mat;
 
 	if (bias!=0.0f) {
-		this->bias = 1.0f-(bias+100.0f)/200.0f;
-		if (this->bias < 0.00001f) this->bias = 0.00001f;
-		if (this->bias > 0.99999f) this->bias = 0.99999f;
-		this->bias = float(log(this->bias)/log(0.5));
-		doBias = TRUE;
+		twist->bias = 1.0f-(bias+100.0f)/200.0f;
+		if (twist->bias < 0.00001f) twist->bias = 0.00001f;
+		if (twist->bias > 0.99999f) twist->bias = 0.99999f;
+		twist->bias = float(log(twist->bias)/log(0.5));
+		doBias = 1;
 	} else {
-		this->bias = 1.0f;
-		doBias = FALSE;
-		}
-
-	Matrix3 mat;
-	Interval valid;	
-	time   = t;	
-
-	tm = modmat;
-	invtm = modinv;
-	mat.IdentityMatrix();
-	
-	switch ( naxis ) {
-		case 0: mat.RotateY( -HALFPI );	 break; //X
-		case 1: mat.RotateX( HALFPI );  break; //Y
-		case 2: break;  //Z
+		twist->bias = 1.0f;
+		doBias = 0;
 	}
-  { // SetAxis(mat):
-  	Matrix3 itm = Inverse(mat);
-  	tm    = tm*mat;
-	  invtm =	itm*invtm;
-  }
 
-	bbox = *mc.box;
+//	time   = t;	
+
+	switch ( naxis ) {
+		case 0: mat_rotateY(mat, -HALFPI );	 break; //X
+		case 1: mat_rotateX(mat, HALFPI );   break; //Y
+		default: mat_identity(mat);  //Z
+	}
+  mat_mul(twist->mat,tm,mat);
+  mat_inverse(twist->invmat,twist->mat);
   
-  angle=DegToRad(angle);
-//	CalcHeight(naxis,DegToRad(angle));
+  angle=angle*M_PI/180.0f;
 
-	switch ( naxis ) {
-		case 0:
-			height = bbox.pmax.x - bbox.pmin.x;
-			break;
-		case 1:
-			height = bbox.pmax.y - bbox.pmin.y;
-			break;
-		case 2:
-			height = bbox.pmax.z - bbox.pmin.z;
-			break;
-		}
-
-	if (height==0.0f) {
-		theAngle = 0.0f;
-		angleOverHeight = 0.0f;
-	} else {
-		theAngle = angle;
-		angleOverHeight = angle / height;
-		}
-	}
+//	twist->theAngle = 0.0f;
+	twist->angleOverHeight = 0.0f;
+		twist->theAngle = angle;
+//		angleOverHeight = angle / height;
 
 }
 
-Point3 TwistDeformer::Map(int i, Point3 p){
+void map_TwistDeformer(Class_TwistDeformer *twist,Point3 *out,Point3 *p0){
 	float x, y, z, cosine, sine, a;
-	if (theAngle==0.0f) return p;
-	p = p * tm;
+  Point3 p;
+  
+	if(theAngle==0.0f){
+    out->x=p0->x;
+    out->y=p0->y;
+    out->z=p0->z;
+    return;
+  }
+
+  mat_mulvec(&p,p0,twist->mat);
 
 	x = p.x;
 	y = p.y;
-	
-	if (doRegion) {
-		if (p.z<from) {
-			z = from;
-		} else 
-		if (p.z>to) {
-			z = to;
-		} else {
-			z = p.z;
-			}
-	} else {	
-		z = p.z;
-		}	
+	z = p.z;
+	if (twist->doRegion) {
+		if (p.z<twist->from) z = twist->from; else
+ 		if (p.z>twist->to)   z = twist->to;
+	}	
 	
 	if (doBias) {
 		float u = z/height;
@@ -101,15 +73,14 @@ Point3 TwistDeformer::Map(int i, Point3 p){
 		if (u<0.0) a = -a;
 	} else {
 		a = z * angleOverHeight;
-		}
+	}
 
-	cosine = float(cos(a));
-	sine = float(sin(a));
+	cosine = cos(a);
+	sine = sin(a);
 	p.x =  cosine*x + sine*y;
 	p.y = -sine*x + cosine*y;
 
-	p = p * invtm;
-	return p;
+  mat_mulvec(out,&p,twist->invmat);
 }
 
 
@@ -120,12 +91,12 @@ Deformer& TwistMod::GetDeformer(
 	int axis;	
 	int doRegion;
 	static TwistDeformer deformer;
-	pblock->GetValue(PB_ANGLE,t,angle,FOREVER);	
-	pblock->GetValue(PB_AXIS,t,axis,FOREVER);
-	pblock->GetValue(PB_FROM,t,from,FOREVER);
-	pblock->GetValue(PB_TO,t,to,FOREVER);
-	pblock->GetValue(PB_BIAS,t,bias,FOREVER);
-	pblock->GetValue(PB_DOREGION,t,doRegion,FOREVER);
+	pblock->GetValue(PB_TWIST_ANGLE,t,angle,FOREVER);	
+	pblock->GetValue(PB_TWIST_AXIS,t,axis,FOREVER);
+	pblock->GetValue(PB_TWIST_FROM,t,from,FOREVER);
+	pblock->GetValue(PB_TWIST_TO,t,to,FOREVER);
+	pblock->GetValue(PB_TWIST_BIAS,t,bias,FOREVER);
+	pblock->GetValue(PB_TWIST_DOREGION,t,doRegion,FOREVER);
 	deformer = TwistDeformer(t,mc,angle,axis,bias,from,to,doRegion,mat,invmat);
 	return deformer;
 	}
