@@ -1,18 +1,17 @@
 // Precise timer routines for WINDOWS
-#include <windows.h>
 #include <mmsystem.h>
-#include <conio.h>
-#include <stdlib.h>
-#include <stdio.h>
+//#include <conio.h>
 #include "timer.h"
 
+DWORD WINAPI timeGetTime(void);
+
 // Returns current time in seconds
-_inline float GetTimer(){
+inline float GetTimer(){
   return (float)timeGetTime() * 0.001;
 }  
 
 // Returns current time in microseconds
-_inline int uGetTimer(){
+inline int uGetTimer(){
   return timeGetTime() * 1000;
 }  
 

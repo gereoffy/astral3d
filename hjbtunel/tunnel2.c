@@ -8,16 +8,8 @@
 #define LOGO_Yx_DIF -5
 #define LOGO_Yy_DIF 55
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "../config.h"
 //#include <unistd.h>
-#include <math.h>
-
-#ifndef __GNUC__
-#include <windows.h>
-#define M_PI 3.1415926527
-#define inline _inline
-#endif
 
 #include "../agl/agl.h"
 

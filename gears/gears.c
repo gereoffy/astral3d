@@ -4,22 +4,7 @@
  * Brian Paul
  */
 
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-
-#ifndef __GNUC__
-#include <windows.h>
-#define M_PI 3.1415926527
-#define inline _inline
-#endif
-
-#ifndef M_PI
-#define M_PI 3.14159265
-#endif
-
+#include "../config.h"
 #include "../agl/agl.h"
 #include "gears.h"
 

@@ -2,22 +2,8 @@
 /* It based on the original UNESP source written in real-mode assembly */
 /* The huffman-tree stuff uses some ideas from the AIN archiver.       */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "../config.h"
 #include "unesp.h"
-
-#ifdef __GNUC__
-#define INLINE __inline__
-#else
-#define INLINE _inline
-#endif
-
-/* Uncomment this to be ANSI-C compliant */
-// #define inline
-
-/* Uncomment this to be WATCOM C compliant */
-// #define inline _inline
 
 /************** Huffman ********************/
 #define forall(i,n) for(i=0;i<(n);i++)

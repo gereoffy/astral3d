@@ -9,13 +9,7 @@
 //  float v[3];
 //} c_PART;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#ifndef __GNUC__
-#include <windows.h>
-#endif
+#include "../config.h"
 
 #include "../agl/agl.h"
 

@@ -1,9 +1,7 @@
 
 #include <sys/types.h>
-#include <stdio.h>
 #include <fcntl.h>
-#include <stdlib.h>
-#include <windows.h>
+#include <mmsystem.h>
 
 #include "audio.h"
 #include "mp3.h"

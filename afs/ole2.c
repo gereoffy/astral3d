@@ -1,8 +1,6 @@
 // OLE2 File library v1.0   (C) 1998-2000 NFL, Boogie, A'rpi
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "../config.h"
 
 #include "afs.h"
 #include "afsmangl.h"

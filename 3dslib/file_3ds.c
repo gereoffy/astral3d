@@ -4,10 +4,8 @@
 //#define SHOW_CHUNK_TREE
 //#define SHOW_CHUNK_NAMES
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include "../config.h"
+
 #include "ast3d.h"
 #include "ast3di.h"
 

@@ -1,19 +1,6 @@
 #define FPS 1800
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifndef __GNUC__
-#include <windows.h>
-#define INLINE _inline
-#define M_PI 3.14159265
-#else
-#define INLINE inline
-#endif
-
-#include <math.h>
-#include <string.h>
-
+#include "../config.h"
 
 #include "../agl/agl.h"
 //#include <GL/glut.h>

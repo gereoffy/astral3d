@@ -1,12 +1,6 @@
 /*  Load MATERIALS and upload to 3D card */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifndef __GNUC__
-#include <windows.h>
-#endif
-
+#include "../config.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 

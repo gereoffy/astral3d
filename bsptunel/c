@@ -1,1 +1,2 @@
-gcc -c -O3 -Wall tunnel.c
+
+$CC -c $OPTFLAGS  -Wall tunnel.c

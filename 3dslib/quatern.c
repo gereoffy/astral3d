@@ -1,5 +1,4 @@
-#include <math.h>
-#include <stdio.h>
+#include "../config.h"
 #include "ast3d.h"
 #include "ast3di.h"
 

@@ -1,2 +1,2 @@
 
-gcc -c -O2 -Wall agl.c
+$CC -c $OPTFLAGS agl.c

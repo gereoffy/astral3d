@@ -1,4 +1,4 @@
 #! /bin/sh
 echo "Compiling timer..."
 
-gcc -O2 -Wall -c timer-lx.c
+$CC $OPTFLAGS -Wall -c timer.c

@@ -35,6 +35,7 @@
 }
 */
 
+#if 0
 static int synth_1to1_mono(real *bandPtr,unsigned char *samples,int *pnt)
 {
   short samples_tmp[64];
@@ -54,7 +55,7 @@ static int synth_1to1_mono(real *bandPtr,unsigned char *samples,int *pnt)
 
   return ret;
 }
-
+#endif
 
 static int synth_1to1_mono2stereo(real *bandPtr,unsigned char *samples,int *pnt)
 {

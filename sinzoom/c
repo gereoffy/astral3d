@@ -1,5 +1,5 @@
 
-gcc -c -Wall sinzoom.c
+$CC -c $OPTFLAGS -Wall sinzoom.c
 
 # cd ..;./demo.sh;cd smoke
 

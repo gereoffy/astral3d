@@ -1,8 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "../config.h"
 #include <ctype.h>
-#include <math.h>
 #include "ast3d.h"
 #include "ast3di.h"
 

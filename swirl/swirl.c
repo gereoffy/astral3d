@@ -1,15 +1,7 @@
 #define CIRCLE_U 64
 #define CIRCLE_V 64
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#ifndef __GNUC__
-#include <windows.h>
-#define M_PI 3.1415926527
-#define inline _inline
-#endif
+#include "../config.h"
 
 #include "swirl.h"
 

@@ -1,15 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "../config.h"
 //#include <sys/time.h>
 //#include <unistd.h>
-#include <math.h>
-
-#ifndef __GNUC__
-#include <windows.h>
-#define M_PI 3.1415926527
-#define inline _inline
-#endif
-
 
 #include "bsptunel.h"
 
@@ -229,7 +220,7 @@ void BSPTUNNEL_Render(float pos,int texture){
   aglZbuffer(AGL_ZBUFFER_NONE);
 
 { int i,j,k;
-  float eu;
+  float eu=0;
   float tu=(int)(16*pos);
   tu=tu/64.0f; tu-=(int)tu;
 

@@ -6,16 +6,9 @@
  * purpose is hereby restricted.
 **/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#ifndef __GNUC__
-#include <windows.h>
-#endif
+#include "../config.h"
 
 #include "rawfile.c"
-
 
 #include "../agl/agl.h"
 

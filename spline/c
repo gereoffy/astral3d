@@ -1,2 +1,4 @@
-gcc -c -O3 -Wall spline.c
+
+# gcc -c -O3 -Wall spline.c
+$CC -c $OPTFLAGS -Wall spline.c
 

@@ -5,17 +5,12 @@
 
 #define MAX_SUPPORT
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "../config.h"
 #include <unistd.h>
-#include <string.h>
-#include <math.h>
 
-#ifdef __GNUC__
+#ifndef WIN32
 #include <sys/time.h>
 #include <sys/types.h>
-#else
-#include <windows.h>
 #endif
 
 #include "../agl/agl.h"

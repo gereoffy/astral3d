@@ -23,20 +23,6 @@
 
 /* ------------------------------------------------- */
 
-#ifdef __GNUC__
-#define INLINE __inline__
-#else
-#define INLINE _inline
-#endif
-
-
-#ifndef M_PI
-#define M_PI 3.14159265359
-#endif
-#ifndef TRUE
-#define TRUE 1
-#define FALSE 0
-#endif
 #define EPSILON 1.0e-6
 #define X 0
 #define Y 1

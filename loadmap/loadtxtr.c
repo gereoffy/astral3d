@@ -1,13 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#ifndef __GNUC__
-#include <windows.h>
-#define INLINE _inline
-#else
-#define INLINE inline
-#endif
-#include <string.h>
-
+#include "../config.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 

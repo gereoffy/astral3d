@@ -1,15 +1,6 @@
 // Astral OpenGL State Manager  v0.1     (C) 2000. by A'rpi/Astral
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#ifndef __GNUC__
-#include <windows.h>
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "../config.h"
 
 #include "agl.h"
 

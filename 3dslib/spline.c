@@ -1,7 +1,6 @@
 /* Optimized by A'rpi/ASTRAL */
 
-#include <stdio.h>
-#include <math.h>
+#include "../config.h"
 #include "ast3d.h"
 #include "ast3di.h"
 
