@@ -1,7 +1,6 @@
 /*----------------- RENDER SPECULAR LIGHTMAP -------------------*/
     if(matflags&ast3d_mat_specularmap){
       current_mat=(c_MATERIAL*)-1;
-      glDepthFunc(GL_EQUAL);
       glEnable(GL_BLEND);
       glBlendFunc(GL_ONE, GL_ONE);
       glEnable(GL_TEXTURE_2D);
@@ -17,5 +16,4 @@
            ast3d_DrawGLTriangle_specularmap(&obj->faces[i]);   /* %%%%%%%%%%% */
       glEnd();
       glDisable(GL_BLEND);
-      glDepthFunc(GL_LESS);
     }  // if(reflect)

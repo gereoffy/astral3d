@@ -1,7 +1,7 @@
 /*----------------- RENDER REFLECTION (ENV MAP) -------------------*/
     if(matflags&ast3d_mat_reflect){
       current_mat=(c_MATERIAL*)-1;
-      glDepthFunc(GL_EQUAL);
+
       glEnable(GL_BLEND);
       glBlendFunc(GL_ONE, GL_ONE);
       glEnable(GL_TEXTURE_2D);
@@ -46,5 +46,4 @@
       }
       
       glDisable(GL_BLEND);
-      glDepthFunc(GL_LESS);
     }  // if(reflect)

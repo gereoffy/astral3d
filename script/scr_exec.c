@@ -3,6 +3,7 @@
 // initialized by scr_init.c
 scrEventStruct scr_playing_event;
 int current_light=0;
+c_OBJECT* current_object=(c_OBJECT*)NULL;
 
 GLvoid scrExec(){
 int i,k,ij;
@@ -40,8 +41,15 @@ fx_struct *fx=current_fx;
   *fx_ptr_vlimit = &fx->vlimit;
   *fx_ptr_blob_alpha = &fx->blob_alpha;
   *fx_ptr_line_blob = &fx->line_blob;
+  *fx_ptr_pic_r = &fx->pic.rgb[0];
+  *fx_ptr_pic_g = &fx->pic.rgb[1];
+  *fx_ptr_pic_b = &fx->pic.rgb[2];
   if(fx->type==FXTYPE_SCENE && fx->scene){
     *scene_ptr_directional_lighting = &fx->scene->directional_lighting;
+    *scene_ptr_znear = &fx->scene->znear;
+    *scene_ptr_zfar = &fx->scene->zfar;
+    *scene_ptr_fog_znear = &fx->scene->fog.fog_znear;
+    *scene_ptr_fog_zfar = &fx->scene->fog.fog_zfar;
   }
 
 //    i=0;
@@ -129,7 +137,12 @@ fx_struct *fx=current_fx;
 
       if(strcmp(p[0],"fixUV")==0){                                     //fixUV
         scene=fx->scene; ast3d_setactive_scene(scene);
-        ast3d_fixUV();
+	if(pdb==1)
+          ast3d_fixUV(NULL);
+	else {
+          int i;
+	  for(i=1;i<pdb;i++) ast3d_fixUV(p[i]);
+	}  
         return;
       }
       if(strcmp(p[0],"SortFaces")==0){                             //tri.strip
@@ -151,6 +164,51 @@ fx_struct *fx=current_fx;
         *light_ptr_attenuation1 = &lights[current_light]->attenuation[1];
         *light_ptr_attenuation2 = &lights[current_light]->attenuation[2];
         *light_ptr_zbuffer = &lights[current_light]->use_zbuffer;
+        return;
+      }
+
+      if(strcmp(p[0],"object")==0){                                   //object
+        w_NODE *node;
+        if(pdb!=2) scrFatal("object: Missing or too many operands!");
+        scene=fx->scene; ast3d_setactive_scene(scene);
+        ast3d_byname(p[1],&node);
+        if(!node) scrFatal("object: Object not found!");
+        if(node->type != ast3d_obj_object) scrFatal("object: Node is not object!");
+        current_object=(c_OBJECT *)(node->object);
+        *object_ptr_bumpdepth = &current_object->bumpdepth;
+        *object_ptr_additivetexture = &current_object->additivetexture;
+        *object_ptr_zbuffer = &current_object->enable_zbuffer;
+        return;
+      }
+
+      // particle "objname" texture_id num
+      if(strcmp(p[0],"particle")==0){                                //particle
+        w_NODE *node;
+        c_OBJECT *obj;
+        int id;
+        if(pdb!=4) scrFatal("particle: Missing or too many operands!");
+	id=scrGetVar_int(p[2]);
+        if(id<1) scrFatal("particle: Texture variable not found!");
+        scene=fx->scene; ast3d_setactive_scene(scene);
+	ast3d_byname(p[1],&node);
+	if(!node) scrFatal("particle: Object not found!");
+	if(node->type != ast3d_obj_object) scrFatal("particle: Node is not object!");
+	obj=(c_OBJECT *)(node->object);
+	if(!(obj->flags&ast3d_obj_particle)) scrFatal("particle: Object is not particle system!");
+{	c_PARTICLE *p=&obj->particle;
+        *particle_ptr_np = &p->np;
+        *particle_ptr_texture_id = &p->texture_id;
+        *particle_ptr_eject_r = &p->eject_r;
+        *particle_ptr_eject_vy = &p->eject_vy;
+        *particle_ptr_eject_vl = &p->eject_vl;
+        *particle_ptr_ridtri = &p->ridtri;
+        *particle_ptr_energy = &p->energy;
+        *particle_ptr_dieratio = &p->dieratio;
+        *particle_ptr_agrav = &p->agrav;
+        *particle_ptr_sizelimit = &p->sizelimit;
+	*particle_ptr_colordecrement = &p->colordecrement;
+}
+	particle_init(obj,id,atoi(p[3]));
         return;
       }
 
@@ -180,6 +238,7 @@ fx_struct *fx=current_fx;
         fx->pic.x2=640; //window_w;
         fx->pic.y2=0;
         fx->pic.id=id;
+        fx->pic.rgb[0]=fx->pic.rgb[1]=fx->pic.rgb[2]=1.0F;
         return;
       }
 
@@ -194,6 +253,7 @@ fx_struct *fx=current_fx;
         fx->pic.x2=atoi(p[4]);
         fx->pic.y2=atoi(p[5]);
         fx->pic.id=id;
+        fx->pic.rgb[0]=fx->pic.rgb[1]=fx->pic.rgb[2]=1.0F;
         return;
       }
 
@@ -208,6 +268,38 @@ fx_struct *fx=current_fx;
         fx->pic.x2=atoi(p[4]);
         fx->pic.y2=atoi(p[5]);
         fx->pic.id=id;
+        fx->pic.rgb[0]=fx->pic.rgb[1]=fx->pic.rgb[2]=1.0F;
+        return;
+      }
+
+      if(strcmp(p[0],"colorbox")==0){                             //fx=colorbox
+        if(pdb<5) scrFatal("colorbox: Missing or too many operands!");
+        fx->type=FXTYPE_PICTURE;
+        fx->pic.type=2;
+        fx->pic.x1=atoi(p[1]);
+        fx->pic.y1=atoi(p[2]);
+        fx->pic.x2=atoi(p[3]);
+        fx->pic.y2=atoi(p[4]);
+        if(pdb>5){
+          fx->pic.rgb[0]=atof(p[5]);
+          fx->pic.rgb[1]=atof(p[6]);
+          fx->pic.rgb[2]=atof(p[7]);
+        } else fx->pic.rgb[0]=fx->pic.rgb[1]=fx->pic.rgb[2]=1.0F;
+        return;
+      }
+      if(strcmp(p[0],"addcolorbox")==0){                             //fx=colorbox
+        if(pdb<5) scrFatal("addcolorbox: Missing or too many operands!");
+        fx->type=FXTYPE_PICTURE;
+        fx->pic.type=3;
+        fx->pic.x1=atoi(p[1]);
+        fx->pic.y1=atoi(p[2]);
+        fx->pic.x2=atoi(p[3]);
+        fx->pic.y2=atoi(p[4]);
+        if(pdb>5){
+          fx->pic.rgb[0]=atof(p[5]);
+          fx->pic.rgb[1]=atof(p[6]);
+          fx->pic.rgb[2]=atof(p[7]);
+        } else fx->pic.rgb[0]=fx->pic.rgb[1]=fx->pic.rgb[2]=1.0F;
         return;
       }
 

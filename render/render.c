@@ -26,14 +26,14 @@
 
 #include "render.h"
 
-#include "particle.h"
-
 #include "../prof.h"
 
 static unsigned short int bytesort_next[2][MAXFACES];
 static int bytesort_start[2][256];
 static int bytesort_end[2][256];
 static int bytesortdata[MAXFACES];
+
+static float bump_du=-0.02,bump_dv=0.0;
 
 /* Current scene: */
 c_SCENE *scene=NULL;
@@ -70,7 +70,6 @@ void ast3d_Perspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble
    glFrustum( xmin, xmax, ymin, ymax, zNear, zFar );
 }
 
-
 void draw3dsframe(void){
     int i;
     int rendered_objects=0;
@@ -91,8 +90,10 @@ void draw3dsframe(void){
 PROF_START(prof_3d_matrixmode);
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-//    ast3d_Perspective(scene->cam->fov,window_w/window_h,10,10000);
-    ast3d_Perspective(scene->cam->fov,1.0,10,10000);
+//    ast3d_Perspective(scene->cam->fov,window_w/window_h,1,10000);
+//    ast3d_Perspective(scene->cam->fov,1.0,10,10000);
+// printf("znear/far: %f  %f\n",scene->fog.znear,scene->fog.zfar);
+    ast3d_Perspective(scene->cam->fov,1.0,scene->znear,scene->zfar);
 
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
@@ -111,13 +112,6 @@ PROF_END(prof_3d_setuplight);
 
 /*------------------ START OF RENDERING LOOP --------------------*/
     for (node = scene->world; node; node=node->next) {
-#if 0
-      if (node->type == ast3d_obj_light) {
-        c_LIGHT *lit = (c_LIGHT *)node->object;
-	if(strncmp(lit->name,"PARTICLE",8)==0){
-	}
-      } else
-#endif
       if (node->type == ast3d_obj_object) {
         c_OBJECT *obj = (c_OBJECT *)node->object;
 
@@ -132,6 +126,13 @@ PROF_END(prof_3d_setuplight);
     mat_normalize (objmat, normat);
 
     ++rendered_objects;
+    
+  if(obj->flags&ast3d_obj_particle){
+  // c_VECTOR ppivot;
+  // mat_mulvec (objmat,&obj->pivot,&ppivot);
+    if(obj->particle.np>0)
+      particle_redraw(obj,objmat,0.015); // !!!!!!!!!!!!! FIXME!
+  } else {
 
 #ifndef NO_LIGHTING
     if(scene->directional_lighting){
@@ -167,13 +168,18 @@ PROF_START(prof_3d_draw);
 
 if(scene->fog.type&ast3d_fog_fog) glEnable(GL_FOG);
 
-// glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,GL_DECAL);
-	
+// obj->enable_zbuffer=0; //hack
+
+if(!obj->enable_zbuffer){ glDisable(GL_DEPTH_TEST); glDepthMask(GL_FALSE);}
+
 PROF_START(prof_3d_texture);
 #include "4_textur.c"
 PROF_END(prof_3d_texture);
 
+if(obj->enable_zbuffer){ glDepthFunc(GL_EQUAL); glDepthMask(GL_FALSE);}
+
 PROF_START(prof_3d_envmap);
+#include "4a_bump.c"
 #include "5_envmap.c"
 PROF_END(prof_3d_envmap);
 
@@ -187,13 +193,16 @@ PROF_START(prof_3d_specmap);
 PROF_END(prof_3d_specmap);
 if(scene->fog.type&ast3d_fog_fog) glEnable(GL_FOG);
 
+glDepthMask(GL_TRUE); glDepthFunc(GL_LESS); glEnable(GL_DEPTH_TEST);
+
 PROF_END(prof_3d_draw);
 
     glDisable(GL_CULL_FACE);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
 
-  }}}
+  }}}}
 
+/*
 PROF_START(prof_3d_particle);
     for (node = scene->world; node; node=node->next) {
       if (node->type == ast3d_obj_light) {
@@ -203,9 +212,13 @@ PROF_START(prof_3d_particle);
       }
     }
 PROF_END(prof_3d_particle);
+*/
 
 PROF_START(prof_3d_lightcorona);
   PutLightCoronas();
 PROF_END(prof_3d_lightcorona);
 //    printf("%d objs.\n",rendered_objects);
+
+bump_du+=0.00002;
+
 }

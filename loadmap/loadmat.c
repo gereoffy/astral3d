@@ -25,8 +25,56 @@ void LoadMaterials(c_SCENE *scene){
         c_MATERIAL *mat = (c_MATERIAL *)node->object;
         texture_st *t;
 
-        /*  Texture1, texture2, opacity map */
-        t=load_texture( fix_mapname(mat->texture.file),
+        if(1 && mat->bump.file){
+          /* Texture1 + texture2 + Bump map */
+	  printf("BUMP.amountof=%f\n",mat->bump.amountof);
+	  mat->bump.amountof=1.0;
+          mat->flags|=ast3d_mat_bump;
+          t=load_texture( fix_mapname(mat->texture.file),
+                          fix_mapname(mat->bump.file),
+                          mat->texture.amountof,
+                        fix_mapname(mat->texture2.file),
+                          fix_mapname(mat->bump.file),
+                          mat->texture2.amountof,
+                        fix_mapname(mat->opacitymap.file),
+                          fix_mapname(mat->opacitymap_mask.file),
+                          mat->opacitymap.amountof,
+                        ((mat->texture.flags&8)?1:0) +
+                        ((mat->bump.flags&8)?16:0) +
+                        ((mat->texture2.flags&8)?2:0) +
+                        ((mat->bump.flags&8)?32:0) +
+                        ((mat->opacitymap.flags&8)?4:0) +
+                        ((mat->opacitymap_mask.flags&8)?64:0) + 512
+                      );
+          mat->texture_id=t->id;
+          t=load_texture( fix_mapname(mat->texture.file),
+                          fix_mapname(mat->bump.file),
+                          mat->texture.amountof,
+                        fix_mapname(mat->texture2.file),
+                          fix_mapname(mat->bump.file),
+                          mat->texture2.amountof,
+                        fix_mapname(mat->opacitymap.file),
+                          fix_mapname(mat->opacitymap_mask.file),
+                          mat->opacitymap.amountof,
+                        ((mat->texture.flags&8)?1:0) +
+                        ((mat->bump.flags&8)?0:16) +
+                        ((mat->texture2.flags&8)?2:0) +
+                        ((mat->bump.flags&8)?0:32) +
+                        ((mat->opacitymap.flags&8)?4:0) +
+                        ((mat->opacitymap_mask.flags&8)?64:0) + 512
+                      );
+          mat->bumpmap_id=t->id;
+          if(t->flags&15) mat->flags|=ast3d_mat_texture;
+          // if(t->flags&4)  mat->flags|=ast3d_mat_texturealpha;
+          if(t->flags&1){
+            mat->diffuse.rgb[0]=mat->texture.amountof+mat->diffuse.rgb[0]*(1.0-mat->texture.amountof);
+            mat->diffuse.rgb[1]=mat->texture.amountof+mat->diffuse.rgb[1]*(1.0-mat->texture.amountof);
+            mat->diffuse.rgb[2]=mat->texture.amountof+mat->diffuse.rgb[2]*(1.0-mat->texture.amountof);
+          }
+          
+        } else {
+          /*  Texture1, texture2, opacity map */
+          t=load_texture( fix_mapname(mat->texture.file),
                           fix_mapname(mat->texture_mask.file),
                           mat->texture.amountof,
                         fix_mapname(mat->texture2.file),
@@ -42,15 +90,16 @@ void LoadMaterials(c_SCENE *scene){
                         (mat->opacitymap.flags&8)?4:0 +
                         (mat->opacitymap_mask.flags&8)?64:0 + 512
                       );
-        mat->texture_id=t->id;
-        if(t->flags&15) mat->flags|=ast3d_mat_texture;
-        if(t->flags&4)  mat->flags|=ast3d_mat_texturealpha;
-        if(t->flags&1){
+          mat->texture_id=t->id;
+          if(t->flags&15) mat->flags|=ast3d_mat_texture;
+          if(t->flags&4)  mat->flags|=ast3d_mat_texturealpha;
+          if(t->flags&1){
             mat->diffuse.rgb[0]=mat->texture.amountof+mat->diffuse.rgb[0]*(1.0-mat->texture.amountof);
             mat->diffuse.rgb[1]=mat->texture.amountof+mat->diffuse.rgb[1]*(1.0-mat->texture.amountof);
             mat->diffuse.rgb[2]=mat->texture.amountof+mat->diffuse.rgb[2]*(1.0-mat->texture.amountof);
+          }
         }
-        
+
         /* reflection map and alpha-mask */
         t=load_texture( fix_mapname(mat->reflection.file), NULL,
                           mat->reflection.amountof,

@@ -37,6 +37,12 @@ INLINE void ast3d_DrawGLTriangle_texture(c_FACE *f){
 #endif
 }
 
+INLINE void ast3d_DrawGLTriangle_bump(c_FACE *f){
+  c_VERTEX *p;
+        p=f->pa; glTexCoord2f(f->u1+p->bump_du,f->v1+p->bump_dv); TRI_COLOR(p); TRI_VERTEX(p);
+        p=f->pb; glTexCoord2f(f->u2+p->bump_du,f->v2+p->bump_dv); TRI_COLOR(p); TRI_VERTEX(p);
+        p=f->pc; glTexCoord2f(f->u3+p->bump_du,f->v3+p->bump_dv); TRI_COLOR(p); TRI_VERTEX(p);
+}
 
 INLINE void ast3d_DrawGLTriangle_envmap(c_FACE *f){
   c_VERTEX *p;

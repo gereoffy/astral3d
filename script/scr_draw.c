@@ -22,6 +22,7 @@ typedef struct {
   int type;
   float x1,y1,x2,y2;
   int id;
+  float rgb[3];
 } pic_struct;  
 
 typedef struct {
@@ -40,6 +41,8 @@ typedef struct {
   /* FDtunnel textures: */
   unsigned int texture1,texture2;
 } fx_struct;
+
+
 
 fx_struct fxlist[FX_DB];
 fx_struct *current_fx=&fxlist[0];
@@ -76,6 +79,11 @@ int zbuf_flag=0;
       *(fade->ptr)=fade->start+(fade->end-fade->start)*fade->blend;
     }
   }
+
+  if(adk_clear_buffer_flag)
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  else 
+    glClear( GL_DEPTH_BUFFER_BIT );
 
   /* Update and render effects */
   for(f=0;f<FX_DB;f++){
@@ -125,7 +133,7 @@ int zbuf_flag=0;
       glDisable(GL_LIGHTING);
       glEnable(GL_BLEND);
       glBlendFunc(GL_ONE, GL_ONE);
-      if(fx->pic.type)
+      if(fx->pic.type & 1)
         glBlendFunc(GL_ONE, GL_ONE);
       else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -137,13 +145,19 @@ int zbuf_flag=0;
 //      gluOrtho2D(0.0, 0.0, 640.0, 480.0);
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
-      
-      glBindTexture(GL_TEXTURE_2D, fx->pic.id);
-      glEnable(GL_TEXTURE_2D);
-      if(fx->pic.type)
-        glColor3f(fx->blend,fx->blend,fx->blend);
+
+      if(fx->pic.type & 2){
+        glDisable(GL_TEXTURE_2D);
+      } else {
+        glBindTexture(GL_TEXTURE_2D, fx->pic.id);
+        glEnable(GL_TEXTURE_2D);
+      }
+      if(fx->pic.type & 1)
+        glColor3f(fx->pic.rgb[0]*fx->blend,
+                  fx->pic.rgb[1]*fx->blend,
+                  fx->pic.rgb[2]*fx->blend);
       else  
-        glColor4f(1.0,1.0,1.0,fx->blend);
+        glColor4f(fx->pic.rgb[0],fx->pic.rgb[1],fx->pic.rgb[2],fx->blend);
       glDisable(GL_CULL_FACE);
       glBegin(GL_QUADS);
         glTexCoord2f(0.0f,0.0f);

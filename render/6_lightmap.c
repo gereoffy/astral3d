@@ -1,7 +1,6 @@
 /*----------------- RENDER LIGHTMAP -------------------*/
     if(matflags&ast3d_mat_lightmap){
       current_mat=(c_MATERIAL*)-1;
-      glDepthFunc(GL_EQUAL);
       glEnable(GL_BLEND);
       glBlendFunc(GL_DST_COLOR,GL_SRC_COLOR);
       glEnable(GL_TEXTURE_2D);
@@ -13,5 +12,4 @@
            ast3d_DrawGLTriangle_lightmap(&obj->faces[i]);   /* %%%%%%%%%%% */
       glEnd();
       glDisable(GL_BLEND);
-      glDepthFunc(GL_LESS);
     }  // if(reflect)

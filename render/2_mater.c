@@ -7,10 +7,17 @@
 if(mat!=current_mat){
     current_mat=mat;
     if(mat){
+//        printf("hello\n");
         /* mat -> current material struct */
-        if(matflags&ast3d_mat_texturealpha || mat->transparency || ast3d_blend<1){
+        if(mat->transparency || matflags&ast3d_mat_texturealpha || ast3d_blend<1){
           glEnable(GL_BLEND);
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          if(obj->additivetexture){
+            glBlendFunc(GL_ONE, GL_ONE);
+//            printf("hello: GL_ONE rulez\n");
+          } else {
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//            printf("hello: GL_SRC_ALPHA sux\n"); 
+          }
         } else glDisable(GL_BLEND);
         if(matflags&ast3d_mat_texture){
           glEnable(GL_TEXTURE_2D);
@@ -29,11 +36,18 @@ if(mat!=current_mat){
 //            l->MatDiff[0]=l->MatDiff[1]=l->MatDiff[2]=0;
             LIGHTCOLOR(l->MatSpec,mat->specular.rgb,l->color.rgb);
 //            l->MatSpec[0]=l->MatSpec[1]=l->MatSpec[2]=1;
-	    if(!(l->flags&ast3d_light_attenuation)){
-	      base_r+=l->MatAmb[0];
-	      base_g+=l->MatAmb[1];
-	      base_b+=l->MatAmb[2];
-	    }
+            if(obj->additivetexture){
+              float src_alpha=(1-mat->transparency)*ast3d_blend;
+//              printf("src_alpha=%f\n",src_alpha);
+              l->MatAmb[0]*=src_alpha;l->MatDiff[0]*=src_alpha;l->MatSpec[0]*=src_alpha;
+              l->MatAmb[1]*=src_alpha;l->MatDiff[1]*=src_alpha;l->MatSpec[1]*=src_alpha;
+              l->MatAmb[2]*=src_alpha;l->MatDiff[2]*=src_alpha;l->MatSpec[2]*=src_alpha;
+            }
+      	    if(!(l->flags&ast3d_light_attenuation)){
+	            base_r+=l->MatAmb[0];
+	            base_g+=l->MatAmb[1];
+    	        base_b+=l->MatAmb[2];
+            }
             if(mat->shading==ast3d_mat_phong){
               specular=1;
               specular_mult=mat->shin_strength;

@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "timer.h"
 
 // Returns current time in seconds
 _inline float GetTimer(){

@@ -31,3 +31,11 @@ extern void draw3dsframe(void);
 extern int FindCameras(c_SCENE *scene);
 extern void LoadMaterials(c_SCENE *scene);
 
+extern float bump_du;
+extern float bump_dv;
+
+extern void ast3d_fixUV(char *objname);
+
+extern void particle_init(c_OBJECT *obj,int texture,int np);
+extern void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt);
+

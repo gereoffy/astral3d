@@ -162,7 +162,7 @@ int afs_fclose2(FILE* f){
 int j;
   for(j=0;j<fs_db;j++)
     if(filesystems[j].file==f) return 0;
-  if(!f) fclose(f);
+  if(f) fclose(f);
   return 0;
 }
 

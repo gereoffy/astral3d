@@ -51,7 +51,7 @@ GLvoid resize_window(int w, int h){
 
 GLvoid DrawScene(){
   if(!scr_playing) return;
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+//  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   draw_scene();
   glFinish();
   glutSwapBuffers();
@@ -99,9 +99,9 @@ int main(int argc,char* argv[]){
 //    glEnable(GL_POLYGON_SMOOTH);
 //    glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
 
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glFinish();
-    glutSwapBuffers();
+//    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+//    glFinish();
+//    glutSwapBuffers();
 
         ast3d_init (ast3d_transform | 
                     ast3d_hierarchy | 

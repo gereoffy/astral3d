@@ -137,8 +137,16 @@ static void SetupLightMode(void){
    if(scene->fog.type&ast3d_fog_fog){
      glEnable(GL_FOG);
      glFogi(GL_FOG_MODE, GL_LINEAR);
-     glFogf(GL_FOG_START,scene->fog.znear*scene->fog.fognear/50);
-     glFogf(GL_FOG_END,scene->fog.zfar*scene->fog.fogfar/50);
+//     glFogf(GL_FOG_START,scene->fog.znear*scene->fog.fognear/50);
+//     glFogf(GL_FOG_END,scene->fog.zfar*scene->fog.fogfar/50);
+
+  printf("fog regi: %f %f\n",scene->fog.znear*scene->fog.fognear/50,
+                             scene->fog.zfar*scene->fog.fogfar/50);
+
+     glFogf(GL_FOG_START,scene->fog.fog_znear);
+     glFogf(GL_FOG_END,scene->fog.fog_zfar);
+  printf("fog znear/far:  %f  %f\n",scene->fog.fog_znear,scene->fog.fog_zfar);  
+
      glFogfv(GL_FOG_COLOR,scene->fog.color.rgb);
      glClearColor(ast3d_blend*scene->fog.color.rgb[0],
                   ast3d_blend*scene->fog.color.rgb[1],

@@ -142,7 +142,8 @@ enum ast3d_mat_flags_ { /* astral 3d material flags */
   ast3d_mat_reflectalpha = 128,           /* reflect has alpha   */
   ast3d_mat_transparent  = 256,           /* transparent object  */
   ast3d_mat_specularmap  = 512,           /* specular phongmap   */
-  ast3d_mat_lightmap  = 1024              /* object has lightmap */
+  ast3d_mat_lightmap  = 1024,             /* object has lightmap */
+  ast3d_mat_bump      = 2048              /* object has bump map */
 };
 
 enum ast3d_map_flags_ { /* astral 3d map flags */
@@ -174,7 +175,8 @@ enum ast3d_obj_flags_ { /* astral 3d object flags */
   ast3d_obj_visible = 64,                  /* object is in frustum    */
   ast3d_obj_allvisible = 128,              /* all faces&vertices visible */
   ast3d_obj_trianglestrip = 256,           /* triangle-stip capable   */
-  ast3d_obj_frustumcull = 512              /* frustum cull faces      */
+  ast3d_obj_frustumcull = 512,             /* frustum cull faces      */
+  ast3d_obj_particle = 1024                /* particle system */
 };
 
 enum ast3d_light_flags_ { /* astral 3d light flags */
@@ -258,6 +260,7 @@ typedef struct _c_MATERIAL { /* material struct */
   unsigned int reflection_id;
   unsigned int specularmap_id;
   unsigned int lightmap_id;
+  unsigned int bumpmap_id;
 } c_MATERIAL;
 
 typedef struct _c_VERTEX { /* vertex struct */
@@ -265,6 +268,8 @@ typedef struct _c_VERTEX { /* vertex struct */
   c_VECTOR norm, pnorm;                  /* vertex normal       */
   c_VECTOR specular;                     /* envmap/lightmap u,v */
   float    u, v;                         /* texture coordinates */
+  float    bump_du, bump_dv;             /* bump texture coordinate offsets */
+  c_VECTOR u_grad,v_grad;                /* u,v gradient vectors */
   int      visible;
   unsigned char rgb[4];
   unsigned char refl_rgb[4];
@@ -312,6 +317,7 @@ typedef struct _c_FOG { /* fog struct */
   float fognear;
   float zfar;
   float fogfar;
+  float fog_znear,fog_zfar;  // calced
   c_RGB color;
 } c_FOG;
 
@@ -443,6 +449,25 @@ typedef struct _c_FRUSTUM {
   float znear,zfar,x,y;
 } c_FRUSTUM;
 
+typedef struct _c_PART {
+  float color[3];
+  float energy;
+  c_VECTOR p; // float p[1][3];
+  float v[3];
+} c_PART;
+
+typedef struct _c_PARTICLE {
+  c_PART *p; // =NULL
+  int np,maxnp;  // =0
+  int texture_id;
+  float eject_r,eject_vy,eject_vl,ridtri;
+  float energy; // 0.8 energy scale
+  int sizelimit; // 0  maximum sprite size
+  float dieratio; // 0.0018  energy--
+  float agrav; // -9.8  gravitation
+  float colordecrement; // 0.999
+} c_PARTICLE;
+
 typedef struct _c_OBJECT { /* object struct */
   char       *name;                      /* object name                */
   int32      id, parent;                 /* object id, object parent   */
@@ -459,6 +484,10 @@ typedef struct _c_OBJECT { /* object struct */
   c_MORPH    morph;                      /* object morph               */
   c_MATRIX   matrix;                     /* object keyframer matrix    */
   c_MAPPING  mapping;                    /* texture mapping info       */
+  float      bumpdepth;
+  c_PARTICLE particle;
+  int        additivetexture;
+  int        enable_zbuffer;         /* 1=use zbuffer */
 } c_OBJECT;
 
 
@@ -473,6 +502,7 @@ typedef struct _c_SCENE { /* scene (world, keyframer) */
   float lightcorona_scale;
   int directional_lighting;
   int sphere_map;
+  float znear,zfar;
 } c_SCENE;
 
 /*****************************************************************************

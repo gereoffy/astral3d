@@ -49,6 +49,7 @@ extern void ExitDemo();
 
 int scr_playing=0;
 int nosound=0;
+int adk_clear_buffer_flag=1;
 
 #include "scr_var.c"
 #include "scr_event.c"

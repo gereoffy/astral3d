@@ -21,7 +21,7 @@
   int32     ast3d_flags;  /* curreng flags         */
 
 struct {
-  char   *name;                   /* file extension        */
+  char   *name;                       /* file extension        */
   int32 (*load_mesh)   (afs_FILE *f); /* loads mesh            */
   int32 (*load_motion) (afs_FILE *f); /* loads motion          */
   int32 (*save_scene)  (afs_FILE *f); /* saves the whole scene */
@@ -36,6 +36,7 @@ struct {
 *****************************************************************************/
 
 #include "fix_uv.c"
+#include "uv_grad.c"
 
 #ifdef TRIANGLE_STRIP
 #include "sortface.c"
@@ -133,9 +134,9 @@ static void calc_normals ()
       optimize_vertex ((c_OBJECT *)node->object);
 #endif
       calc_objnormals ((c_OBJECT *)node->object);
+      ast3d_NOfixUV((c_OBJECT *)node->object);
+      calc_uv_grads((c_OBJECT *)node->object);
     }
-
-  ast3d_NOfixUV();
 
 }
 
@@ -571,6 +572,8 @@ int32 ast3d_alloc_scene (c_SCENE **scene)
   (*scene)->backgr.type = 0;
   (*scene)->directional_lighting = 0;
   (*scene)->sphere_map = 0;
+  (*scene)->znear=10.0;
+  (*scene)->zfar=10000.0;
   return ast3d_err_ok;
 }
 
@@ -964,15 +967,20 @@ int32 ast3d_getkey_morph (t_TRACK *track, float frame, c_MORPH *out)
   if (frame < track->last->frame) keys = track->keys; else keys = track->last;
   while (keys->next && frame > keys->next->frame) keys = keys->next;
   track->last = keys;
-  
+
   if (!keys->next || frame < keys->frame) {
-    out->from = keys->prev->val._int;
+    if(!keys->prev){
+      out->from = keys->val._int;
+    } else {
+      out->from = keys->prev->val._int;
+    }
     out->to = keys->val._int;
     out->alpha = 1.0;
     out->key=(t_KEY*) NULL;
     return ast3d_err_ok;
   }
   
+//printf("2\n");  
   out->from = keys->val._int;
   out->to = keys->next->val._int;
   alpha = (frame - keys->frame) / (keys->next->frame - keys->frame);

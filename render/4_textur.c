@@ -84,6 +84,7 @@
     glEnd();
 }
 #else
+#if 1
     /* Draw faces: */
     glBegin(GL_TRIANGLES);
     if(matflags&ast3d_mat_texture){
@@ -96,6 +97,7 @@
           ast3d_DrawGLTriangle_gouraud(&obj->faces[i]);   /* %%%%%%%%%%% */
     }
     glEnd();
+#endif
 #endif
 
   }

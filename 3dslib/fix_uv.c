@@ -1,5 +1,7 @@
 
-void ast3d_fixUV(void){
+void calc_uv_grads(c_OBJECT *obj);
+
+void ast3d_fixUV(char *objname){
     int      i;
     w_NODE *node=NULL;
 
@@ -7,6 +9,7 @@ void ast3d_fixUV(void){
     for (node = ast3d_scene->world; node; node=node->next)
       if (node->type == ast3d_obj_object){
         c_OBJECT *obj = (c_OBJECT *)node->object;
+	if(!objname || strcmp(obj->name,objname)==0)
         if(obj->numfaces){
           int x=0;
           float tUs=1.0,tVs=1.0;
@@ -67,20 +70,19 @@ void ast3d_fixUV(void){
 
     printf("Fixed %d UVs, faces=%ld\n",x,obj->numfaces);
 
+    calc_uv_grads(obj);
+
     }}
 
 }
 
 
-void ast3d_NOfixUV(void){
-    int      i;
-    w_NODE *node=NULL;
+void ast3d_NOfixUV(c_OBJECT *obj){
+int i;
+  if(obj->numfaces>0){
 
 /*------------------ START OF RENDERING LOOP --------------------*/
-    for (node = ast3d_scene->world; node; node=node->next)
-      if (node->type == ast3d_obj_object){
-        c_OBJECT *obj = (c_OBJECT *)node->object;
-        if(obj->numfaces){
+
           float tUs=1.0,tVs=1.0;
           float lUs=1.0,lVs=1.0;
           float tUo=0.5,tVo=0.5;
@@ -108,7 +110,5 @@ void ast3d_NOfixUV(void){
       obj->faces[i].u3=tUo+tUs*(pc->u-0.5); obj->faces[i].v3=tVo-tVs*(pc->v-0.5);
       obj->faces[i].lu3=lUo+lUs*(pc->u-0.5); obj->faces[i].lv3=lVo-lVs*(pc->v-0.5);
     } // for
-  
-  }}
-
+  }  
 }

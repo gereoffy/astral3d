@@ -1,3 +1,7 @@
+
+// #define DUV_SCALE (0.005F);
+#define DUV_SCALE (obj->bumpdepth);
+
 /*----------------- CALCULATE LIGHTING ---------------------*/
 
 // specular=0;
@@ -10,7 +14,53 @@
       specular_limit4=specular_limit/4.0;
     }
     if(matflags&ast3d_mat_specularmap) specular=1;
+    
+    if(matflags&ast3d_mat_bump){
+      c_LIGHT *l=lights[0];
 
+    for (i = 0; i < obj->numverts; i++){
+      if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){
+        obj->vertices[i].visible=0;
+        { c_VERTEX *v=&obj->vertices[i];
+          c_VECTOR *normal=&obj->vertices[i].pnorm;
+          c_VECTOR u_normal,v_normal,delta;
+          float x=l->ppos.x - v->pvert.x;
+          float y=l->ppos.y - v->pvert.y;
+          float z=l->ppos.z - v->pvert.z;
+          float len=x*x+y*y+z*z;
+          if(len>0){ len=1.0/sqrt(len);x*=len;y*=len;z*=len;}
+	  
+          u_normal.x= v->u_grad.x*normat[X][X] + v->u_grad.y*normat[X][Y] + v->u_grad.z*normat[X][Z];
+          u_normal.y= v->u_grad.x*normat[Y][X] + v->u_grad.y*normat[Y][Y] + v->u_grad.z*normat[Y][Z];
+          u_normal.z= v->u_grad.x*normat[Z][X] + v->u_grad.y*normat[Z][Y] + v->u_grad.z*normat[Z][Z];
+
+          v_normal.x= v->v_grad.x*normat[X][X] + v->v_grad.y*normat[X][Y] + v->v_grad.z*normat[X][Z];
+          v_normal.y= v->v_grad.x*normat[Y][X] + v->v_grad.y*normat[Y][Y] + v->v_grad.z*normat[Y][Z];
+          v_normal.z= v->v_grad.x*normat[Z][X] + v->v_grad.y*normat[Z][Y] + v->v_grad.z*normat[Z][Z];
+	  
+          delta.x=x*u_normal.x+y*u_normal.y+z*u_normal.z;
+          delta.y=x*v_normal.x+y*v_normal.y+z*v_normal.z;
+          delta.z=x*normal->x+y*normal->y+z*normal->z;
+          if(delta.z<0.0){
+            float t = (1.0f+delta.z) * 4.0f - 3.0f;
+            if (t < 0)
+            t = 0;
+            delta.x *= t;
+            delta.y *= t;  
+            delta.z = 0;
+          }
+          delta.z += 0.2f;  // ambient
+          if(delta.z > 1.0f) delta.z = 1.0f; else
+          if(delta.z < 0.0f) delta.z = 0.0f;
+          obj->vertices[i].bump_du=-delta.x*DUV_SCALE;
+          obj->vertices[i].bump_dv=delta.y*DUV_SCALE;
+          obj->vertices[i].rgb[0]=clip_255(delta.z*(l->MatDiff[0]));
+          obj->vertices[i].rgb[1]=clip_255(delta.z*(l->MatDiff[1]));
+          obj->vertices[i].rgb[2]=clip_255(delta.z*(l->MatDiff[2]));
+          obj->vertices[i].rgb[3]=src_alpha;
+    } } }
+
+    } else
     for (i = 0; i < obj->numverts; i++){
       if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){
         obj->vertices[i].visible=0;

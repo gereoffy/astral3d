@@ -1,7 +1,7 @@
 /*
  * written by David Bucciarelli (tech.hmw@plus.it)
  *            Humanware s.r.l.
- * hacked by Strepto / Astral  :)      
+ * hacked by Strepto / Astral  :)      and A'rpi :)
  */
 
 #include <stdio.h>
@@ -15,6 +15,7 @@
 #include <GL/gl.h>
 #include "../3dslib/ast3d.h"
 #include "render.h"
+//#include "particle.h"
 
 #define vinit(a,i,j,k) {\
   (a)[0]=i;\
@@ -22,59 +23,36 @@
   (a)[2]=k;\
 } 
 
-#define AGRAV -9.8
+// #define AGRAV -9.8
 
-typedef struct {
-  float color[3];
-  float energy;
-  c_VECTOR p; // float p[1][3];
-  float v[3];
-} part;
+//static int np;
+//static float eject_r,dt,eject_vy,eject_vl;
+//static float ridtri;
+//static part *p;
 
-static int np;
-static float eject_r,dt,eject_vy,eject_vl;
-static float ridtri;
-static part *p;
+static INLINE float vrnd(void){ return(((float)rand())/RAND_MAX); }
 
-static float vrnd(void)
-{
-  return(((float)rand())/RAND_MAX);
-}
-
-static void setnewpart(part *p)
-{
+static void setnewpart(c_PART *p,c_OBJECT *obj){
   float a,v[3];
-
   a=vrnd()*3.14159265359*2.0;
-
-  vinit(v,sin(a)*eject_r*vrnd(),0.15,cos(a)*eject_r*vrnd());
-  p->p.x=v[0]+vrnd()*ridtri;
-  p->p.y=v[1]+vrnd()*ridtri;
-  p->p.z=v[2]+vrnd()*ridtri;
+  vinit(v,sin(a)*obj->particle.eject_r*vrnd(),0.15,cos(a)*obj->particle.eject_r*vrnd());
+//  printf("setnewpart.  a=%f   xyz: %f %f %f\n",a,v[0],v[1],v[2]);
+  p->p.x=v[0]+vrnd()*obj->particle.ridtri;
+  p->p.y=v[1]+vrnd()*obj->particle.ridtri;
+  p->p.z=v[2]+vrnd()*obj->particle.ridtri;
+//  printf("setnewpart.  p.xyz: %f %f %f\n",p->p.x,p->p.y,p->p.z);
   vinit(p->color,vrnd(),vrnd(),vrnd());
-  vinit(p->v,v[0]*eject_vl/(eject_r/2),
-             vrnd()*eject_vy+eject_vy/2,
-             v[2]*eject_vl/(eject_r/2));
+  vinit(p->v,v[0]*obj->particle.eject_vl/(obj->particle.eject_r/2),
+             vrnd()*obj->particle.eject_vy+obj->particle.eject_vy/2,
+             v[2]*obj->particle.eject_vl/(obj->particle.eject_r/2));
+//  printf("setnewpart.  v.xyz: %f %f %f\n",p->v[0],p->v[1],p->[2]);
   p->energy=1;
 }
 
-static void setpart(part *p)
-{
 
-  if(p->p.y<0.1) {
-    setnewpart(p);
-    return;
-  }
-
-  p->v[1]+=AGRAV*dt;
-  p->p.x+=dt*p->v[0];
-  p->p.y+=dt*p->v[1];
-  p->p.z+=dt*p->v[2];
-}
-
-
-void particle_redraw(c_VECTOR *pos){
+void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
   int	j;
+  c_PART *p=obj->particle.p;
 
   glDisable(GL_DEPTH_TEST);
 //  glShadeModel(GL_FLAT);
@@ -85,25 +63,21 @@ void particle_redraw(c_VECTOR *pos){
   glBlendFunc(GL_ONE,GL_ONE);
 
     glBegin(GL_QUADS);
-    for(j=0;j<np;j++) {
+    for(j=0;j<obj->particle.np;j++){
       c_VECTOR pt;
       float p_scale;
 //      glColor3f(p[j].energy,p[j].energy,p[j].energy);
 
-      { c_VECTOR b;
-#define cammat scene->cam->matrix
-        b.x=p[j].p.x+pos->x;
-        b.y=p[j].p.y+pos->y;
-        b.z=p[j].p.z+pos->z;
-        pt.x= b.x*cammat[X][X] + b.y*cammat[X][Y] + b.z*cammat[X][Z] + cammat[X][W];
-        pt.y= b.x*cammat[Y][X] + b.y*cammat[Y][Y] + b.z*cammat[Y][Z] + cammat[Y][W];
-        pt.z= b.x*cammat[Z][X] + b.y*cammat[Z][Y] + b.z*cammat[Z][Z] + cammat[Z][W];
-#undef cammat
-      } // mat_mulvec(scene->cam->matrix,&p[j].p,&pt);  /* Transformation */
+      pt.x= p[j].p.x*objmat[X][X] + p[j].p.y*objmat[X][Y] + p[j].p.z*objmat[X][Z] + objmat[X][W];
+      pt.y= p[j].p.x*objmat[Y][X] + p[j].p.y*objmat[Y][Y] + p[j].p.z*objmat[Y][Z] + objmat[Y][W];
+      pt.z= p[j].p.x*objmat[Z][X] + p[j].p.y*objmat[Z][Y] + p[j].p.z*objmat[Z][Z] + objmat[Z][W];
 //      p_scale=(0.8/(p[j].energy*2));
-      p_scale=(0.8/p[j].energy);
-//      if (p_scale>20) p_scale=20;
-//      if (p_scale<-20) p_scale=-20;
+      p_scale=(obj->particle.energy/p[j].energy);
+      if(obj->particle.sizelimit!=0){
+        if (p_scale>obj->particle.sizelimit) p_scale=obj->particle.sizelimit;
+        if (p_scale<-obj->particle.sizelimit) p_scale=-obj->particle.sizelimit;
+      }
+
       glColor3fv(p[j].color);
       glTexCoord2f(0.0,0.0);
       glVertex3f(pt.x-p_scale,pt.y-p_scale,pt.z);
@@ -113,19 +87,26 @@ void particle_redraw(c_VECTOR *pos){
       glVertex3f(pt.x+p_scale,pt.y+p_scale,pt.z);
       glTexCoord2f(0.0,1.0);
       glVertex3f(pt.x-p_scale,pt.y+p_scale,pt.z);
-      p[j].energy-=0.0018;
+      p[j].energy-=obj->particle.dieratio;
 
-#if 1
-      p[j].color[0]-=0.001*p[j].color[0];
-      p[j].color[1]-=0.001*p[j].color[1];
-      p[j].color[2]-=0.001*p[j].color[2];
+      p[j].color[0]*=obj->particle.colordecrement;
+      p[j].color[1]*=obj->particle.colordecrement;
+      p[j].color[2]*=obj->particle.colordecrement;
+
+#if 0
+      if(p[j].p.y<0.1|| p[j].energy<=0.001) {  // 
 #else
-      p[j].color[0]-=0.01;
-      p[j].color[1]-=0.01;
-      p[j].color[2]-=0.01;
+      if(p[j].p.y<0.1) {  // 
 #endif
-
-      setpart(&p[j]);
+	setnewpart(&p[j],obj);
+//	putchar('.');fflush(stdout);
+      } else {
+        p[j].v[1]+=obj->particle.agrav*dt;
+        p[j].p.x+=dt*p[j].v[0];
+        p[j].p.y+=dt*p[j].v[1];
+        p[j].p.z+=dt*p[j].v[2];
+      }
+      
     }
     glEnd();
 
@@ -134,23 +115,23 @@ void particle_redraw(c_VECTOR *pos){
 
 }
 
-void particle_init(){
+void particle_init(c_OBJECT *obj,int texture,int np){
 int i;
-  np=2800;
-//  dt=0.015;
-//  eject_r=0.1;
-//  eject_vy=4;
-//  eject_vl=1;
-//  ridtri=0.1;
-  dt=0.015;
-  eject_r=0.75;
-  eject_vy=30;
-  eject_vl=7.5;
-  ridtri=0.75;
-
-  p=malloc(sizeof(part)*np);
-
-  for(i=0;i<np;i++) setnewpart(&p[i]);
+  if(!(obj->particle.p=malloc(sizeof(c_PART)*np))) np=0;
+  
+  obj->particle.maxnp=np;
+  obj->particle.np=np;
+  obj->particle.texture_id=texture;
+  obj->particle.eject_r=0.75;
+  obj->particle.eject_vy=30;
+  obj->particle.eject_vl=7.5;
+  obj->particle.ridtri=0.75;
+  obj->particle.energy=0.8;
+  obj->particle.sizelimit=0;
+  obj->particle.dieratio=0.0018;
+  obj->particle.agrav=-9.81;
+  obj->particle.colordecrement=0.999;
+  printf("particle.init. np=%d\n",np);
+  for(i=0;i<np;i++) setnewpart(&obj->particle.p[i],obj);
 }
-
 

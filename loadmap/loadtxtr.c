@@ -49,6 +49,8 @@ texture_st* load_texture(char *txt1,char *txt1m,float txt1a,
                          char *alp,char *alpm,float alpa,int negflags){
 int i;
 
+printf("load_texture called negflags=%d\n",negflags);
+
   /* Compare to already loaded textures */
 #define CMP_NAMES(a,b) ( ((!(a)) && (!(b))) || ((a) && (b) && strcmp(a,b)==0) )
   for(i=0;i<texture_db;i++){
@@ -165,7 +167,7 @@ int i;
 #if 1
 //  printf("Texture is ready to upload!\n");
 	glGenTextures(1, &t->id);
-//  printf("Putting texture %dx%d, id=%d\n",xsize,ysize,mat->texture_id);
+  printf("Putting %s texture %dx%d, id=%d, neg=%d\n",(t->pixelsize==4)?"RGBA":"RGB",t->xsize,t->ysize,t->id,negflags);
 	glBindTexture(GL_TEXTURE_2D, t->id);
   if(negflags&256){
   	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP);

@@ -533,6 +533,10 @@ static int read_TRIMESH (afs_FILE *f)
   obj->vertices=NULL;
   obj->faces=NULL;
   obj->flags = 0;
+  obj->bumpdepth=0.005;
+  obj->enable_zbuffer=1;
+  if(strncmp(obj->name,"PARTICLE",8)==0) obj->flags|=ast3d_obj_particle;
+  obj->particle.np=obj->particle.maxnp=0;
   vec_zero (&obj->pivot);
   vec_zero (&obj->translate);
   vec_zero (&obj->scale);
@@ -693,12 +697,24 @@ static int read_FOGPARAMS (afs_FILE *f)
   read_FOGPARAMS: Fog reader.
 */
   float   c[4];
+  float t;
   c_FOG *fog=&ast3d_scene->fog;
   if (afs_fread (c, 4*4, 1, f) != 1) return ast3d_err_badfile;
-  fog->znear=c[0];  
+  fog->znear=c[0];
   fog->fognear=c[1];  
   fog->zfar=c[2];  
   fog->fogfar=c[3];
+//  
+  c[1]/=100.0;
+  c[3]/=100.0;
+  t=(c[2]-c[0])/(c[3]-c[1]);
+  fog->fog_zfar=(1-c[1])*t+c[0];
+  fog->fog_znear=c[0]-(c[1]*t+c[0]);
+
+  printf("fog Znear/Zfar: %f  %f\n",fog->znear,fog->zfar);
+  printf("fog Dnear/Dfar: %f  %f\n",fog->fognear,fog->fogfar);  
+  printf("fog znear/far:  %f  %f\n",fog->fog_znear,fog->fog_zfar);  
+  
 //  fog->type|=ast3d_fog_fog;
   if (afs_fread (c, 3*2, 1, f) != 1) return ast3d_err_badfile;
   if (afs_fread (&fog->color, 3*4, 1, f) != 1) return ast3d_err_badfile;

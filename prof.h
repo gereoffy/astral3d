@@ -1,13 +1,16 @@
 /* Profiling */
-//#define PROFILING
 
-#ifdef PROFILING
-#define PROF_START(x) x-=uGetTimer();
-#define PROF_END(x) x+=uGetTimer();
-#else
+#define PROFILING
+
+#ifndef PROFILING
+
 #define PROF_START(x) ;
 #define PROF_END(x) ;
-#endif
+
+#else
+
+#define PROF_START(x) x-=uGetTimer();
+#define PROF_END(x) x+=uGetTimer();
 
 #ifdef DEFINE_PROF_VARS
 #define P(x) int x=0;
@@ -28,6 +31,7 @@ P(prof_3d_draw)
   P(prof_3d_lightmap)
   P(prof_3d_specmap)
 P(prof_3d_lightcorona)
+P(prof_3d_particle)
 
 P(prof_clear)
 P(prof_update)
@@ -38,3 +42,5 @@ P(prof_swapbuffers)
 P(prof_total)
 
 #undef P
+#endif
+

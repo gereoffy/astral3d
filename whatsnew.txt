@@ -297,9 +297,21 @@ v2.61  99/12/11  by A'rpi
 - optimvert.c: mostantol ujra generalja a vertexeket, es a nem hasznaltakat
   kiszedi (nem kell morpholni+transzformalni), es felhasznalasuk szerinti
   sorrendben lesznek -> cache jobb kihasznalasa! CVA miatt is kell...
+
+v3.0   99/12/16-18  by A'rpi
+- Bump mapping!!!
+- bump fixalva - normalizalni kellett u_grad es v_grad vektorokat
+
+v3.1  99/12/18   by A'rpi & Strepto & Inferno
+- Particle system mostantol nem LIGHT hanem OBJECT.  (neve: "PARTICLE*")
+  bekapcsolva ha: obj->flags & ast3d_obj_particle
+  strukturak:  rendszer: c_PARTICLE, 1 db: c_PART
+  objmat-ot hasznalja, tehat lehet forgatni stb.
+  scriptbol vezerelheto jol.
   
 
 KELL MEG:
+- Zbuffer kitoltese - fade effektek
 - profiling: meg mindig "elveszik" neha ido a 'draw' reszben. pl chevy, szoba
 - optimalt directional lighting attenuation nelkul, normal forgatas nelkul
 - objectek sortolasa: eloszor tomor obj-k, utana atlatszok z-sort-olva
@@ -316,7 +328,8 @@ KELL MEG:
 - multitextura  (textura+lightmap esetre legalabb)
 - morph transzformaciot attenni render.c-be! meg a pre-trans cull-t is!
 - keyframer bug: LOOP-ot nem tamogat (spline.c tudja de ami hivja az nem igazan)
-
+  lehet hogy megis tamogatja! le kene mar tesztelni...
+  
 EGYEB:
 - bug: chevy szelvedojen nincs specular!  -- specularmap-al van!!!!!
 - Morfnal pretrans face cull  -- megbeszeltuk hogy nem lehet, mert az
