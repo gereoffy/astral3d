@@ -23,6 +23,61 @@ char* update_PRS(node_st *node){
   return NULL;
 }
 
+// Parameter map indices
+#define PB_TORUSKNOT_RADIUS		0
+#define PB_TORUSKNOT_RADIUS2		1
+#define PB_TORUSKNOT_ROTATION		2
+#define PB_TORUSKNOT_TWIST		3
+#define PB_TORUSKNOT_SEGMENTS		4
+#define PB_TORUSKNOT_SIDES		5
+#define PB_TORUSKNOT_SMOOTH		6
+#define PB_TORUSKNOT_P	7
+#define PB_TORUSKNOT_Q	8
+#define PB_TORUSKNOT_E    9
+#define PB_TORUSKNOT_LUMPS    10
+#define PB_TORUSKNOT_LUMP_HEIGHT    11
+#define PB_TORUSKNOT_BASE_CURVE     12
+#define PB_TORUSKNOT_GENUV          13
+#define PB_TORUSKNOT_UTILE          14
+#define PB_TORUSKNOT_VTILE          15
+#define PB_TORUSKNOT_UOFF           16
+#define PB_TORUSKNOT_VOFF           17
+#define PB_TORUSKNOT_WARP_HEIGHT    18
+#define PB_TORUSKNOT_WARP_FREQ      19
+
+
+char* init_TorusKnot(node_st *node){
+  Class_TorusKnot *knot=malloc(sizeof(Class_TorusKnot));
+  node_st *pblock=dep_node_by_ref(node,0);
+  if(!pblock) return "TorusKnot: missing ParamBlock!";
+  node->data=knot;
+  node->update=update_TorusKnot;
+  init_mesh(&knot->mesh);
+  knot->radius=getparam_float(pblock,PB_TORUSKNOT_RADIUS);
+  knot->radius2=getparam_float(pblock,PB_TORUSKNOT_RADIUS2);
+  knot->Rotation=getparam_float(pblock,PB_TORUSKNOT_ROTATION);
+  knot->radius=getparam_float(pblock,PB_TORUSKNOT_RADIUS);
+  knot->Twist=getparam_float(pblock,PB_TORUSKNOT_TWIST);
+  knot->segs=getparam_int(pblock,PB_TORUSKNOT_SEGMENTS);
+  knot->sides=getparam_int(pblock,PB_TORUSKNOT_SIDES);
+  knot->smooth=getparam_int(pblock,PB_TORUSKNOT_SMOOTH);
+  knot->P=getparam_float(pblock,PB_TORUSKNOT_P);
+  knot->Q=getparam_float(pblock,PB_TORUSKNOT_Q);
+  knot->E=getparam_float(pblock,PB_TORUSKNOT_E);
+  knot->P=getparam_float(pblock,PB_TORUSKNOT_P);
+  knot->Lumps=getparam_float(pblock,PB_TORUSKNOT_LUMPS);
+  knot->LumpHeight=getparam_float(pblock,PB_TORUSKNOT_LUMP_HEIGHT);
+  knot->BaseCurve=getparam_int(pblock,PB_TORUSKNOT_BASE_CURVE);
+  knot->genUV=getparam_int(pblock,PB_TORUSKNOT_GENUV);
+  knot->uTile=getparam_float(pblock,PB_TORUSKNOT_UTILE);
+  knot->vTile=getparam_float(pblock,PB_TORUSKNOT_VTILE);
+  knot->uOff=getparam_float(pblock,PB_TORUSKNOT_UOFF);
+  knot->vOff=getparam_float(pblock,PB_TORUSKNOT_VOFF);
+  knot->WarpHeight=getparam_float(pblock,PB_TORUSKNOT_WARP_HEIGHT);
+  knot->WarpFreq=getparam_float(pblock,PB_TORUSKNOT_WARP_FREQ);
+  return NULL;
+}
+
 char* init_PRS(node_st *node){
   Class_PRS *prs=malloc(sizeof(Class_PRS));
   node->data=prs;
@@ -76,27 +131,29 @@ char* init_LookAt(node_st *node){
 
 char* update_Node(node_st *node){
   Class_Node *n=node->data;
-  printf("updating Node '%s'\n",n->name);
-//  printf("tm_mat:\n");mat_print(n->tm_mat);
+//  printf("updating Node '%s'\n",n->name);
   if(n->orient_mat){
-//    printf("orient:\n");mat_print(*n->orient_mat);
-    mat_mul(n->mat,n->tm_mat,*n->orient_mat);
-//    mat_mul(n->mat,*n->orient_mat,n->tm_mat);
-//    printf("tm*orient:\n");mat_print(n->mat);
-  } else mat_copy(n->mat,n->tm_mat);
-  if(n->parent_mat){
-//    printf("parent_mat:\n");mat_print(*n->parent_mat);
-    Matrix temp;
-    mat_mul(temp,*n->parent_mat,n->mat);
-    mat_copy(n->mat,temp);
-//    mat_mul2(n->mat,*n->parent_mat);
-//    printf("mat:\n");mat_print(n->mat);
+    if(n->parent_mat){
+      // OM*PM
+      mat_mul(n->mat,*n->parent_mat,*n->orient_mat);
+    } else {
+      // OM
+      mat_copy(n->mat,*n->orient_mat);
+    }
+  } else {
+    if(n->parent_mat){
+      // PM
+      mat_copy(n->mat,*n->parent_mat);
+    } else {
+      // identity
+      mat_identity(n->mat);
+    }
   }
   return NULL;
 }
 
 char* init_Node(node_st *node){
-  Matrix tempmat;
+//  Matrix tempmat;
   Class_Node *n=node->data;
   node_st *orient;
   node_st *object;
@@ -118,8 +175,8 @@ char* init_Node(node_st *node){
     Orientation *o=orient->data;
     n->orient_mat=&o->mat;
   } else n->orient_mat=NULL;
-//  mat_from_tm(n->tm_mat,&n->tm);
-  mat_from_tm(tempmat,&n->tm);mat_inverse(n->tm_mat,tempmat);
+  mat_from_tm(n->tm_mat,&n->tm);
+//  mat_from_tm(tempmat,&n->tm);mat_inverse(n->tm_mat,tempmat);
 //  printf("TM_mat:\n");mat_print(n->tm_mat);
   node->update=update_Node;
   n->mesh=NULL;
@@ -168,6 +225,12 @@ int i;
         switch(node_cl->subtype){
           case 1: err=init_PRS(node);break;
           case 2: err=init_LookAt(node);break;
+        }
+        break;
+      }
+      case CLASSTYPE_MESH: {
+        switch(node_cl->subtype){
+          case 1: err=init_TorusKnot(node);break;
         }
         break;
       }

@@ -47,6 +47,7 @@ int main(int argc,char* argv[]){
   OLE2_File *of;
   afs_FILE *f1;
   afs_FILE *f2;
+  afs_FILE *f3;
 
     // Load Scene:
     afs_init("",AFS_TYPE_FILES);
@@ -57,13 +58,15 @@ int main(int argc,char* argv[]){
     if(!f1){ printf("Invalid MAX file (missing ClassDirectory2/3)!\n");exit(1);}
     f2=afs_open_OLE2(of,"Scene");
     if(!f2){ printf("Invalid MAX file (missing Scene)!\n");exit(1);}
-    if(load_scene(f1,f2)) {printf("Error reading scene.\n"); return 1;} // error
-    afs_fclose(f1); afs_fclose(f2);
+    f3=afs_open_OLE2(of,"Config");
+    if(!f3){ printf("Invalid MAX file (missing Config)!\n");exit(1);}
+    if(load_scene(f3,f1,f2)) {printf("Error reading scene.\n"); return 1;} // error
+    afs_fclose(f1); afs_fclose(f2); afs_fclose(f3);
     OLE2_Close(of);
 
-  update(100);
-  draw_scene(scene.Nodes,"Camera01");
-  draw_scene(scene.Nodes,"Camera02");
+//  update(100);
+//  draw_scene(scene.Nodes,"Camera01");
+//  draw_scene(scene.Nodes,"Camera02");
 
   return 0;
 }

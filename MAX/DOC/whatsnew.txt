@@ -73,6 +73,21 @@ MAX3D v0.7   2000.04.08.  by A'rpi
      mar csak a laba van kicsit odebb, talan PIVOT gond???
      lehet, hogy a parent TM-jet nem kene beleszamolni?
 
+MAX3D v0.71   2000.04.09.  by A'rpi
+=========================
+- Pivot fix (birdshow miatt)
+  nem kell invertalni a tm_mat-ot!!!
+- "Config" OLE2 objektum beolvasasa (lasd meg config.txt)
+  Ebben van tarolva tobbek kozt a start/end/current frame es az FPS is.
+- Integer ertekek is keyframelhetoek (kicsit hack, de muxik)
+- TorusKnot implementalva!!!!! :-)
+  Teljesen, twist, warp, etc..  meg a sides/segments-et is lehet keyframelni!
+  Szamol normalt, es textura koordinatat is ha genUV==1.
+  A MAXSDK3-ban levo knot.cpp-t hasznaltam fel, csak kisse megoptimalizaltam
+  mert az nagyon szar volt...
+- Render.c tud texturazni is (ofkoz COINS.BMP...) egyelore csak UV teszteleshez
 
 
+RULEZ, a modifierek forrasa megvan a MAXSDK3-ban! (twist,taper,bend,skew etc...)
+RULEZ az FFD modifier, nagyon durva objecteket lehet vele csinalni egyszeruen!
 

@@ -14,9 +14,13 @@ int nodeno=0;
 
 Scene scene;
 
+#include "mesh.c"
+
 #include "get.c"
 #include "reader.c"
 #include "readers/readers.h"
+
+#include "config.c"
 
 //========================================================================//
 //               node reader
@@ -173,13 +177,19 @@ if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 
 #include "classdef.c"
 
+// Object generators:
+#include "tknot.c"
+
 // Keyframer:
 #include "linknode.c"
 #include "init.c"
 #include "update.c"
 
 
-int load_scene(FILE *classdirfile,FILE *f){
+int load_scene(FILE *configfile,FILE *classdirfile,FILE *f){
+
+while(!feof(configfile)) config_reader(configfile,0);
+printf("frames: %d - %d   current: %d\n",scene.start_frame,scene.end_frame,scene.current_frame);
 
 while(!feof(classdirfile)) class_dir_reader(classdirfile,0);
 

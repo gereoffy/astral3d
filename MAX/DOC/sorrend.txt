@@ -1,0 +1,41 @@
+Hogyan implementaljuk/ellenorizzuk a MAX-ot:       by A'rpi
+============================================
+
+1. lepes:  nincs kamera, tehat ami a -Z terfelben van azt latjuk.
+   a nezopont tehat az origoban van, es az X=0 Y=0 Z=-1 fele nez.
+   
+   csinalni kell teszt objecteket, keyframelni stb:
+   1.a. implement position
+   1.b. implement rotation
+   1.c. implement scale
+   1.d. implement pivot pos
+   1.e. implement pivot rot
+   1.f. implement pivot scale
+   
+   Ha ez mind okes, akkor johet a hierarchy!!!
+   Kerdes, hogy a hierarchynal a parent mat-ot mikepp kell figyelembe
+   venni:
+     - mat vagy inv mat ?
+     - mat szorzasnal mi a helyes sorrend
+   
+   1.g. inherited pos (plusz X,Y,Z flagek!!)
+   1.h. inherited rot
+   1.i. inherited scale
+   ha az is ok, akkor lephetunk csak tovabb
+   
+2. lepes: PRS kamera. ki kell talalni, hogy a kamera a mat-ot vagy
+   a mat inverzet (vagy inv pos de nem inv rot) hasznalja.
+   Az 1. pont miatt a PRS mat tutira jo, tehat ehhez kell igazitani
+   a kamera szamolasat.
+
+3. LookAt kamera implementalasa
+   A 2. ponthoz kell igazitani, tehat ha a mat inverze a kamera, akkor
+   nekunk ugy kell mat-ot csinalni hogy az inverze legyen okes...
+   
+   3.b. LookAt AXIS implementalasa.
+        celszeru figyelembe venni a twist.c-ben levo axis szamolast.
+
+4. ObjGen implementalasa. pl. TorusKnot
+
+5. Object-Space Modifier (OSM) implementalasa. pl. Twist
+

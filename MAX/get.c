@@ -67,6 +67,13 @@ float* getkey_float(node_st *node){
   return &(track->val_vect.x);
 }
 
+//  int
+int* getkey_int(node_st *node){
+  Track *track=node->data;
+  if(!node || !track) return NULL;
+  return &(track->val_int);
+}
+
 //  color/vect
 Point3* getkey_vect(node_st *node){
   Track *track=node->data;
@@ -91,8 +98,9 @@ int* getparam_int(node_st *node,int pno){
       return ((int*)(&pb->data[pno]));
     case 0x0201:
     case 0x0204:
-      printf("!!! Warning! type 'int' can't be keyframed!\n");
-      return NULL; //getkey_int(pb->data[pno]);
+      return getkey_int(pb->data[pno]);
+//      printf("!!! Warning! type 'int' can't be keyframed!\n");
+//      return NULL; //getkey_int(pb->data[pno]);
   }
   return NULL;
 }

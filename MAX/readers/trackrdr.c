@@ -175,11 +175,11 @@ switch(chunk_id){
   case 0x2504:
   case 0x2505: {
     switch(subtype&15){  // val_vect
-      case 1: track->val_vect.x=float_reader(f,&chunk_size);break;
+      case 1: track->val_int=track->val_vect.x=float_reader(f,&chunk_size);break;
       case 2:
       case 3:
       case 5:
-        track->val_vect.x=float_reader(f,&chunk_size);
+        track->val_int=track->val_vect.x=float_reader(f,&chunk_size);
         track->val_vect.y=float_reader(f,&chunk_size);
         track->val_vect.z=float_reader(f,&chunk_size);
         break;

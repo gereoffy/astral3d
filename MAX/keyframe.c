@@ -113,6 +113,26 @@ void update_track(node_st *node,float frame){
         }
         break; }
 
+    case 0x2516: { SET_KEY(Bezier_Float_Key)
+    
+        if(alpha==0.0){
+          track->val_vect.x=keys[keyno].value;
+        } else {
+          float u=alpha,u1=1-u;
+          float h0=u1*u1*(u1+3*u);
+          float h1=dt*u*u1*u1;
+          float h2=dt*u*u*u1;
+          float h3=u*u*(u+3*u1);
+          
+          track->val_vect.x = (h0*keys[keyno].value) +
+                              (h1*keys[keyno].out_tan) +
+                              (h2*keys[keyno1].in_tan) +
+                              (h3*keys[keyno1].value);
+        }
+        break; }
+
+
+
     case 0x2522: { SET_KEY(TCB_Rot_Key)
         Quat p,q;
         float d_angle, spin;
@@ -120,8 +140,8 @@ void update_track(node_st *node,float frame){
         
 //        d_angle=keys[keyno1].angle-keys[keyno].angle;
         d_angle=keys[keyno1].angle;
-        if(d_angle>0) spin = floor (d_angle / (2*M_PI));
-                 else spin = ceil  (d_angle / (2*M_PI));
+        if(d_angle>0) spin = M_PI * floor (d_angle / (2*M_PI));
+                 else spin = M_PI * ceil  (d_angle / (2*M_PI));
 
 #ifdef SPLINE_QUAT_INTERP
         quat_slerpl(&p, &keys[keyno].value,&keys[keyno1].value,spin,t);
@@ -136,6 +156,7 @@ void update_track(node_st *node,float frame){
 
     default: printf("Key type %04X not yet supported :-(\n",track->keytype);
   }
+  track->val_int=track->val_vect.x; // !!!!!!!
 
 #undef SET_KEY
 }

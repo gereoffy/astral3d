@@ -100,6 +100,7 @@ typedef struct {
   float *z;
 } Class_EulerXYZ;
 
+
 typedef struct {
   Point3 p;
   Point3 n;
@@ -131,6 +132,32 @@ typedef struct {
   TFace *tfaces;
 } Class_EditableMesh;
 
+typedef struct {
+  Class_EditableMesh mesh;
+  float* radius;
+  float* radius2;
+  float* Rotation;
+  float* Twist;
+  int* segs;
+  int* sides;
+  int* smooth;
+  float* P;
+  float* Q;
+  float* E;
+  float* Lumps;
+  float* LumpHeight;
+  int* BaseCurve;
+  int* genUV;
+  float* uTile;
+  float* vTile;
+  float* uOff;
+  float* vOff;
+  float* WarpHeight;
+  float* WarpFreq;
+} Class_TorusKnot;
+
+
+
 // Keyframer:
 
 typedef struct {
@@ -141,6 +168,7 @@ typedef struct {
   int flags;   // track flags
   Point3 val_vect; // float (x) or vect/color (xyz) value
   Quat val_quat;   // quaternion (xyzw) value
+  int val_int;     // integer value
   int numkeys; // number of keys
   int frame_from,frame_to; // frame of first&last keys
   int keytype; // chunk id
@@ -244,6 +272,8 @@ typedef struct {
   node_st *Modifiers;
   node_st *ModifiedObjs;
   node_st *Nodes;
+  int fps;
+  int start_frame,end_frame,current_frame;
 } Scene;
 
 #define CLASSTYPE_ERROR 0
@@ -258,6 +288,7 @@ typedef struct {
 #define CLASSTYPE_MESH 8
 
 #define CLASSTYPE_NODE 9
+#define CLASSTYPE_SCENE 10
 
 #define CLASSTYPE_MAP 20
 #define CLASSTYPE_MATERIAL 21

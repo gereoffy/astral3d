@@ -291,7 +291,7 @@ void mat_from_lookat(Matrix out,Point3 *pos,Point3 *target,float roll,Point3 *sc
      case 0x102: y.z=-1;break;
      default: y.z=1;
    }
-   printf("UP-vector: %d %d %d  (axis=%d)\n",(int)y.x,(int)y.y,(int)y.z,axisflag);
+//   printf("UP-vector: %d %d %d  (axis=%d)\n",(int)y.x,(int)y.y,(int)y.z,axisflag);
 //   y.x=0; y.y=0; y.z=1;
 
    /* X vector = Y=(0,0,1) cross Z */
@@ -305,7 +305,7 @@ void mat_from_lookat(Matrix out,Point3 *pos,Point3 *target,float roll,Point3 *sc
    y.x =  z.y*x.z - z.z*x.y;
    y.y = -z.x*x.z + z.z*x.x;
    y.z =  z.x*x.y - z.y*x.x;
-   printf("y.len=%f\n",vec_length(&y));
+//   printf("y.len=%f\n",vec_length(&y));
 //   vec_normalize(&y);    // imho ez felesleges (mert 1*1=1 ugyebar...)
 
    // Apply roll angle
@@ -391,21 +391,29 @@ void quat_slerpl(Quat *out,Quat *a,Quat *b,float spin,float alpha){
   float flip=1.0;
 
   cosa = quat_dotunit(a,b);
-  if (cosa < 0.0){ cosa = -cosa, flip = -1;}
+//  if (cosa < 0.0){ cosa = -cosa, flip = -1;}
   if (1.0 - fabs(cosa) < (1.0e-6)) {
     k1 = 1.0 - alpha;
     k2 = alpha;
   } else {
     angle = acos (cosa);
-    sina = sin (angle);
-    anglespin = angle + spin*M_PI;
-    k1 = sin (angle - alpha*anglespin) / sina;
-    k2 = sin (alpha*anglespin) / sina;
+//    sina = 1.0f/sin(angle);
+    sina = 1.0f/sqrt(1.0f-cosa*cosa);
+    anglespin = alpha*(angle+spin);
+    k1 = sin (angle - anglespin) * sina;
+    k2 = sin (anglespin) * sina;
   }
   k2 *= flip;
   out->x = k1*a->x + k2*b->x;
   out->y = k1*a->y + k2*b->y;
   out->z = k1*a->z + k2*b->z;
   out->w = k1*a->w + k2*b->w;
+}
+
+INLINE void vec_cross(Point3 *out,Point3 *a,Point3 *b){
+/*  vec_cross: computes cross product of two vectors.*/
+  out->x = a->y*b->z - a->z*b->y;
+  out->y = a->z*b->x - a->x*b->z;
+  out->z = a->x*b->y - a->y*b->x;
 }
 

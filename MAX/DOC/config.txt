@@ -1,0 +1,19 @@
+A "Config" OLE2 objektum felepitese:      (by A'rpi)
+
+CHUNK-okbol all. A top-level chunk hatarozza meg a tobbi jelenteset:
+
+20B0:  time configuration
+=====
+  0010(4)  24      Frame rate (FPS)
+  0020(4)  2       View  0=frames  1=SMPTE  2=frames:ticks  3=MM:SS:ticks
+  0030(4)  1       ???
+  0040(4)  1       ???
+  0050(4)  1060    Start tick
+  0060(4)  9080    End tick
+  0070(4)  2850    Current tick
+    0090(4)  0     ???
+  0110(4)  0       ???
+
+  fontos:  1 sec = 4800 ticks!!!  FPS-tol fuggetlenul!
+    => 1 frame = 4800/FPS ticks
+  ami nincs letarolva sehol:  playback/speed

@@ -1,4 +1,4 @@
 
 rm -f Render
-gcc -Wall -g Render.c agl/agl.o -o Render -L/usr/X11/lib -I/usr/X11/include -lGL -lGLU -lglut -lX11 -lXext -lXi -lXmu -lm -Lafs -lafs
+gcc -Wall -g Render.c agl/agl.o timer/timer-lx.o -o Render -Lloadmap -llmap -L/demo/lib -ljpeg -L/usr/X11/lib -I/usr/X11/include -lGL -lGLU -lglut -lX11 -lXext -lXi -lXmu -lm -Lafs -lafs
 

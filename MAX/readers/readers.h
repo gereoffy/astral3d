@@ -10,6 +10,7 @@ static int extra_refs=0;
 #include "pblock.c"
 #include "meshrdr.c"
 #include "lookatrd.c"
+//#include "scenerdr.c"
 
 void init_classreaders(){
   // Track/Key reader:
@@ -37,10 +38,13 @@ void init_classreaders(){
   register_classreader("Bitmap",CLASSTYPE_MAP,1,NULL,material_chunk_reader,NULL);
   // ParamBlock:
   register_classreader("ParamBlock",CLASSTYPE_PARAMBLOCK,0,paramblock_init,paramblock_chunk_reader,paramblock_uninit);
-  // Editable Mesh
+  // Editable Mesh / Object
   register_classreader("Editable Mesh",CLASSTYPE_MESH,0,mesh_init,mesh_chunk_reader,mesh_uninit);
+  register_classreader("Torus Knot",CLASSTYPE_MESH,1,NULL,NULL,NULL);
   // Orientation
   register_classreader("Position/Rotation/Scale",CLASSTYPE_ORIENTATION,1,NULL,NULL,NULL);
   register_classreader("Look At",CLASSTYPE_ORIENTATION,2,lookat_init,lookat_chunk_reader,lookat_uninit);
+  // etc
+//  register_classreader("Scene",CLASSTYPE_SCENE,0,NULL,scene_chunk_reader,NULL);
   
 }
