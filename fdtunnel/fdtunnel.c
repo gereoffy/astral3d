@@ -6,6 +6,8 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
+#include "fdtunnel.h"
+
 extern int window_w,window_h;
 extern float ast3d_blend;
 
@@ -21,8 +23,8 @@ typedef struct { float u,v,bright;} POINT_ST;
 static POINT_ST points[400];
 
 static float  rmat[3][3];
-static float	     alpha,beta,fd_gamma,rad_alpha,zpos;
-static float radmod=0;
+static float  alpha,beta,fd_gamma,zpos;
+static float radmod=0,radszog=5;
 
 static float fd_bright=1.0;
 
@@ -58,7 +60,7 @@ static void fd_tunnel(int x,int y,POINT_ST* p,float radius){
         dvec.x=pvec.x*rmat[0][0]+pvec.y*rmat[1][0]+pvec.z*rmat[2][0];
         dvec.y=pvec.x*rmat[0][1]+pvec.y*rmat[1][1]+pvec.z*rmat[2][1];
         dvec.z=pvec.x*rmat[0][2]+pvec.y*rmat[1][2]+pvec.z*rmat[2][2];
-        if(radmod) radius+=radmod*sin(atan2(dvec.x,dvec.y)*5);
+        if(radmod) radius+=radmod*sin(atan2(dvec.x,dvec.y)*radszog);
 
         a = dvec.x*dvec.x + dvec.y*dvec.y;
         b = 2*(ovec.x*dvec.x + ovec.y*dvec.y);
@@ -71,6 +73,7 @@ static void fd_tunnel(int x,int y,POINT_ST* p,float radius){
         v = (fabs(atan2(ivec.y, ivec.x)/M_PI));
         bright=fd_bright/t; // BRIGHT/(t*1556);
 //        bright=(bright>=1.0)?ast3d_blend:bright*ast3d_blend;
+
         if(y>0){
           glTexCoord2f(p->u,p->v);
           glColor4f(p->bright,p->bright,p->bright,ast3d_blend);
@@ -82,14 +85,13 @@ static void fd_tunnel(int x,int y,POINT_ST* p,float radius){
         p->u=u;p->v=v;p->bright=bright;
 }
 
-void draw_fdtunnel(float frame,int texture,int texture2){
-  int x,y;
+void draw_fdtunnel(float frame,fx_fdtunnel_struct *params){
+  int x,y,j;
 
   // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDisable(GL_FOG);
   glDisable(GL_DEPTH_TEST);
   glDepthMask(GL_FALSE);  /* thanx to reptile/ai */
-           
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -102,54 +104,35 @@ void draw_fdtunnel(float frame,int texture,int texture2){
 
   glEnable(GL_TEXTURE_2D);
 
-   alpha=frame*0.008f;
-   beta=frame*0.009736f;
-//   fd_gamma+=0.00456735f;
-   zpos=frame*6;
-   rad_alpha=frame*0.02354f;
-   matrix_calc();
-
-//   glMatrixMode(GL_PROJECTION);
-
+  alpha=frame*params->speed[0];
+  beta=frame*params->speed[1];
+  zpos=frame*params->speed[2];
+  matrix_calc();
   ovec.x=0;ovec.y=0;ovec.z=zpos;
-  pvec.z=3;
 
-  if(ast3d_blend<1){
+for(j=0;j<=1;j++) if(params->texture[j]>0){
+  if(j==0){
+    if(ast3d_blend<1){
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    } else glDisable(GL_BLEND);  
+    fd_bright=params->bright[j];
+  } else {
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  } else glDisable(GL_BLEND);  
-  fd_bright=BRIGHT/1556;
-  
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  radmod=0; //128*sin(rad_alpha);
-  for(y=0;y<=SCR_y;y+=TILE_SIZE){
-    POINT_ST *p=&points[0];
-    pvec.y=(y-200)/120.0f;
-    glBegin(GL_QUAD_STRIP);
-    for(x=0;x<=SCR_x;x+=TILE_SIZE){
-      pvec.x=(x-200)/120.0f;
-      fd_tunnel(x,y,p++,768);
-    }  
-    glEnd();
+    glBlendFunc(GL_ONE, GL_ONE);
+    fd_bright=params->bright[j]*ast3d_blend; //*BRIGHT/1556;
   }
-
-
-if(texture2>0){
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  fd_bright=ast3d_blend*BRIGHT/1556;
-
-  glBindTexture(GL_TEXTURE_2D, texture2);
-
-  radmod=128*sin(rad_alpha);
+  glBindTexture(GL_TEXTURE_2D, params->texture[j]);
+  pvec.z=params->persp[j];
+  radmod=params->rad_amp[j]*sin(frame*params->rad_speed[j]);
+  radszog=params->rad_szog[j];
   for(y=0;y<=SCR_y;y+=TILE_SIZE){
     POINT_ST *p=&points[0];
-    pvec.y=(y-200)/120.0f;
+    pvec.y=(y-200)/params->fovy[j];
     glBegin(GL_QUAD_STRIP);
     for(x=0;x<=SCR_x;x+=TILE_SIZE){
-      pvec.x=(x-200)/120.0f;
-      fd_tunnel(x,y,p++,300);
+      pvec.x=(x-200)/params->fovx[j];
+      fd_tunnel(x,y,p++,768);
     }  
     glEnd();
   }
@@ -160,4 +143,20 @@ if(texture2>0){
 //  glutSwapBuffers();
 }
 
-
+void fdtunnel_setup(fx_fdtunnel_struct *fd,int j,
+               float sp1,float sp2,float sp3,
+               float bright,
+               float persp,float fovx,float fovy,
+               float radius, float rad_speed,float rad_szog,float rad_amp){
+  fd->speed[0]=sp1;
+  fd->speed[1]=sp2;
+  fd->speed[2]=sp3;
+  fd->bright[j]=bright;
+  fd->persp[j]=persp;
+  fd->fovx[j]=fovx;
+  fd->fovy[j]=fovy;
+  fd->radius[j]=radius;
+  fd->rad_speed[j]=rad_speed;
+  fd->rad_szog[j]=rad_szog;
+  fd->rad_amp[j]=rad_amp;
+}

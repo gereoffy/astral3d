@@ -1,11 +1,12 @@
 
 /*----------------- RENDER BUMP -------------------*/
-    if(1 && matflags&ast3d_mat_bump){
+    if(matflags&ast3d_mat_bump){
       current_mat=(c_MATERIAL*)-1;
       glEnable(GL_BLEND);
       glBlendFunc(GL_ONE, GL_ONE);
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, mat->bumpmap_id);
+
 
 // printf("Doing BUMP mapping\n");
 

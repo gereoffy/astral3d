@@ -7,6 +7,9 @@
 #define FXTYPE_FDTUNNEL 2
 #define FXTYPE_BLOB 3
 #define FXTYPE_PICTURE 4
+#define FXTYPE_SPLINESURFACE 5
+#define FXTYPE_SMOKE 6
+#define FXTYPE_SINPART 7
 
 typedef struct {
   int type;        /* 0=linear  1=sinus */
@@ -23,9 +26,11 @@ fade_struct fader[MAX_FADER];
 
 typedef struct {
   int type;
-  float x1,y1,x2,y2;
+  float x1,y1,x2,y2,z;
   int id;
   float rgb[3];
+  int alphamode,zbuffer;
+  float alphalevel;
 } pic_struct;  
 
 typedef struct {
@@ -33,18 +38,18 @@ typedef struct {
   float blend;
   float fps;
   float frame;
-  /* BLOB: */
-  float vlimit;    
-  float blob_alpha;
-  int line_blob;
+  fx_blob_struct blob;
+  fx_smoke_struct smoke;
+  fx_sinpart_struct sinpart;
+  fx_fdtunnel_struct fdtunnel;
   /* 3DS player: */
   c_SCENE *scene;
+  int loop_scene;
   /* PIC: */
   pic_struct pic;
-  /* FDtunnel textures: */
-  unsigned int texture1,texture2;
+  /* Spline surface */
+  float face_blend,wire_blend,spline_size,spline_n;
 } fx_struct;
-
 
 
 fx_struct fxlist[FX_DB];
@@ -59,7 +64,8 @@ int f;
     fx->fps=25.0;
     fx->frame=0.0;
     fx->scene=NULL;
-    fx->texture1=fx->texture2=0;
+    fx->loop_scene=1;
+//    fx->texture1=fx->texture2=0;
   }
 }
 
@@ -104,6 +110,7 @@ int zbuf_flag=0;
       ast3d_setframe(fx->frame);
       ast3d_update();
       draw3dsframe(); 
+      if(fx->loop_scene)
       { float frame,frames;
         ast3d_getframes(&frame,&frames);
         if(fx->frame>=frames) fx->frame=fx->frame-frames+frame;
@@ -116,30 +123,64 @@ int zbuf_flag=0;
 
     if(fx->type==FXTYPE_BLOB){
 //      printf("Playing BLOB for fx #%d\n",f);
-      if(!fx->line_blob)
+      if(!fx->blob.line_blob)
         if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
-      DrawBlob(fx->frame,fx->line_blob,fx->vlimit,fx->blob_alpha);
+      DrawBlob(fx->frame,&fx->blob);
+    }
+
+    if(fx->type==FXTYPE_SPLINESURFACE){
+//      printf("Playing SPLINESURFACE for fx #%d\n",f);
+      // if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      glDisable(GL_TEXTURE_2D);
+      glDisable(GL_DEPTH_TEST); glDepthMask(GL_FALSE);
+        splinesurface_redraw(fx->frame,fx->spline_size,ast3d_blend*fx->face_blend,ast3d_blend*fx->wire_blend,(int)fx->spline_n);
+      glEnable(GL_DEPTH_TEST); glDepthMask(GL_TRUE);
     }
 
     if(fx->type==FXTYPE_FDTUNNEL){
 //      printf("Playing FDTUNNEL for fx #%d\n",f);
       if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
-      draw_fdtunnel(fx->frame,fx->texture1,fx->texture2);
+      draw_fdtunnel(fx->frame,&fx->fdtunnel);
+    }
+
+    if(fx->type==FXTYPE_SMOKE){
+//      printf("Playing SMOKE for fx #%d\n",f);
+//      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      draw_smoke(fx->frame,&fx->smoke);
+    }
+
+    if(fx->type==FXTYPE_SINPART){
+//      printf("Playing SMOKE for fx #%d\n",f);
+//      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      draw_sinpart(fx->frame,&fx->sinpart);
     }
 
     if(fx->type==FXTYPE_PICTURE){
-//        printf("Putting picture (id=%d)  %f;%f - %f;%f\n",fx->pic.id,
-//            fx->pic.x1,fx->pic.y1,fx->pic.x2,fx->pic.y2);
-      glDisable(GL_DEPTH_TEST);
-      glDepthMask(GL_FALSE);  /* thanx to reptile/ai */
-
+      if(fx->pic.zbuffer){
+        glDepthMask(GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+      } else {
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);  /* thanx to reptile/ai */
+      }
+      if(fx->pic.alphamode){
+        glEnable(GL_ALPHA_TEST);
+        if(fx->pic.alphamode<0)
+          glAlphaFunc(GL_LEQUAL,fx->pic.alphalevel);
+        else
+          glAlphaFunc(GL_GEQUAL,fx->pic.alphalevel);
+      }
       glDisable(GL_LIGHTING);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE);
-      if(fx->pic.type & 1)
+      if(fx->pic.alphamode){
+        glDisable(GL_BLEND);
+      } else {
+        glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
-      else
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        if(fx->pic.type & 1)
+          glBlendFunc(GL_ONE, GL_ONE);
+        else
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      }
 
 //      glViewport (0, 0, 640, 480);
       glMatrixMode(GL_PROJECTION);
@@ -155,7 +196,7 @@ int zbuf_flag=0;
         glBindTexture(GL_TEXTURE_2D, fx->pic.id);
         glEnable(GL_TEXTURE_2D);
       }
-      if(fx->pic.type & 1)
+      if(fx->pic.type&1 || fx->pic.alphamode)
         glColor3f(fx->pic.rgb[0]*fx->blend,
                   fx->pic.rgb[1]*fx->blend,
                   fx->pic.rgb[2]*fx->blend);
@@ -164,15 +205,16 @@ int zbuf_flag=0;
       glDisable(GL_CULL_FACE);
       glBegin(GL_QUADS);
         glTexCoord2f(0.0f,0.0f);
-        glVertex2f(fx->pic.x1,fx->pic.y1);
+        glVertex3f(fx->pic.x1,fx->pic.y1,fx->pic.z);
         glTexCoord2f(1.0f,0.0f);
-        glVertex2f(fx->pic.x2,fx->pic.y1);
+        glVertex3f(fx->pic.x2,fx->pic.y1,fx->pic.z);
         glTexCoord2f(1.0f,1.0f);
-        glVertex2f(fx->pic.x2,fx->pic.y2);
+        glVertex3f(fx->pic.x2,fx->pic.y2,fx->pic.z);
         glTexCoord2f(0.0f,1.0f);
-        glVertex2f(fx->pic.x1,fx->pic.y2);
+        glVertex3f(fx->pic.x1,fx->pic.y2,fx->pic.z);
       glEnd();
 
+      glDisable(GL_ALPHA_TEST);
       glDepthMask(GL_TRUE);
       glEnable(GL_DEPTH_TEST);
     }

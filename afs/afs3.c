@@ -88,7 +88,7 @@ int afs_init(char *filename,int type){
 
 afs_FILE* afs_fopen(char *filename,char *mode){
  int i,j;
- for(j=0;j<fs_db;j++){
+ for(j=fs_db-1;j>=0;j--){
   afs=&filesystems[j];
   if(afs->type==AFS_TYPE_DAT || afs->type==AFS_TYPE_PAK){
    for(i=0;i<afs->file_db;i++)
@@ -130,7 +130,7 @@ afs_FILE* afs_fopen(char *filename,char *mode){
 
 FILE* afs_fopen2(char *filename,char *mode){
  int i,j;
- for(j=0;j<fs_db;j++){
+ for(j=fs_db-1;j>=0;j--){
   afs=&filesystems[j];
   if(afs->type==AFS_TYPE_DAT || afs->type==AFS_TYPE_PAK){
    for(i=0;i<afs->file_db;i++)
@@ -160,8 +160,7 @@ int afs_fclose(afs_FILE* f){
 
 int afs_fclose2(FILE* f){
 int j;
-  for(j=0;j<fs_db;j++)
-    if(filesystems[j].file==f) return 0;
+  for(j=fs_db-1;j>=0;j--) if(filesystems[j].file==f) return 0;
   if(f) fclose(f);
   return 0;
 }

@@ -27,7 +27,7 @@ if(mat!=current_mat){
         src_alpha=clip_255((1-mat->transparency)*ast3d_blend);
         base_r=base_g=base_b=(mat->self_illum);
         { int li;
-          for(li=0;li<lightno;li++){
+          for(li=0;li<lightno;li++) if(lights[li]->enabled){
             c_LIGHT *l=lights[li];
             LIGHTCOLOR(l->MatAmb,mat->ambient.rgb ,ambient->color.rgb);
             l->ambient=(l->MatAmb[0]>0 || l->MatAmb[1]>0 || l->MatAmb[2]>0);

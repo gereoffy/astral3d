@@ -47,5 +47,6 @@ script.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
 script.o: /usr/include/sys/time.h /usr/include/bits/time.h ../mp3lib/mp3.h
 script.o: /usr/include/GL/gl.h /usr/include/GL/glu.h ../3dslib/ast3d.h
 script.o: ../timer/timer.h ../blob/blob.h ../fdtunnel/fdtunnel.h
-script.o: ../render/render.h ../loadmap/loadmaps.h scr_var.c scr_event.c
-script.o: scr_file.c scr_init.c vars.h scr_draw.c scr_exec.c
+script.o: ../spline/spline.h ../smoke/smoke.h ../sinpart/sinpart.h
+script.o: ../render/render.h ../afs/afs.h ../loadmap/loadmaps.h scr_var.c
+script.o: scr_event.c scr_file.c scr_init.c vars.h scr_draw.c scr_exec.c

@@ -1,3 +1,15 @@
+
+#if 0
+  if(matflags&ast3d_mat_wire){
+    int i;
+    glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0,1.0,1.0);
+      for(i=0;i<obj->numfaces;i++)
+        ast3d_DrawGLTriangle_wire(&obj->faces[i]);   /* %%%%%%%%%%% */
+    glEnable(GL_TEXTURE_2D);
+  }
+#endif
+
 /*---------------------- SETUP VERTEX ARRAYS -----------------------*/
 #ifdef VERTEX_ARRAY
   glVertexPointer(3, GL_FLOAT, sizeof(c_VERTEX), &obj->vertices[0].pvert);
@@ -13,7 +25,7 @@
 #endif
 
 /*---------------------- RENDER TRIANGLES -----------------------*/
-  if(matflags&ast3d_mat_transparent){
+  if(matflags&ast3d_mat_transparent && obj->enable_zbuffer){
     int i,j;
     
     /*  TRANSPARENT OBJECT -> Z-Sorting with 16-bit ByteSort method */
@@ -52,7 +64,10 @@
         glArrayElement(obj->faces[i-1].b);
         glArrayElement(obj->faces[i-1].c);
 #else
-        ast3d_DrawGLTriangle_texture(&obj->faces[i-1]);   /* %%%%%%%%%%% */
+//        if(matflags&ast3d_mat_wire)
+//          ast3d_DrawGLTriangle_wire(&obj->faces[i-1]);   /* %%%%%%%%%%% */
+//        else
+          ast3d_DrawGLTriangle_texture(&obj->faces[i-1]);   /* %%%%%%%%%%% */
 #endif
         if(i==bytesort_end[1][j]) break;
         i=bytesort_next[1][i];
@@ -85,18 +100,18 @@
 }
 #else
 #if 1
-    /* Draw faces: */
-    glBegin(GL_TRIANGLES);
-    if(matflags&ast3d_mat_texture){
-      for (i=0;i<obj->numfaces;i++)
-        if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible)
-          ast3d_DrawGLTriangle_texture(&obj->faces[i]);   /* %%%%%%%%%%% */
-    } else {
-      for (i=0;i<obj->numfaces;i++)
-        if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible)
-          ast3d_DrawGLTriangle_gouraud(&obj->faces[i]);   /* %%%%%%%%%%% */
-    }
-    glEnd();
+      /* Draw faces: */
+      glBegin(GL_TRIANGLES);
+      if(matflags&ast3d_mat_texture){
+        for (i=0;i<obj->numfaces;i++)
+          if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible)
+            ast3d_DrawGLTriangle_texture(&obj->faces[i]);   /* %%%%%%%%%%% */
+      } else {
+        for (i=0;i<obj->numfaces;i++)
+          if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible)
+            ast3d_DrawGLTriangle_gouraud(&obj->faces[i]);   /* %%%%%%%%%%% */
+      }
+      glEnd();
 #endif
 #endif
 

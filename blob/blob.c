@@ -41,6 +41,7 @@ optim/fejlesztesek:
   - dupla blobnal fel lehetne hasznalni az 1. blob altal kiszamolt Value-kat
 
 /---------------------------------------------------------------------------*/
+#include "blob.h"
 
 int blobmap=0;
 
@@ -52,8 +53,6 @@ static int line_blob=1;
 #define max_blobs 5
 static int blob_db=5;
 
-#define Vlimit1 200000
-#define Vlimit2 180000
 #define Vconst 0x10000000
 
 static long Vlimit=Vlimit1;
@@ -716,7 +715,7 @@ megvan:
 
 }
 
-void DrawBlob(float szog,int lineblob_flag,float vlimit_val,float blob_alpha_level){
+void DrawBlob(float szog,fx_blob_struct *params){
 int i,j;
 
     glMatrixMode(GL_PROJECTION);
@@ -729,25 +728,26 @@ int i,j;
     glDisable(GL_LIGHTING);
 
 #define BLOB_RGB(i,r,g,b) blobs[i].rgb[0]=r;blobs[i].rgb[1]=g;blobs[i].rgb[2]=b;
-      blobs[0].x=17000+6000*(cos(szog*0.763333));
-      blobs[0].y=17000+6000*(sin(szog*0.763333));
-      blobs[0].z=17000+2000*(cos(szog*0.363333));
 
-      blobs[1].x=17000+6000*(cos(szog*0.2433333));
-      blobs[1].y=17000+6000*(sin(szog*0.243333));
-      blobs[1].z=17000+2000*(cos(szog*0.4633333));
+      blobs[0].x=params->pos[0]+params->rad[0]*(cos(szog*0.763333));
+      blobs[0].y=params->pos[1]+params->rad[1]*(sin(szog*0.763333));
+      blobs[0].z=params->pos[2]+params->rad[2]*(cos(szog*0.363333));
 
-      blobs[2].x=17000+6000*(cos(szog*0.4072433333));
-      blobs[2].y=17000+6000*(sin(szog*0.407243333));
-      blobs[2].z=17000+2000*(cos(szog*0.26894633333));
+      blobs[1].x=params->pos[0]+params->rad[0]*(cos(szog*0.2433333));
+      blobs[1].y=params->pos[1]+params->rad[1]*(sin(szog*0.243333));
+      blobs[1].z=params->pos[2]+params->rad[2]*(cos(szog*0.4633333));
 
-      blobs[3].x=17000+6000*(cos(szog*0.29003633));
-      blobs[3].y=17000+6000*(sin(szog*0.29003633));
-      blobs[3].z=17000+2000*(cos(szog*0.9824633333));
+      blobs[2].x=params->pos[0]+params->rad[0]*(cos(szog*0.4072433333));
+      blobs[2].y=params->pos[1]+params->rad[1]*(sin(szog*0.407243333));
+      blobs[2].z=params->pos[2]+params->rad[2]*(cos(szog*0.26894633333));
 
-      blobs[4].x=17000+6000*(cos(szog*0.89364072433333));
-      blobs[4].y=17000+6000*(sin(szog*0.8936407243333));
-      blobs[4].z=17000+2000*(cos(szog*0.5326894633333));
+      blobs[3].x=params->pos[0]+params->rad[0]*(cos(szog*0.29003633));
+      blobs[3].y=params->pos[1]+params->rad[1]*(sin(szog*0.29003633));
+      blobs[3].z=params->pos[2]+params->rad[2]*(cos(szog*0.9824633333));
+
+      blobs[4].x=params->pos[0]+params->rad[0]*(cos(szog*0.89364072433333));
+      blobs[4].y=params->pos[1]+params->rad[1]*(sin(szog*0.8936407243333));
+      blobs[4].z=params->pos[2]+params->rad[2]*(cos(szog*0.5326894633333));
 
 //      BLOB_RGB(0, 230,0,80);
 //      BLOB_RGB(1, 30,170,210);
@@ -767,8 +767,8 @@ int i,j;
       Vcubedb2=0;
       Vlines=0;
 
-      line_blob=lineblob_flag;
-      Vlimit=vlimit_val;
+      line_blob=params->line_blob;
+      Vlimit=params->vlimit;
       poly_db=0;
       ++framenum;   // enelkul nem muxik!!!
       for(i=0;i<blob_db;i++){
@@ -814,9 +814,9 @@ if(!line_blob){
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    if(blob_alpha_level>0){
+    if(params->blob_alpha>0){
       glEnable(GL_ALPHA_TEST);
-      glAlphaFunc(GL_GEQUAL,blob_alpha_level);
+      glAlphaFunc(GL_GEQUAL,params->blob_alpha);
     }
 
     glBegin(GL_TRIANGLES);

@@ -78,7 +78,8 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
         if (p_scale<-obj->particle.sizelimit) p_scale=-obj->particle.sizelimit;
       }
 
-      glColor3fv(p[j].color);
+//      glColor3fv(p[j].color);
+      glColor3f(p[j].color[0]*ast3d_blend,p[j].color[1]*ast3d_blend,p[j].color[2]*ast3d_blend);
       glTexCoord2f(0.0,0.0);
       glVertex3f(pt.x-p_scale,pt.y-p_scale,pt.z);
       glTexCoord2f(1.0,0.0);
@@ -87,8 +88,8 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
       glVertex3f(pt.x+p_scale,pt.y+p_scale,pt.z);
       glTexCoord2f(0.0,1.0);
       glVertex3f(pt.x-p_scale,pt.y+p_scale,pt.z);
-      p[j].energy-=obj->particle.dieratio;
 
+      p[j].energy-=obj->particle.dieratio;
       p[j].color[0]*=obj->particle.colordecrement;
       p[j].color[1]*=obj->particle.colordecrement;
       p[j].color[2]*=obj->particle.colordecrement;
@@ -115,6 +116,33 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
 
 }
 
+void particle_preplay(c_OBJECT *obj,float dt,int times){
+  int i,j;
+  c_PART *p=obj->particle.p;
+  printf("Calculating particle system...");fflush(stdout);
+  for(j=0;j<obj->particle.np;j++){
+    for(i=0;i<times;i++){
+      p[j].energy-=obj->particle.dieratio;
+      p[j].color[0]*=obj->particle.colordecrement;
+      p[j].color[1]*=obj->particle.colordecrement;
+      p[j].color[2]*=obj->particle.colordecrement;
+#if 0
+      if(p[j].p.y<0.1|| p[j].energy<=0.001){
+#else
+      if(p[j].p.y<0.1){
+#endif
+        setnewpart(&p[j],obj);
+      } else {
+        p[j].v[1]+=obj->particle.agrav*dt;
+        p[j].p.x+=dt*p[j].v[0];
+        p[j].p.y+=dt*p[j].v[1];
+        p[j].p.z+=dt*p[j].v[2];
+      }
+    }
+  }
+  printf("ready\n");
+}
+
 void particle_init(c_OBJECT *obj,int texture,int np){
 int i;
   if(!(obj->particle.p=malloc(sizeof(c_PART)*np))) np=0;
@@ -134,4 +162,5 @@ int i;
   printf("particle.init. np=%d\n",np);
   for(i=0;i<np;i++) setnewpart(&obj->particle.p[i],obj);
 }
+
 

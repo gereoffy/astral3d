@@ -18,6 +18,7 @@
     if(matflags&ast3d_mat_bump){
       c_LIGHT *l=lights[0];
 
+//------------------------- BUMP -----------------------
     for (i = 0; i < obj->numverts; i++){
       if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){
         obj->vertices[i].visible=0;
@@ -58,7 +59,13 @@
           obj->vertices[i].rgb[1]=clip_255(delta.z*(l->MatDiff[1]));
           obj->vertices[i].rgb[2]=clip_255(delta.z*(l->MatDiff[2]));
           obj->vertices[i].rgb[3]=src_alpha;
+          delta.z*=ast3d_blend;
+          obj->vertices[i].refl_rgb[0]=clip_255(delta.z*(l->MatDiff[0]));
+          obj->vertices[i].refl_rgb[1]=clip_255(delta.z*(l->MatDiff[1]));
+          obj->vertices[i].refl_rgb[2]=clip_255(delta.z*(l->MatDiff[2]));
+          obj->vertices[i].refl_rgb[3]=src_alpha;
     } } }
+//------------------------- END OF BUMP -----------------------
 
     } else
     for (i = 0; i < obj->numverts; i++){
@@ -68,7 +75,7 @@
           c_VECTOR *n=&obj->vertices[i].pnorm;
           int li;
           float r=base_r,g=base_g,b=base_b;
-          for(li=0;li<lightno;li++){
+          for(li=0;li<lightno;li++) if(lights[li]->enabled){
             c_LIGHT *l=lights[li];
             float x=l->ppos.x - p->x;
             float y=l->ppos.y - p->y;
@@ -196,7 +203,7 @@ if(l->flags&ast3d_light_attenuation){
           obj->vertices[i].rgb[1]=clip_255(g);
           obj->vertices[i].rgb[2]=clip_255(b);
           obj->vertices[i].rgb[3]=src_alpha;
-          if(matflags&ast3d_mat_reflect){
+          if(matflags&(ast3d_mat_reflect|ast3d_mat_bump)){
             obj->vertices[i].refl_rgb[0]=clip_255_blend(r,ast3d_blend);
             obj->vertices[i].refl_rgb[1]=clip_255_blend(g,ast3d_blend);
             obj->vertices[i].refl_rgb[2]=clip_255_blend(b,ast3d_blend);

@@ -22,7 +22,12 @@
 #include "../timer/timer.h"
 #include "../blob/blob.h"
 #include "../fdtunnel/fdtunnel.h"
+#include "../spline/spline.h"
+#include "../smoke/smoke.h"
+#include "../sinpart/sinpart.h"
+
 #include "../render/render.h"
+#include "../afs/afs.h"
 #include "../loadmap/loadmaps.h"
 #endif
 

@@ -183,6 +183,7 @@ enum ast3d_light_flags_ { /* astral 3d light flags */
   ast3d_light_omni = 1,                    /* light is omni */
   ast3d_light_spot = 2,                    /* light is spotlight */
   ast3d_light_attenuation = 4              /* attenuation */
+//  ast3d_light_corona_only = 8              /* fake light */
 };
 
 enum ast3d_track_flags_ { /* astral 3d track flags */
@@ -302,10 +303,12 @@ typedef struct _c_LIGHT { /* light struct */
   float    roll;                         /* roll (spotlight)      */
   float    hotspot, falloff;             /* hotspot, falloff      */
   c_RGB    color;                        /* light color           */
+// script parameters:
   float    corona_scale;
   float    attenuation[3];
   int use_zbuffer;
-  int enabled;
+  int enabled;  // default=1. if 0, no lighting calculation, only corona sprite
+// calculated:
   float MatAmb[3],MatDiff[3],MatSpec[3];
   float CosFalloff,CosHotspot,SpotExp;
   int ambient;
@@ -507,6 +510,7 @@ typedef struct _c_SCENE { /* scene (world, keyframer) */
   int directional_lighting;
   int sphere_map;
   float znear,zfar;
+  int frustum_cull;
 } c_SCENE;
 
 /*****************************************************************************

@@ -1,1 +1,3 @@
-gcc -c -g -Wall fdtunnel.c
+
+# gcc -c -g -Wall fdtunnel.c
+gcc -c -g -Wall fdtunnel.c -o fdtunnel.o

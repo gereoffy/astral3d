@@ -1,0 +1,5 @@
+
+gcc -c -g -Wall sinpart.c
+
+cd ..;./demo.sh;cd smoke
+

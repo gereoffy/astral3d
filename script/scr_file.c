@@ -4,7 +4,8 @@
 char script_file[scrMAXSIZE];
 int script_file_size;
 int script_file_ptr=0;
-char sor[8192];
+//char sor[8192];
+char sor[16384];
 int script_lineno=0;
 
 void scrFatal(byte *s1){

@@ -502,6 +502,7 @@ int32 ast3d_alloc_scene (c_SCENE **scene)
   (*scene)->sphere_map = 0;
   (*scene)->znear=10.0;
   (*scene)->zfar=10000.0;
+  (*scene)->frustum_cull=1;
   return ast3d_err_ok;
 }
 

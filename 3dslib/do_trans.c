@@ -76,6 +76,12 @@ if(!obj->morph.key){
       } else {
       /*----------------- NOT MORPH: ----------------------*/
 
+
+        obj->flags|=ast3d_obj_visible;
+
+#if 1
+        
+
         for(i=0;i<8;i++) mat_mulvec2 (objmat, &obj->bbox.p[i], &obj->pbbox.p[i]);
         obj->pbbox.min.x=obj->pbbox.max.x=obj->pbbox.p[0].x;
         obj->pbbox.min.y=obj->pbbox.max.y=obj->pbbox.p[0].y;
@@ -87,14 +93,16 @@ if(!obj->morph.key){
         }
 
         /* Frustum test */
-        if( (obj->numfaces>0)
-        &&  (obj->pbbox.max.x> ast3d_scene->frustum.x*obj->pbbox.min.z &&
+        if( (obj->numfaces>0) && (
+          (ast3d_scene->frustum_cull==0) ||
+          (
+            (obj->pbbox.max.x> ast3d_scene->frustum.x*obj->pbbox.min.z &&
              obj->pbbox.min.x<-ast3d_scene->frustum.x*obj->pbbox.min.z)
         &&  (obj->pbbox.max.y> ast3d_scene->frustum.y*obj->pbbox.min.z &&
              obj->pbbox.min.y<-ast3d_scene->frustum.y*obj->pbbox.min.z)
         &&  (obj->pbbox.max.z> ast3d_scene->frustum.zfar &&
              obj->pbbox.min.z< ast3d_scene->frustum.znear)
-        ){
+        ))){
 
         int matflags=(obj->faces[0].pmat)?(obj->faces[0].pmat->flags):0;
 
@@ -111,7 +119,9 @@ if(!obj->morph.key){
         &&  (obj->pbbox.min.z> ast3d_scene->frustum.zfar &&
              obj->pbbox.max.z< ast3d_scene->frustum.znear)
         ) obj->flags&=~ast3d_obj_frustumcull;
+               
 #endif
+
 
 
 #ifdef PRETRANS_CULL_FACELIMIT
@@ -123,9 +133,15 @@ if(!obj->morph.key){
         obj->flags&=~ast3d_obj_allvisible;
 #include "visibchk.c"
       } // if !transparent
+      else {
+        obj->flags|=ast3d_obj_allvisible;
+//        obj->flags&=~ast3d_obj_frustumcull; // HACK
+      }
 
 
 } // if(numfaces && in frustum)
+
+#endif
 
       }  // morph or not morph
     }    // if object not hidden

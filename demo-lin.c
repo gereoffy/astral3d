@@ -88,7 +88,7 @@ int main(int argc,char* argv[]){
 #endif
 
 
-    glutFullScreen();
+//    glutFullScreen();
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
     glClearDepth( 1.0 );
@@ -123,7 +123,7 @@ int main(int argc,char* argv[]){
     blob_init();
     scrInit();
     fx_init();
-    scrLoad("script1.scr");
+    if(argc>1) scrLoad(argv[1]); else scrLoad("script1.scr");
     adk_time=0.0; // adk_frame=0.0;
     
     printf("lightmap loading\n");

@@ -1,7 +1,7 @@
 
 // ====================== Script variables ===============================
 
-#define scrMAXVAR 128
+#define scrMAXVAR 512
 #define scrMAXTYPE 8
 #define scrMAXVARLENGTH 32
 #define scrSTRLEN 128

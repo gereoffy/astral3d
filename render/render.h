@@ -8,8 +8,8 @@
 /* Maximum number of faces in _transparent_ objects */
 #define MAXFACES 16384
 
-#define MAX_CAMNO 10
-#define MAX_LIGHTNO 8
+#define MAX_CAMNO 16
+#define MAX_LIGHTNO 32
 
 extern c_SCENE *scene;
 extern float ast3d_blend;  /* GLOBAL Blend value */
@@ -38,4 +38,5 @@ extern void ast3d_fixUV(char *objname);
 
 extern void particle_init(c_OBJECT *obj,int texture,int np);
 extern void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt);
+extern void particle_preplay(c_OBJECT *obj,float dt,int times);
 

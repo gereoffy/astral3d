@@ -308,10 +308,25 @@ v3.1  99/12/18   by A'rpi & Strepto & Inferno
   strukturak:  rendszer: c_PARTICLE, 1 db: c_PART
   objmat-ot hasznalja, tehat lehet forgatni stb.
   scriptbol vezerelheto jol.
-  
+
+v3.2  99/12/21  by A'rpi
+- uj object-dependent: ha zbuffer=0 akkor nem sortolja a poligonokat Z szerint
+
+v3.3  99/12/22  by A'rpi & Strepto  - TP demo
+- Spline berakva enginebe - kulon fx
+- FDtunnel effekt scriptbol programozhato...
+- uj script parancs: mount
+  pl.: mount dir akarmi/
+       mount pak astral.pak
+       mount dat astral.dat
+  AFS: mostantol forditott sorrendben keresi a filesystemeket, tehat a
+  legutoljara definaltban keres eloszor.
+- Alphatest fade effektek. Picture fx tipusaira muxik, es lehet
+  zbuffert is bekapcsolni ra.
+- blob pozicio es mozgasi sugar allithato scriptbol.  (alpha2-hoz kellett)
+
 
 KELL MEG:
-- Zbuffer kitoltese - fade effektek
 - profiling: meg mindig "elveszik" neha ido a 'draw' reszben. pl chevy, szoba
 - optimalt directional lighting attenuation nelkul, normal forgatas nelkul
 - objectek sortolasa: eloszor tomor obj-k, utana atlatszok z-sort-olva
