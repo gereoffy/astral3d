@@ -8,17 +8,13 @@
 #define LOGO_Yx_DIF -5
 #define LOGO_Yy_DIF 55
 
-#include "../config.h"
-//#include <unistd.h>
+#include "../../config.h"
+#include "../../agl/agl.h"
+#include "../../afs/afs.h"
+#include "../../loadmap/loadmaps.h"
 
-#include "../agl/agl.h"
-
-#include "../afs/afs.h"
-//#include "../afs/afsmangl.h"
-#include "../loadmap/loadmaps.h"
-
-#include "../3dslib/ast3d.h"
-#include "../3dslib/vector.h"
+#include "../../3dslib/ast3d.h"
+#include "../../3dslib/vector.h"
 
 #include "hjbtunel.h"
 
@@ -574,7 +570,7 @@ for(i=0;i<=SPHERE_Y_SEGS;i++){
 
 }
 
-void HJBTUNNEL_Render(fx_hjbtunnel_struct* param,float pos){
+void HJBTUNNEL_Render(float pos,fx_hjbtunnel_struct* param){
 float pos_=0.5*pos;
 int i,k;
 int u0;

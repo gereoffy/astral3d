@@ -69,9 +69,8 @@ static long Vlimit=Vlimit1;
 
 //---------------------------------------------------------------------------
 
-#include "../config.h"
-
-#include "../agl/agl.h"
+#include "../../config.h"
+#include "../../agl/agl.h"
 
 extern int window_w,window_h;
 

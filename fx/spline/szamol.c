@@ -78,7 +78,7 @@ Local float xu(long k, long j, long r, struct LOC_rajz *LINK){
 }
 
 Local float xv(long i, long l, struct LOC_rajz *LINK){
-  float Result;
+  float Result=0;
   int j;
 
   for (j = 0; j <= nv - 2; j++)
@@ -149,7 +149,7 @@ Local float yv(i, l, LINK)
 long i, l;
 struct LOC_rajz *LINK;
 {
-  float Result;
+  float Result=0;
   int j;
 
   for (j = 0; j <= nv - 2; j++)
@@ -220,7 +220,7 @@ Local float zv(i, l, LINK)
 long i, l;
 struct LOC_rajz *LINK;
 {
-  float Result;
+  float Result=0;
   int j;
 
   for (j = 0; j <= nv - 2; j++)

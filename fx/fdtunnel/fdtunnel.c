@@ -1,13 +1,10 @@
-#include "../config.h"
-#include "../agl/agl.h"
+#include "../../config.h"
+#include "../../agl/agl.h"
 
 #include "fdtunnel.h"
 
 extern int window_w,window_h;
 extern float ast3d_blend;
-
-#define FALSE 0
-#define TRUE 1
 
 #define BRIGHT 4*65536
 #define TILE_SIZE 8

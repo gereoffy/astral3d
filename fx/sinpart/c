@@ -1,5 +1,0 @@
-
-$CC -c $OPTFLAGS -Wall sinpart.c
-
-# cd ..;./demo.sh;cd smoke
-

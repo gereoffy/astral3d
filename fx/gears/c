@@ -1,2 +1,0 @@
-
-$CC -c $CFLAGS -Wall gears.c

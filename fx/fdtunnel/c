@@ -1,3 +1,0 @@
-
-# gcc -c -g -Wall fdtunnel.c
-$CC -c $OPTFLAGS  -Wall fdtunnel.c

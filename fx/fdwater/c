@@ -1,3 +1,0 @@
-
-# gcc -O3  -c -Wall fdwater.c
-$CC $OPTFLAGS -c -Wall fdwater.c

@@ -4,10 +4,9 @@
  * Brian Paul
  */
 
-#include "../config.h"
-#include "../agl/agl.h"
+#include "../../config.h"
+#include "../../agl/agl.h"
 #include "gears.h"
-
 
 static void
 gear(GLfloat inner_radius, GLfloat inner_radius2, GLfloat outer_radius,GLfloat outer_radius2, GLfloat width,

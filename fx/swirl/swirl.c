@@ -1,16 +1,12 @@
 #define CIRCLE_U 64
 #define CIRCLE_V 64
 
-#include "../config.h"
+#include "../../config.h"
+#include "../../agl/agl.h"
 
 #include "swirl.h"
 
-#include "../agl/agl.h"
-#include "../3dslib/ast3d.h"
-//#include "/demo/src/afs/afs.h"
-//#include "/demo/src/loadmap/loadmaps.h"
-//#include "/demo/src/timer/timer.h"
-
+#include "../../3dslib/ast3d.h"
 
 /* ************************************************************************** */
 

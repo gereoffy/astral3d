@@ -1,14 +1,11 @@
 // Greetings maker :)
 
-#include "../config.h"
-#include "../agl/agl.h"
+#include "../../config.h"
+#include "../../agl/agl.h"
 #include "greets.h"
 
 extern int window_w,window_h;
 extern float ast3d_blend;
-
-#define FALSE 0
-#define TRUE 1
 
 #define SCR_x 400
 #define SCR_y 400

@@ -1,5 +1,0 @@
-
-$CC -c $OPTFLAGS -Wall sinzoom.c
-
-# cd ..;./demo.sh;cd smoke
-

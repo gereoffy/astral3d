@@ -1,3 +1,0 @@
-
-$CC -c $OPTFLAGS  -Wall greets.c
-

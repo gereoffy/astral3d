@@ -1,5 +1,8 @@
-#include "../config.h"
-#include "../agl/agl.h"
+#include "../../config.h"
+#include "../../agl/agl.h"
+#include "spline.h"
+
+extern float ast3d_blend;
 
 #define Local static
 
@@ -139,18 +142,17 @@ static float rndtabla[nu+1][nv+1][3];       // speed
 static float szogtabla[nu+1][nv+1][3];      // phase
 
 
-
-void splinesurface_redraw(float frame,float rg,float face_blend,float wire_blend,int spl_n){
+void splinesurface_redraw(float frame,fx_spline_struct *fx_par){
 int i,j;
 
-  n=spl_n; if(n>nm) n=nm;
+  n=fx_par->spline_n; if(n>nm) n=nm;
 
 //  update_rnd(frame);
   for(i=0;i<=nu;i++)
   for(j=0;j<=nv;j++){
-    a[i][j].xp = rg*sin((szogtabla[i][j][0]+frame*rndtabla[i][j][0]));
-    a[i][j].yp = rg*sin((szogtabla[i][j][1]+frame*rndtabla[i][j][1]));
-    a[i][j].zp = rg*sin((szogtabla[i][j][2]+frame*rndtabla[i][j][2]));
+    a[i][j].xp = fx_par->spline_size*sin((szogtabla[i][j][0]+frame*rndtabla[i][j][0]));
+    a[i][j].yp = fx_par->spline_size*sin((szogtabla[i][j][1]+frame*rndtabla[i][j][1]));
+    a[i][j].zp = fx_par->spline_size*sin((szogtabla[i][j][2]+frame*rndtabla[i][j][2]));
   }
 
   rajzracs();
@@ -167,7 +169,8 @@ int i,j;
   aglZbuffer(AGL_ZBUFFER_NONE);
   aglTexture(0);
 
-  megjelen(face_blend,wire_blend);   /* Interpolalt felulet rajzolasa */
+  /* Interpolalt felulet rajzolasa: */
+  megjelen(ast3d_blend*fx_par->face_blend,ast3d_blend*fx_par->wire_blend);
 
 }
 

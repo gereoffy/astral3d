@@ -1,18 +1,15 @@
 // Sinus particle system
 
-#include "../config.h"
-#include "../agl/agl.h"
+#include "../../config.h"
+#include "../../agl/agl.h"
 
-#include "../3dslib/ast3d.h"
-#include "../3dslib/vector.h"
+#include "../../3dslib/ast3d.h"
+#include "../../3dslib/vector.h"
 
 #include "sinpart.h"
 
 extern int window_w,window_h;
 extern float ast3d_blend;
-
-#define FALSE 0
-#define TRUE 1
 
 #define SCR_x 400
 #define SCR_y 400

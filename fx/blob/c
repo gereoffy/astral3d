@@ -1,5 +1,0 @@
-#! /bin/sh
-echo "Compiling blob..."
-
-# gcc -c -O3 blob.c
-$CC -c $OPTFLAGS blob.c

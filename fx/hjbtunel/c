@@ -1,2 +1,0 @@
-
-$CC -c $OPTFLAGS  tunnel2.c

@@ -1,18 +1,10 @@
-#include "../config.h"
-//#include <sys/time.h>
-//#include <unistd.h>
+#include "../../config.h"
+#include "../../agl/agl.h"
 
 #include "bsptunel.h"
 
-#include "../agl/agl.h"
-//#include <GL/glut.h>
-
-//#include "../afs/afs.h"
-//#include "../loadmap/loadmaps.h"
-//#include "../timer/timer.h"
-
-#include "../3dslib/ast3d.h"
-#include "../3dslib/vector.h"
+#include "../../3dslib/ast3d.h"
+#include "../../3dslib/vector.h"
 
 #define CTRLPOINTS_U 1024
 #define CTRLPOINTS_V 12

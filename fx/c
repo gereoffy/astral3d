@@ -1,0 +1,4 @@
+
+rm -f lib*.a lib*.h
+find . -maxdepth 1 -not -name \. -type d -exec ./comp1.sh {} \;
+

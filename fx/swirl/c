@@ -1,4 +1,0 @@
-
-# gcc -c -g -Wall fdtunnel.c
-# gcc -c -O2 -Wall swirl.c
-$CC -c $OPTFLAGS -Wall swirl.c
