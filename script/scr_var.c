@@ -11,6 +11,13 @@
 #define scrTYPE_str 3
 #define scrTYPE_scene 6
 
+#define scrCLASS_absolute 0
+#define scrCLASS_fx 1
+#define scrCLASS_scene 2
+#define scrCLASS_light 3
+#define scrCLASS_object 4
+
+
 typedef struct {
    byte name[scrMAXVARLENGTH];
    int type;

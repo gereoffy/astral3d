@@ -9,3 +9,6 @@ extern void draw_scene();
 extern void scrInit();
 extern void scrLoad(char* filename);
 extern void fx_init();
+
+extern FILE* fx_debug;
+

@@ -1,5 +1,7 @@
 // ====================== EVENT handler ===============================
 float adk_time=0.0;
+float adk_time_corrected=0.0;
+
 float adk_mp3_frame=0.0;
 #define MP3_FRAMES (nosound?adk_mp3_frame:(MP3_frames))
 
@@ -13,13 +15,30 @@ typedef struct {
    float time;
    int pattern;
    float *frameptr;
+   float *fpsptr;
 } scrEventStruct;
+
+scrEventStruct scr_playing_event;
 
 int scrTestEvent(scrEventStruct* event){
 //  t=GetRelativeTime(); adk_time+=t;adk_frame+=adk_fps*t;
-  if(event->type&scrEVENTframe && event->frame<event->frameptr[0]) return 1;
-  if(event->type&scrEVENTtime && event->time<adk_time) return 1;
-  if(event->type&scrEVENTpattern && event->pattern<MP3_FRAMES) return 1;
+  adk_time_corrected=adk_time;
+  if(event->type&scrEVENTframe && event->frame<event->frameptr[0]){
+    float fps=event->fpsptr[0];
+    float d_f=event->frameptr[0]-event->frame;
+    if(fps) adk_time_corrected=adk_time-d_f/fps;
+    if(fx_debug) fprintf(fx_debug,"scrEvent: frame correction %5.3ff  (%5.3fs)\n",d_f,adk_time-adk_time_corrected);
+    return 1;
+  }
+  if(event->type&scrEVENTtime && event->time<adk_time){
+    adk_time_corrected=event->time;
+    if(fx_debug) fprintf(fx_debug,"scrEvent: time correction %5.3fs\n",adk_time-adk_time_corrected);
+    return 1;
+  }
+  if(event->type&scrEVENTpattern && event->pattern<MP3_FRAMES){
+    if(fx_debug) fprintf(fx_debug,"scrEvent: pattern correction %5.3fp\n",MP3_FRAMES-event->pattern);
+    return 1;
+  }
   return 0;
 }
 
@@ -31,7 +50,7 @@ int i;
     s[slen]=0;
     event->type|=scrEVENTtime;
     x=str2float(s);
-    event->time=(x<0)?(-x):(x+adk_time);
+    event->time=(x<0)?(-x):(x+adk_time_corrected);
 //    printf("Event:  time  value=%f\n",event->time);
     return scrEVENTtime;
   }

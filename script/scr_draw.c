@@ -71,13 +71,19 @@ int f;
   }
 }
 
+float fx_debug_time=0.0f;
+float fx_debug_lasttime=0.0f;
 
 void draw_scene(){
 float rel_time=GetRelativeTime();
 int f;
 int zbuf_flag=0;
+int active_faders=0;
   adk_time+=rel_time;
+  fx_debug_time+=rel_time;
   adk_mp3_frame+=rel_time*(44100.0F/1152.0F);
+
+  if(scrTestEvent(&scr_playing_event)){ scr_playing=0; return;}
 
   /* Update faders */
   for(f=0;f<MAX_FADER;f++) if(fader[f].ptr){
@@ -89,7 +95,37 @@ int zbuf_flag=0;
       *(fade->ptr)=val;
       if(fade->blend>=1.0) fade->ptr=NULL;
     }
+    ++active_faders;
   }
+
+
+#if 1
+  if(fx_debug) if(fx_debug_time>=0.1){
+    int f;
+    fprintf(fx_debug,"%6.2f [%5d] |",adk_time,(int)(MP3_FRAMES));
+    for(f=0;f<FX_DB;f++){
+      fx_struct* fx=&fxlist[f];
+      char t=' ';
+      if(fx->type==0 || fx->blend==0){
+        fprintf(fx_debug,"      |");
+      } else {
+        if(fx->type==1) t='S'; else
+        if(fx->type==2) t='F'; else
+        if(fx->type==3) t='B'; else
+        if(fx->type==4){ t='P'; if(fx->pic.type&2) t='C'; } else
+        if(fx->type==5) t='5'; else
+        if(fx->type==6) t='6'; else
+        if(fx->type==7) t='7'; else
+        if(fx->type==8) t='G';
+        fprintf(fx_debug,"%c %4.2f|",t,fx->blend);
+      }
+    }
+    fprintf(fx_debug,"%d\n",active_faders);
+    while(fx_debug_time>=0.1) fx_debug_time-=0.1;
+//    while(fx_debug_time<=adk_time) fx_debug_time+=0.1;
+  }
+#endif
+
 
   if(adk_clear_buffer_flag)
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

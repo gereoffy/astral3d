@@ -1,7 +1,6 @@
 // ====================== Script interpreter ===============================
 
 // initialized by scr_init.c
-scrEventStruct scr_playing_event;
 int current_light=0;
 c_OBJECT* current_object=(c_OBJECT*)NULL;
 int current_fdtunnel=0;
@@ -14,10 +13,7 @@ int pdb=0;
 byte* p[20];
 fx_struct *fx=current_fx;
 
-  if(scr_playing){
-    if(!scrTestEvent(&scr_playing_event))  return;  /* !!!!!!!!!!!!!! */
-    scr_playing=0;
-  }
+  if(scr_playing) return;
 
   if(scrReadln2(sor)==-1) ExitDemo();
   if(strcmp(sor,"end")==0) ExitDemo();
@@ -57,6 +53,7 @@ fx_struct *fx=current_fx;
   *fx_ptr_pic_alphamode = &fx->pic.alphamode;
   *fx_ptr_pic_zbuffer = &fx->pic.zbuffer;
   *fx_ptr_pic_alphalevel = &fx->pic.alphalevel;
+
   *fx_ptr_face_blend = &fx->face_blend;
   *fx_ptr_wire_blend = &fx->wire_blend;
   *fx_ptr_spline_size = &fx->spline_size;
@@ -135,6 +132,13 @@ fx_struct *fx=current_fx;
       printf("EXEC: unknown type variable: %s\n",p[0]);
     }else{
       /* -------------------- COMMANDS ---------------------- */
+
+      if(strcmp(p[0],"time")==0){                                  //time
+        if(pdb!=2) scrFatal("time: Missing or too many operands!");
+        adk_time=adk_time_corrected=atof(p[1]);
+        GetRelativeTime();
+        return;
+      }
 
       if(strcmp(p[0],"load_scene")==0){                            //loadscene
         if(pdb<3) scrFatal("load_scene: Missing operands!");
@@ -478,8 +482,9 @@ fx_struct *fx=current_fx;
           fade->start=atof(p[2]);
           fade->end=atof(p[3]);
           fade->speed=1.0/atof(p[4]);
-          fade->blend=0.0;
-          *(fade->ptr)=fade->start;
+          fade->blend=fade->speed*(adk_time-adk_time_corrected);
+//          fade->blend=0.0;
+//          *(fade->ptr)=fade->start;
 //          printf("FADE: %f .. %f, speed=%f\n",fade->start,fade->end,fade->speed);
         }
         return;
@@ -498,7 +503,8 @@ fx_struct *fx=current_fx;
           fade->start=atof(p[2]);
           fade->end=atof(p[3]);
           fade->speed=1.0/atof(p[4]);
-          fade->blend=0.0;
+          fade->blend=fade->speed*(adk_time-adk_time_corrected);
+//          fade->blend=0.0;
           if(pdb>=6) fade->amp=atof(p[5]); else fade->amp=1.0F;
           if(pdb>=7) fade->offs=atof(p[6]); else fade->offs=0.0F;
 //          *(fade->ptr)=fade->start;
@@ -520,6 +526,7 @@ fx_struct *fx=current_fx;
       if(strcmp(p[0],"play")==0){                                   //play
         scr_playing_event.type=0;
         scr_playing_event.frameptr=&(fx->frame);
+        scr_playing_event.fpsptr=&(fx->fps);
         if(pdb>1){
           for(i=1;i<pdb;i++){
             if(!scrSetEvent(&scr_playing_event,p[i])) scrFatal("Invalid event type");

@@ -26,6 +26,7 @@ void ExitDemo(){
     MP3_Stop();
     MP3_CloseDevice();
   }
+  if(fx_debug) fclose(fx_debug);
 //  printf("\nTexture memory used:  32bpp: %d k    16bpp: %d k\n",
 //    map_memory_used/1024,map_memory_used_16bpp/1024);
   exit(0);
@@ -126,6 +127,8 @@ int main(int argc,char* argv[]){
     if(argc>1) scrLoad(argv[1]); else scrLoad("alpha2.scr");
     adk_time=0.0; // adk_frame=0.0;
     
+//    fx_debug=fopen("effects.log","wt");
+
     printf("lightmap loading\n");
     lightmap=LoadSimpleMap("light.bmp");
     printf("lightmap OK\n");

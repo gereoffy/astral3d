@@ -95,6 +95,6 @@ SCR_FLOAT_PTR(scene_ptr_zfar,"zfar");
 SCR_INT_PTR(scene_ptr_frustumcull,"frustum_culling");
 
 #ifdef SCR_DEFINE_NOW
-scrCreateVar_float("time",0,&adk_time);
+//scrCreateVar_float("time",0,&adk_time);
 scrCreateVar_int("clear_buffer",1,&adk_clear_buffer_flag);
 #endif
