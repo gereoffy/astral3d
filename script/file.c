@@ -86,6 +86,7 @@ int i;
     case scrTYPE_flag: printf("flag_var"); break;
     case scrTYPE_float: printf("float_var"); break;
     case scrTYPE_pic: printf("texture_var"); break;
+    case scrTYPE_picanim: printf("picanim_var"); break;
     case scrTYPE_scene: printf("scene_var"); break;
     case scrTYPE_const: printf("<value>"); break;
     case scrTYPE_newvar: printf("new_var_name"); break;
@@ -211,6 +212,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       if(pdb<2) scrSyntax("variable setting: missing value");
       if(pdb>2) scrSyntax("variable setting: too many parameters");
       if(cmd->Type==scrTYPE_pic) scrSyntax("Picture/texture variables are NOT redefinable!");
+      if(cmd->Type==scrTYPE_picanim) scrSyntax("Animated texture variables are NOT redefinable!");
       if(cmd->Type==scrTYPE_scene) scrSyntax("Scene variables are NOT redefinable!");
       // Check/setup environment:
       ptr=scrGetPtr(cmd, fx);
@@ -268,6 +270,17 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
             if(!pvar[i]) scrSyntaxH("texture not defined/loaded",cmd,i);
             t=scrGetPtr(pvar[i],fx);
             pval[i]=t->id;
+          }
+          break;
+        case scrTYPE_picanim:
+          if(i>pdb || strcmp(p[i],"0")==0){
+            pval[i]=0; pvar[i]=NULL;
+          } else {
+            picanim_st *t;
+            pvar[i]=scrSearchVar(p[i]);
+            if(!pvar[i]) scrSyntaxH("animated texture not defined/loaded",cmd,i);
+            t=scrGetPtr(pvar[i],fx);
+            pval[i]=t->nummaps;
           }
           break;
         case scrTYPE_newvar:
@@ -373,17 +386,38 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       }
 //===============================================================================
 // 7/0:  particle "objname" texture_id num
+// 7/0:  particle "objname" texture_id num linenum
 // 7/1:  particle_preplay "objname" dt times
+// 7/2:  particle_clone "dstobjname" "srcobjname"
       if(cmdp->code==7){
         w_NODE *node;
         ast3d_byname(p[1],&node); if(!node) scrSyntaxH("object not found",cmd,1);
         if(node->type != ast3d_obj_object) scrSyntaxH("Node is not object",cmd,1);
         current_object=(c_OBJECT *)(node->object);
         if(!(current_object->flags&ast3d_obj_particle)) scrSyntaxH("Object is not particle system!",cmd,1);
-        if(cmdp->type==0)
-          particle_init(current_object,pval[2],pval[3]);
-        else
-          particle_preplay(current_object,pval[2],pval[3]);
+        if(cmdp->type==2){
+          // clone
+          c_OBJECT *dstobj=current_object;
+          c_OBJECT *srcobj;
+          ast3d_byname(p[2],&node); if(!node) scrSyntaxH("src object not found",cmd,2);
+          if(node->type != ast3d_obj_object) scrSyntaxH("src Node is not object",cmd,2);
+          srcobj=(c_OBJECT *)(node->object);
+          memcpy(&dstobj->particle,&srcobj->particle,sizeof(c_PARTICLE));
+          dstobj->particle.type|=8;
+          printf("Cloning particle system %s->%s, type %d to %d\n",srcobj->name,dstobj->name,srcobj->particle.type,dstobj->particle.type);
+          return;
+        }
+        if(cmdp->type==0){
+          if(pval[4]<0)
+            particle_init(current_object,pval[2],pval[3]);
+          else
+            NEWparticle_init(&current_object->particle,pval[2],pval[3],pval[4]);
+        } else {
+          if(current_object->particle.type==0)
+            particle_preplay(current_object,pval[2],pval[3]);
+          else
+            NEWparticle_preplay(&current_object->particle,pval[2],pval[3]);
+        }
         return;
       }
 //===============================================================================
@@ -391,6 +425,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       if(cmdp->code==8){
         FX_RESET(fx);
         fx->type=FXTYPE_BLOB;
+        fx->blob.texture= (pdb==1) ? pval[1] : blobmap;
 #if 0
         fx->blob.vlimit=200000;
         fx->blob.line_blob=0;
@@ -517,6 +552,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 //===============================================================================
 // 17/0:  fade float_var start end time
 // 17/1:  sinfade float_var start end time amp offs
+// 17/2:  rndfade float_var min max delay
       if(cmdp->code==17){
         int f;
         for(f=0;f<MAX_FADER;f++){ if(!fader[f].ptr) break; }
@@ -526,7 +562,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
           fade->ptr=scrGetPtr(pvar[1],fx);
           fade->start=(strcmp(p[2],"*")==0)?(*fade->ptr):(pval[2]);
           fade->end=pval[3];
-          fade->speed=1.0/pval[4];
+          fade->speed=pval[4]?(1.0f/pval[4]):0;
           fade->blend=fade->speed*(adk_time-adk_time_corrected);
           if(cmdp->type==1){
             fade->amp=pval[5];
@@ -591,7 +627,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 //===============================================================================
 // 23:  lightmap [xsize ysize]
       if(cmdp->code==23){
-        printf("lmapmafe for %s\n",current_object->name);
+//        printf("lmapmake for %s\n",current_object->name);
         current_object->flags|=ast3d_obj_lmapmake;
         make_lightmap_uv(current_object,pval[1],(pval[2]>0)?pval[2]:pval[1]);
         return;
@@ -624,9 +660,141 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         return;
       }
 //===============================================================================
-
-
-//      return;
+// 27: hjbtunnel txt1 txt2 x_tile y_tile
+      if(cmdp->code==27){
+        FX_RESET(fx);
+        fx->type=FXTYPE_HJBTUNNEL;
+        fx->hjbtunnel.part_texture=pval[1];
+        fx->hjbtunnel.sphere_texture=pval[2];
+        fx->hjbtunnel.sphere_x_tile=pval[3];
+        fx->hjbtunnel.sphere_y_tile=pval[4];
+        return;
+      }
+      if(cmdp->code==28){
+        HJBTUNNEL_Init(pval[1]);
+        return;
+      }
+//===============================================================================
+// 29: swirl txt [scale]
+      if(cmdp->code==29){
+        FX_RESET(fx);
+        fx->type=FXTYPE_SWIRL;
+        fx->swirl.texture=pval[1];
+        fx->swirl.scale=pval[2];
+        return;
+      }
+//===============================================================================
+// 30: noise txt [color]
+      if(cmdp->code==30){
+        FX_RESET(fx);
+        fx->type=FXTYPE_PICTURE;
+        fx->pic.type=cmdp->type;
+        fx->pic.id=pval[1];
+        fx->pic.x1=0;
+        fx->pic.y1=480;
+        fx->pic.x2=640;
+        fx->pic.y2=0;
+        fx->pic.rgb[0]=pval[2];
+        fx->pic.rgb[1]=pval[3];
+        fx->pic.rgb[2]=pval[4];
+        return;
+      }
+//===============================================================================
+// 31:  killfade float_var
+      if(cmdp->code==31){
+        int f;
+        float* ptr=scrGetPtr(pvar[1],fx);
+        if(ptr)
+          for(f=0;f<MAX_FADER;f++)
+            if(fader[f].ptr==ptr) fader[f].ptr=NULL;
+        return;
+      }
+//===============================================================================
+// 32: bsptunnel txt
+      if(cmdp->code==32){
+        FX_RESET(fx);
+        fx->type=FXTYPE_BSPTUNNEL;
+        fx->pic.id=pval[1];
+        return;
+      }
+      if(cmdp->code==33){
+        BSPTUNNEL_Init(pval[1]);
+        return;
+      }
+//===============================================================================
+// 34:  load_picanim picanim_var "basefilename" nummaps
+      if(cmdp->code==34){
+        picanim_st* picanim=malloc(sizeof(picanim_st));
+        int nummaps=(int)pval[3];
+        texture_st **t=malloc(sizeof(texture_st *)*nummaps);
+        int i;
+        printf("PicANIM: loading %d frames:\n",nummaps);
+        for(i=0;i<nummaps;i++){
+          char name[128];
+          sprintf(name,"%s%02d.jpg",p[2],i);
+          printf("PicANIM: loading frame %02d: %s\n",i,name);
+          t[i]=load_texture( fix_mapname(name), NULL, 1.0, NULL,NULL,0, NULL,NULL,0, 0);
+          if(!t[i] || !(t[i]->flags&15)) scrSyntax("loadpicanim: File not found!");
+        }
+        picanim->nummaps=nummaps;
+        picanim->maps=t;
+        scrAddNewVar(strdup(p[1]),scrTYPE_picanim,scrCLASS_global,0,(void*)picanim);
+        return;
+      }
+//===============================================================================
+// 35/0: projected_map pic [scale]
+// 35/1: projected_map_anim picanim [scale]
+      if(cmdp->code==35){
+        picanim_st* picanim=scrGetPtr(pvar[1],fx);
+        current_scene->projmap.maps=picanim;
+        if(cmdp->type==0){
+          current_scene->projmap.nummaps=1;
+        } else {
+          current_scene->projmap.nummaps=picanim->nummaps;
+          if(picanim->nummaps==1)
+            current_scene->projmap.maps=picanim->maps[0];
+          else
+            current_scene->projmap.maps=picanim->maps;
+        }
+        if(current_scene->projmap.nummaps<1) scrSyntax("projected_map: minimum 1 texture must exisist!!!");
+        printf("Enabling projected-mapping, animated textures: %d\n",current_scene->projmap.nummaps);
+        current_material->flags|=ast3d_mat_reflect|ast3d_mat_projected_map;
+        current_scene->projmap.animphase=0;
+        current_scene->projmap.scale=pval[2];
+        return;
+      }
+//===============================================================================
+// 36/0: fdwater txt map1 map2 [color]
+// 36/1: fdripples txt [color]
+      if(cmdp->code==36){
+        FX_RESET(fx);
+        fx->type=FXTYPE_FDWATER;
+        fx->fdwater.type=cmdp->type;
+        fx->fdwater.texture=pval[1];
+        if(cmdp->type==0){
+          if(!LoadMAP(p[2],&fx->fdwater.map1)) scrSyntax("fdwater: heightmap 1 file not found!");
+          if(!LoadMAP(p[3],&fx->fdwater.map2)) scrSyntax("fdwater: heightmap 2 file not found!");
+          fx->fdwater.color[0]=pval[4];
+          fx->fdwater.color[1]=pval[5];
+          fx->fdwater.color[2]=pval[6];
+        } else {
+          fx->fdwater.color[0]=pval[2];
+          fx->fdwater.color[1]=pval[3];
+          fx->fdwater.color[2]=pval[4];
+        }
+        return;
+      }
+//===============================================================================
+// 37: clone_fx fxnum
+      if(cmdp->code==37){
+        int fno=pval[1];
+        if(fno<0 || fno>=FX_DB) scrSyntax("Invalid FX index");
+        //FX_RESET(fx);
+        memcpy(fx,&fxlist[fno],sizeof(fx_struct));
+        return;
+      }
+//===============================================================================
+      scrSyntax("Internal error: Unimplemented command (check command code!)");
     }
   }
   scrSyntax("Unknown command");

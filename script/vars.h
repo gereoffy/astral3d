@@ -34,15 +34,29 @@ VAR_FX(scrTYPE_float,"blob_oz",blob.pos[2],17000);
 VAR_FX(scrTYPE_float,"blob_rx",blob.rad[0],6000);
 VAR_FX(scrTYPE_float,"blob_ry",blob.rad[1],6000);
 VAR_FX(scrTYPE_float,"blob_rz",blob.rad[2],2000);
+VAR_FX(scrTYPE_float,"blob_uscale",blob.uscale,0.5);
+VAR_FX(scrTYPE_float,"blob_vscale",blob.vscale,0.5);
+//VAR_FX(scrTYPE_float,"blob_bfangle",blob.bflimit,-1);
+VAR_FX(scrTYPE_float,"blob_zpos",blob.zpos,-10);
+VAR_FX(scrTYPE_int  ,"blob_zsort",blob.zsort,0);
 
 // PICTURE:
 VAR_FX(scrTYPE_float,"pic_r",pic.rgb[0],1.0);
 VAR_FX(scrTYPE_float,"pic_g",pic.rgb[1],1.0);
 VAR_FX(scrTYPE_float,"pic_b",pic.rgb[2],1.0);
 VAR_FX(scrTYPE_float,"pic_z",pic.z,10.0);
+VAR_FX(scrTYPE_float,"pic_x1",pic.x1,0.0);
+VAR_FX(scrTYPE_float,"pic_y1",pic.y1,480.0);
+VAR_FX(scrTYPE_float,"pic_x2",pic.x2,640.0);
+VAR_FX(scrTYPE_float,"pic_y2",pic.y2,0.0);
 VAR_FX(scrTYPE_int  ,"pic_alphamode",pic.alphamode,0);
 VAR_FX(scrTYPE_float,"pic_alphalevel",pic.alphalevel,0);
 VAR_FX(scrTYPE_int  ,"pic_zbuffer",pic.zbuffer,0);
+VAR_FX(scrTYPE_float,"noise_angle",pic.angle,0);
+VAR_FX(scrTYPE_float,"noise_xscale",pic.xscale,1);
+VAR_FX(scrTYPE_float,"noise_yscale",pic.yscale,(480.0f/640.0f));
+VAR_FX(scrTYPE_float,"noise_xoffs",pic.xoffs,0.5);
+VAR_FX(scrTYPE_float,"noise_yoffs",pic.yoffs,0.5);
 
 // SPLINE:
 VAR_FX(scrTYPE_float,"fade_blend",face_blend,1.0);
@@ -64,12 +78,27 @@ VAR_FX(scrTYPE_float,"fdtunnel_rad_speed",fdtunnel.rad_speed[1],0.02354);
 VAR_FX(scrTYPE_float,"fdtunnel_rad_amp",fdtunnel.rad_amp[1],128);
 VAR_FX(scrTYPE_float,"fdtunnel_rad_szog",fdtunnel.rad_szog[1],5);
 
+
 // GREETS:
 VAR_FX(scrTYPE_float,"greets_blend_speed",greets.blend_speed,1.0);
 VAR_FX(scrTYPE_float,"greets_move_speed",greets.move_speed,0);
 VAR_FX(scrTYPE_float,"greets_rot_speed",greets.rot_speed,0);
 VAR_FX(scrTYPE_float,"greets_dist",greets.dist,0);
 VAR_FX(scrTYPE_float,"greets_scale",greets.scale,1.0);
+
+// SWIRL:
+VAR_FX(scrTYPE_float,"swirl_txscale",swirl.texturescale,0.5);
+VAR_FX(scrTYPE_int  ,"swirl_blurlevel",swirl.blur_level,1);
+VAR_FX(scrTYPE_float,"swirl_bluralpha",swirl.blur_alpha,0.8);
+VAR_FX(scrTYPE_float,"swirl_blurpos",swirl.blur_alpha,0.01);
+VAR_FX(scrTYPE_float,"swirl_scale",swirl.scale,15);
+VAR_FX(scrTYPE_float,"lens_power",swirl.lens,1.0f);
+VAR_FX(scrTYPE_float,"twist_inner",swirl.twist_inner,0);
+VAR_FX(scrTYPE_float,"twist_outer",swirl.twist_outer,0);
+VAR_FX(scrTYPE_float,"wave_phase",swirl.wave_phase,0);
+VAR_FX(scrTYPE_float,"wave_amp",swirl.wave_amp,0);
+VAR_FX(scrTYPE_float,"wave_freq",swirl.wave_freq,10);
+
 
 // SINPARTicle:
 VAR_FX(scrTYPE_float,"sinpart_ox",sinpart.ox,0);
@@ -79,6 +108,16 @@ VAR_FX(scrTYPE_float,"sinpart_size",sinpart.size,300);
 VAR_FX(scrTYPE_float,"sinpart_scale",sinpart.scale,10);
 VAR_FX(scrTYPE_float,"sinpart_speed",sinpart.speed,1);
 VAR_FX(scrTYPE_float,"sinpart_sinspeed",sinpart.sinspeed,0.01);
+
+// FDWATER
+VAR_FX(scrTYPE_float,"fdwater_amp",fdwater.amp,0.005);
+VAR_FX(scrTYPE_float,"fdwater_scale",fdwater.scale,0.3);
+VAR_FX(scrTYPE_float,"fdwater_bright",fdwater.bright,0.00001);
+VAR_FX(scrTYPE_float,"fdwater_u_speed1",fdwater.u_speed1,0);
+VAR_FX(scrTYPE_float,"fdwater_v_speed1",fdwater.v_speed1,0);
+VAR_FX(scrTYPE_float,"fdwater_u_speed2",fdwater.u_speed2,0);
+VAR_FX(scrTYPE_float,"fdwater_v_speed2",fdwater.v_speed2,0);
+
 
 #undef VAR_FX
 
@@ -150,6 +189,8 @@ VAR_MAT(scrTYPE_float,"self_illumination",self_illum,0);
 VAR_MAT(scrTYPE_flag ,"env_positional",flags,ast3d_mat_env_positional);
 VAR_MAT(scrTYPE_flag ,"env_spheremap",flags,ast3d_mat_env_sphere);
 
+//VAR_MAT(scrTYPE_flag ,"projected_map",flags,ast3d_mat_projected_map);
+
 #undef VAR_MAT
 
 //=============================
@@ -163,6 +204,12 @@ VAR_SCENE(scrTYPE_int  ,"fog_type",fog.type);
 VAR_SCENE(scrTYPE_float,"fog_znear",fog.fog_znear);
 VAR_SCENE(scrTYPE_float,"fog_zfar",fog.fog_zfar);
 VAR_SCENE(scrTYPE_int,  "frustum_culling",frustum_cull);
+
+VAR_SCENE(scrTYPE_float,"projmap_uoffs",projmap.uoffs);
+VAR_SCENE(scrTYPE_float,"projmap_voffs",projmap.voffs);
+VAR_SCENE(scrTYPE_float,"projmap_amount",projmap.amount);
+VAR_SCENE(scrTYPE_float,"projmap_scale",projmap.scale);
+VAR_SCENE(scrTYPE_float,"projmap_animphase",projmap.animphase);
 
 #undef VAR_SCENE
 

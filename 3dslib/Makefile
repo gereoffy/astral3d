@@ -3,7 +3,7 @@
 SRCS = ast3d.c camera.c file_3ds.c quatern.c spline.c
 OBJS = ast3d.o camera.o file_3ds.o quatern.o spline.o
 CC   = gcc
-CFLAGS = -O2 -Wall -mpentiumpro -pipe
+CFLAGS = -g -Wall -mpentiumpro -pipe
 
 .SUFFIXES: .c .o
 
@@ -43,9 +43,9 @@ ast3d.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h
 ast3d.o: /usr/include/string.h /usr/include/ctype.h /usr/include/math.h
 ast3d.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
 ast3d.o: /usr/include/bits/mathcalls.h ast3d.h ast3di.h ../afs/afs.h vector.h
-ast3d.o: matrix.h uv_grad.c smothgrp.c normals.c fix_uv.c optimvtx.c
-ast3d.o: lightmap.c getkey.c do_trans.c morphspl.h frustcul.h morphspl.c
-ast3d.o: morphlin.c visibchk.c transfrm.c frustcul.c update.c
+ast3d.o: matrix.h uv_grad.c smothgrp.c normals.c fix_uv.c lightmap.c getkey.c
+ast3d.o: do_trans.c morphspl.h frustcul.h morphspl.c morphlin.c visibchk.c
+ast3d.o: transfrm.c frustcul.c update.c
 camera.o: /usr/include/math.h /usr/include/features.h
 camera.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
 camera.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h

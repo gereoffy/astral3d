@@ -46,7 +46,7 @@ static void key(unsigned char k, int x, int y){
   case 27:  /* Escape */
     ExitDemo();
   case 'p': 
-    printf("MARK:  p=%5d   t=%6.2f  dt=%5.2f\n",MP3_frames,adk_time,adk_time-time_dt);
+    printf("MARK:  p=%5d   t=%6.2f  dt=%5.2f  fps=%4.2f\n",MP3_frames,adk_time,adk_time-time_dt,(adk_time>2)?(total_frames/adk_time):0);
     time_dt=adk_time;
     break;
   case 's': 
@@ -81,7 +81,7 @@ GLvoid IdleFunc(){
 
 
 int main(int argc,char* argv[]){
-int fullscreen=1;
+int fullscreen=0;
 char* scriptname="astral.scr";
 int xs=640;
 int ys=480;
@@ -89,6 +89,7 @@ int ys=480;
     { int i;
       for(i=1;i<argc;i++){
         if(strcmp(argv[i],"-window")==0) fullscreen=0; else
+        if(strcmp(argv[i],"-fullscreen")==0) fullscreen=1; else
         if(strcmp(argv[i],"-nosound")==0) nosound=1; else
         if(strcmp(argv[i],"-640")==0){ xs=640;ys=480;} else
         if(strcmp(argv[i],"-800")==0){ xs=800;ys=600;} else

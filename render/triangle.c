@@ -9,6 +9,7 @@
 #define TRI_TEX3(p) glTexCoord2fv(&f->u3)
 #define TRI_BUMP_COLOR(p) glColor4ubv(p->refl_rgb)
 #define TRI_REFL_COLOR(p) glColor4ubv(p->refl_rgb)
+#define TRI_REFL_COLOR_A(p) glColor3ub((p->refl_rgb[0]*a)>>8,(p->refl_rgb[1]*a)>>8,(p->refl_rgb[2]*a)>>8)
 //#define TRI_REFL_COLOR(p) 
 #define TRI_REFL_TEX(p) glTexCoord2fv((float*)&p->pnorm)
 #define TRI_REFL_EUV(p) glTexCoord2fv(&p->env_u)
@@ -90,6 +91,32 @@ INLINE void ast3d_DrawGLTriangle_real_envmap(c_FACE *f){
         p=f->pa; TRI_REFL_EUV(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
         p=f->pb; TRI_REFL_EUV(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
         p=f->pc; TRI_REFL_EUV(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
+#else
+        p=f->pa; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+        p=f->pb; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+        p=f->pc; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+#endif
+}
+
+INLINE void ast3d_DrawGLTriangle_projectedmap(c_FACE *f){
+  c_VERTEX *p;
+#ifdef NO_LIGHTING
+        p=f->pa; TRI_REFL_EUV(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
+        p=f->pb; TRI_REFL_EUV(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
+        p=f->pc; TRI_REFL_EUV(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
+#else
+        p=f->pa; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+        p=f->pb; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+        p=f->pc; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
+#endif
+}
+
+INLINE void ast3d_DrawGLTriangle_projectedmap_alpha(c_FACE *f,int a){
+  c_VERTEX *p;
+#ifdef NO_LIGHTING
+        p=f->pa; TRI_REFL_EUV(p); TRI_REFL_COLOR_A(p); TRI_VERTEX(p);
+        p=f->pb; TRI_REFL_EUV(p); TRI_REFL_COLOR_A(p); TRI_VERTEX(p);
+        p=f->pc; TRI_REFL_EUV(p); TRI_REFL_COLOR_A(p); TRI_VERTEX(p);
 #else
         p=f->pa; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);
         p=f->pb; TRI_REFL_EUV(p); TRI_NORMAL(p); TRI_VERTEX(p);

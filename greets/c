@@ -1,3 +1,3 @@
 
-gcc -c -g -Wall greets.c
+gcc -c -Wall greets.c
 

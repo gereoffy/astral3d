@@ -188,7 +188,7 @@ static void PutLightCoronas(void){
     for(i=0; i<lightno; i++) if(lights[i]->ppos.z<0){
         factor=((scene->fog.zfar+lights[i]->ppos.z)/scene->fog.zfar)*lights[i]->corona_scale*10;
         glColor3fv(lights[i]->color.rgb);
-        aglZbuffer((lights[i]->use_zbuffer)?AGL_ZBUFFER_RW:AGL_ZBUFFER_NONE);
+        aglZbuffer((lights[i]->use_zbuffer)?AGL_ZBUFFER_R:AGL_ZBUFFER_NONE);
     	  glBegin(GL_QUADS);
           glTexCoord2f(0.0f,0.0f);
           glVertex3f(lights[i]->ppos.x-factor,lights[i]->ppos.y-factor,lights[i]->ppos.z);

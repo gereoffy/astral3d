@@ -22,6 +22,7 @@
 #include "../timer/timer.h"
 #include "../mp3lib/mp3.h"
 #include "../afs/afs.h"
+#include "../loadmap/load_map.h"
 #include "../loadmap/loadtxtr.h"
 
 #include "../blob/blob.h"
@@ -31,6 +32,10 @@
 #include "../sinpart/sinpart.h"
 #include "../greets/greets.h"
 #include "../render/render.h"
+#include "../hjbtunel/hjbtunel.h"
+#include "../bsptunel/bsptunel.h"
+#include "../swirl/swirl.h"
+#include "../fdwater/fdwater.h"
 
 
 // ------ LIMITS ---------------
@@ -38,7 +43,7 @@
 #define scrMAXVARS 512
 #define scrHASH 256
 // draw:
-#define FX_DB 10
+#define FX_DB 20
 #define MAX_FADER 32
 // file:
 #define SCRIPT_MAXSIZE 65536
@@ -52,6 +57,7 @@
 #define scrTYPE_pic 5
 #define scrTYPE_scene 6
 #define scrTYPE_flag 7
+#define scrTYPE_picanim 8
 #define scrTYPE_const 10
 #define scrTYPE_newvar 11
 
@@ -71,6 +77,10 @@
 #define FXTYPE_SMOKE 6
 #define FXTYPE_SINPART 7
 #define FXTYPE_GREETS 8
+#define FXTYPE_HJBTUNNEL 9
+#define FXTYPE_SWIRL 10
+#define FXTYPE_BSPTUNNEL 11
+#define FXTYPE_FDWATER 12
 
 #define MAX_PDB 20
 
@@ -104,6 +114,10 @@ typedef struct {
 
 fade_struct fader[MAX_FADER];
 
+typedef struct {
+  int nummaps;
+  texture_st** maps;
+} picanim_st;
 
 typedef struct {
   int type;
@@ -112,6 +126,7 @@ typedef struct {
   float rgb[3];
   int alphamode,zbuffer;
   float alphalevel;
+  float angle,xscale,yscale,xoffs,yoffs; // noise params
 } pic_struct;  
 
 typedef struct {
@@ -123,7 +138,10 @@ typedef struct {
   fx_smoke_struct smoke;
   fx_sinpart_struct sinpart;
   fx_fdtunnel_struct fdtunnel;
+  fx_hjbtunnel_struct hjbtunnel;
   fx_greets_struct greets;
+  fx_swirl_struct swirl;
+  fx_fdwater_struct fdwater;
   /* 3DS player: */
   c_SCENE *scene;
   int loop_scene;

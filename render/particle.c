@@ -56,7 +56,8 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
   c_PART *p=obj->particle.p;
 
 //  glShadeModel(GL_FLAT);
-  aglZbuffer(AGL_ZBUFFER_NONE);
+//  aglZbuffer(AGL_ZBUFFER_NONE);
+  aglZbuffer(AGL_ZBUFFER_R);
   aglTexture(lightmap);
   aglBlend(AGL_BLEND_ADD);
 
@@ -141,7 +142,7 @@ void particle_preplay(c_OBJECT *obj,float dt,int times){
 void particle_init(c_OBJECT *obj,int texture,int np){
 int i;
   if(!(obj->particle.p=malloc(sizeof(c_PART)*np))) np=0;
-  
+  obj->particle.type=0;
   obj->particle.maxnp=np;
   obj->particle.np=np;
   obj->particle.texture_id=texture;
@@ -157,5 +158,3 @@ int i;
   printf("particle.init. np=%d\n",np);
   for(i=0;i<np;i++) setnewpart(&obj->particle.p[i],obj);
 }
-
-

@@ -10,7 +10,7 @@
 #define SPLINE_MORPH
 
 /* Enable removing duplicated vertices */
-#define OTIMIZE_VERTEX
+//#define OTIMIZE_VERTEX
 
 /* Sort faces for triangle strip. Not works yet... :( */
 // #define TRIANGLE_STRIP
@@ -152,7 +152,8 @@ enum ast3d_mat_flags_ { /* astral 3d material flags */
   ast3d_mat_bump      = 2048,             /* object has bump map */
   ast3d_mat_env_positional = 4096,        /* envmap is positional */
   ast3d_mat_env_sphere = 8192,            /* envmap uses sphere mapping */
-  ast3d_mat_reflect_light = 16384         /* lightning on reflection map */
+  ast3d_mat_reflect_light = 16384,        /* lightning on reflection map */
+  ast3d_mat_projected_map = 32768         /* projected "water" map */
 };
 
 enum ast3d_map_flags_ { /* astral 3d map flags */
@@ -388,7 +389,7 @@ typedef struct _c_AMBIENT { /* ambient struct */
 typedef struct _c_PART {
   float color[3];
   float energy;
-  c_VECTOR p; // float p[1][3];
+  c_VECTOR p;
   float v[3];
 } c_PART;
 
@@ -402,6 +403,7 @@ typedef struct _c_PARTICLE {
   float dieratio; // 0.0018  energy--
   float agrav; // -9.8  gravitation
   float colordecrement; // 0.999
+  int type; // hogyan mozog  0=regi(mesa)  1=uj(hjb)
 } c_PARTICLE;
 
 typedef struct _c_OBJECT { /* object struct */
@@ -545,6 +547,15 @@ typedef struct _c_SCENE { /* scene (world, keyframer) */
 //  int sphere_map;
   float znear,zfar;
   int frustum_cull;
+  struct {
+    int nummaps;
+    void *maps;
+    float animphase;
+    float uoffs;
+    float voffs;
+    float scale;
+    float amount;
+  } projmap;
 } c_SCENE;
 
 /*****************************************************************************

@@ -3,7 +3,7 @@
 SRCS = script2.c
 OBJS = script2.o
 CC   = gcc
-CFLAGS = -g -O2 -Wall
+CFLAGS = -O2 -Wall
 
 .SUFFIXES: .c .o
 
@@ -43,7 +43,9 @@ script2.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
 script2.o: /usr/include/bits/mathcalls.h /usr/include/sys/time.h
 script2.o: /usr/include/bits/time.h ../agl/agl.h /usr/include/GL/gl.h
 script2.o: /usr/include/GL/glu.h ../3dslib/ast3d.h ../timer/timer.h
-script2.o: ../mp3lib/mp3.h ../afs/afs.h ../loadmap/loadtxtr.h ../blob/blob.h
-script2.o: ../fdtunnel/fdtunnel.h ../spline/spline.h ../smoke/smoke.h
-script2.o: ../sinpart/sinpart.h ../greets/greets.h ../render/render.h vars.h
-script2.o: cmds.h scr_evnt.c scr_draw.c file.c
+script2.o: ../mp3lib/mp3.h ../afs/afs.h ../loadmap/load_map.h
+script2.o: ../loadmap/loadtxtr.h ../blob/blob.h ../fdtunnel/fdtunnel.h
+script2.o: ../spline/spline.h ../smoke/smoke.h ../sinpart/sinpart.h
+script2.o: ../greets/greets.h ../render/render.h ../hjbtunel/hjbtunel.h
+script2.o: ../bsptunel/bsptunel.h ../swirl/swirl.h ../fdwater/fdwater.h
+script2.o: vars.h cmds.h scr_evnt.c scr_draw.c file.c

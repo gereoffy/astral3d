@@ -1,0 +1,3 @@
+
+# gcc -c -g -Wall fdtunnel.c
+gcc -c -O2 -Wall swirl.c

@@ -22,6 +22,12 @@ int active_faders=0;
   for(f=0;f<MAX_FADER;f++) if(fader[f].ptr){
     fade_struct *fade=&fader[f];
     fade->blend+=fade->speed*rel_time;
+    if(fade->type==2){
+      if(fade->speed==0 || fade->blend>=1.0){
+        fade->blend-=(int)fade->blend;
+        *(fade->ptr)=fade->start+(fade->end-fade->start)*rand()/(float)RAND_MAX;
+      }
+    } else
     { float val=fade->start+(fade->end-fade->start)*fade->blend;
       if(fade->blend>=1.0) val=fade->end;
       if(fade->type==1) val=fade->offs+fade->amp*sin(val*M_PI/180.0F);
@@ -86,7 +92,7 @@ int active_faders=0;
       ast3d_setactive_camera(scene->cam);
       ast3d_setframe(fx->frame);
 //      ast3d_update();
-      draw3dsframe(); 
+      draw3dsframe(rel_time); 
       if(fx->loop_scene)
       { float frame,frames;
         ast3d_getframes(&frame,&frames);
@@ -118,6 +124,24 @@ int active_faders=0;
       draw_fdtunnel(fx->frame,&fx->fdtunnel);
     }
 
+    if(fx->type==FXTYPE_HJBTUNNEL){
+//      printf("Playing FDTUNNEL for fx #%d\n",f);
+//      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      HJBTUNNEL_Render(&fx->hjbtunnel,fx->frame);
+    }
+
+    if(fx->type==FXTYPE_BSPTUNNEL){
+//      printf("Playing FDTUNNEL for fx #%d\n",f);
+//      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      BSPTUNNEL_Render(fx->frame,fx->pic.id);
+    }
+
+    if(fx->type==FXTYPE_SWIRL){
+//      printf("Playing FDTUNNEL for fx #%d\n",f);
+//      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      SWIRL_Render(fx->frame,&fx->swirl);
+    }
+
     if(fx->type==FXTYPE_SMOKE){
 //      printf("Playing SMOKE for fx #%d\n",f);
 //      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
@@ -134,6 +158,10 @@ int active_faders=0;
 //      printf("Playing SMOKE for fx #%d\n",f);
 //      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
       draw_sinpart(fx->frame,&fx->sinpart);
+    }
+
+    if(fx->type==FXTYPE_FDWATER){
+      draw_fdwater(fx->frame,&fx->fdwater);
     }
 
     if(fx->type==FXTYPE_PICTURE){
@@ -176,6 +204,26 @@ int active_faders=0;
         glColor4f(fx->pic.rgb[0],fx->pic.rgb[1],fx->pic.rgb[2],fx->blend);
       glDisable(GL_CULL_FACE);
       glBegin(GL_QUADS);
+      if(fx->pic.type&4){
+        float a=fx->pic.angle;
+        // NOISE
+        glTexCoord2f(fx->pic.xscale*sin(a)+fx->pic.xoffs,
+                     fx->pic.yscale*cos(a)+fx->pic.yoffs);
+        glVertex3f(fx->pic.x1,fx->pic.y1,fx->pic.z);
+        a+=M_PI/2.0f;
+        glTexCoord2f(fx->pic.xscale*sin(a)+fx->pic.xoffs,
+                     fx->pic.yscale*cos(a)+fx->pic.yoffs);
+        glVertex3f(fx->pic.x2,fx->pic.y1,fx->pic.z);
+        a+=M_PI/2.0f;
+        glTexCoord2f(fx->pic.xscale*sin(a)+fx->pic.xoffs,
+                     fx->pic.yscale*cos(a)+fx->pic.yoffs);
+        glVertex3f(fx->pic.x2,fx->pic.y2,fx->pic.z);
+        a+=M_PI/2.0f;
+        glTexCoord2f(fx->pic.xscale*sin(a)+fx->pic.xoffs,
+                     fx->pic.yscale*cos(a)+fx->pic.yoffs);
+        glVertex3f(fx->pic.x1,fx->pic.y2,fx->pic.z);
+      } else {
+        // PICTURE
         glTexCoord2f(0.0f,0.0f);
         glVertex3f(fx->pic.x1,fx->pic.y1,fx->pic.z);
         glTexCoord2f(1.0f,0.0f);
@@ -184,6 +232,7 @@ int active_faders=0;
         glVertex3f(fx->pic.x2,fx->pic.y2,fx->pic.z);
         glTexCoord2f(0.0f,1.0f);
         glVertex3f(fx->pic.x1,fx->pic.y2,fx->pic.z);
+      }
       glEnd();
 
       glDisable(GL_ALPHA_TEST);

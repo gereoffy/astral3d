@@ -23,6 +23,8 @@
 #include "../3dslib/vector.h"
 #include "../3dslib/matrix.h"
 
+#include "../loadmap/loadtxtr.h"
+
 #include "render.h"
 
 #include "../prof.h"
@@ -52,7 +54,7 @@ int laserno;
 
 #include "laser.c"
 
-void draw3dsframe(void){
+void draw3dsframe(float deltatime){
     int i;
     int rendered_objects=0;
     w_NODE *node;
@@ -62,6 +64,7 @@ void draw3dsframe(void){
     unsigned char refl_rgb[3];
     int specular=0;
     unsigned char src_alpha=255;
+    int particle_update=1;
     
     ast3d_update();        // keyframing & transformations
 
@@ -95,15 +98,28 @@ if(laserno){
           int matflags= mat?(mat->flags):0;
           static c_MATRIX objmat;
           static c_MATRIX normat;
+          static c_VECTOR obj_normat;
           mat_mul (scene->cam->matrix, obj->matrix, objmat);
           mat_normalize (objmat, normat);
+
+          obj_normat.x=obj->matrix[Y][X];
+          obj_normat.y=obj->matrix[Y][Y];
+          obj_normat.z=obj->matrix[Y][Z];
+          vec_normalize(&obj_normat,&obj_normat);
+          
           ++rendered_objects;
 
           if(obj->flags&ast3d_obj_particle){
-            if(obj->particle.np>0)
-              particle_redraw(obj,objmat,0.015); // !!!!!!!!!!!!! FIXME!
+            if(obj->particle.np>0){
+              if((obj->particle.type&7)==1)
+                NEWparticle_redraw(&obj->particle,objmat,particle_update*0.5*deltatime); // !!!!!!!!!!!!! FIXME!
+              else
+                particle_redraw(obj,objmat,particle_update*0.5*deltatime); // !!!!!!!!!!!!! FIXME!
+              particle_update=0;
+            }
             continue;
           }
+
           if(obj->vertexlights!=0.0){
             draw_vertexlights(obj,objmat);
             continue;

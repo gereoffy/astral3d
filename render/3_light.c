@@ -89,6 +89,7 @@
           c_VECTOR *n=&obj->vertices[i].pnorm;
           int li;
           float r=base_r,g=base_g,b=base_b;
+          float refl_a=1.0f;
           if((matflags&ast3d_mat_reflect)&&(matflags&ast3d_mat_env_positional)){
             /* Reflection (real envmap) */
             c_VECTOR t;
@@ -104,6 +105,21 @@
             if(d>0) d=0.5F/sqrt(d); else d=0.5F;
             obj->vertices[i].env_u=0.5+t.x*d;
             obj->vertices[i].env_v=0.5+t.y*d;
+          } else
+          if(matflags&ast3d_mat_projected_map){
+            /* Projected map (water effekt) */
+            c_VECTOR temp;
+            c_VECTOR *p=&obj->vertices[i].vert;
+            c_VECTOR *n=&obj->vertices[i].norm;
+//            mat_mulvec (obj->matrix,p,&pp);
+            temp.x = p->x*obj->matrix[X][X] + p->y*obj->matrix[X][Y] + p->z*obj->matrix[X][Z] + obj->matrix[X][W];
+            temp.z = p->x*obj->matrix[Z][X] + p->y*obj->matrix[Z][Y] + p->z*obj->matrix[Z][Z] + obj->matrix[Z][W];
+            temp.y = n->x*obj_normat.x + n->y*obj_normat.y + n->z*obj_normat.z;
+            obj->vertices[i].env_u=scene->projmap.uoffs+scene->projmap.scale*temp.x;
+            obj->vertices[i].env_v=scene->projmap.voffs+scene->projmap.scale*temp.z;
+            refl_a=temp.y*scene->projmap.amount;
+//            refl_a=1.0f;
+//            printf("Proj:  u=%8.3f  v=%8.3f  n=%8.3f\n", obj->vertices[i].env_u,obj->vertices[i].env_v,refl_a);
           }
           for(li=0;li<lightno;li++) if(lights[li]->enabled){
             c_LIGHT *l=lights[li];
@@ -239,13 +255,13 @@ if(l->flags&ast3d_light_attenuation){
           obj->vertices[i].rgb[2]=clip_255(b);
           obj->vertices[i].rgb[3]=src_alpha;
           if(matflags&(ast3d_mat_reflect_light|ast3d_mat_bump)){
-            obj->vertices[i].refl_rgb[0]=clip_255_blend(r,ast3d_blend);
-            obj->vertices[i].refl_rgb[1]=clip_255_blend(g,ast3d_blend);
-            obj->vertices[i].refl_rgb[2]=clip_255_blend(b,ast3d_blend);
+            obj->vertices[i].refl_rgb[0]=clip_255_blend(r,refl_a*ast3d_blend);
+            obj->vertices[i].refl_rgb[1]=clip_255_blend(g,refl_a*ast3d_blend);
+            obj->vertices[i].refl_rgb[2]=clip_255_blend(b,refl_a*ast3d_blend);
           } else {
             obj->vertices[i].refl_rgb[0]=
             obj->vertices[i].refl_rgb[1]=
-            obj->vertices[i].refl_rgb[2]=ast3d_blend_byte;
+            obj->vertices[i].refl_rgb[2]=clip_255_blend(refl_a,ast3d_blend);
           }
 //          printf("Lighting vertex %d color=%f %f %f\n",i,r,g,b);
         }

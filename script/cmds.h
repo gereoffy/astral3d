@@ -3,7 +3,8 @@
 #define P_INT(i) cmd->ptype[i]=scrTYPE_int;
 #define P_FLOAT(i) cmd->ptype[i]=scrTYPE_float;
 //#define P_STR(i) cmd->ptype[i]=scrTYPE_str;
-#define P_PIC(i) cmd->ptype[i]=scrTYPE_pic; // !!!! _pic lesz egyszer
+#define P_PIC(i) cmd->ptype[i]=scrTYPE_pic;
+#define P_PICANIM(i) cmd->ptype[i]=scrTYPE_picanim;
 #define P_SCENE(i) cmd->ptype[i]=scrTYPE_scene;
 #define P_CONST(i,dv) cmd->ptype[i]=scrTYPE_const; cmd->defval[i]=dv;
 #define P_NEW(i) cmd->ptype[i]=scrTYPE_newvar;
@@ -32,10 +33,12 @@ V("light",scrCLASS_scene, 5,0, 1,1); P_CONST(1,0);
 // 6:  object "objname"
 V("object",scrCLASS_scene, 6,0, 1,1);
 
-// 7/0:  particle "objname" texture_id num
-V("particle",scrCLASS_scene, 7,0, 2,3); P_PIC(2); P_CONST(3,800);
+// 7/0:  particle "objname" texture_id num [linenum]
+V("particle",scrCLASS_scene, 7,0, 2,4); P_PIC(2); P_CONST(3,800); P_CONST(4,-1);
 // 7/1:  particle_preplay "objname" dt times
 V("particle_preplay",scrCLASS_scene, 7,1, 1,3); P_CONST(2,0.015); P_CONST(3,600);
+// 7/2:  particle_clone "dstobjname" "srcobjname"
+V("particle_clone",scrCLASS_scene, 7,2, 2,2);
 
 // 8:  blob [texture]
 V("blob",scrCLASS_fx, 8,0, 0,1); P_PIC(1);
@@ -82,6 +85,8 @@ V("loadRGBA",scrCLASS_global,16,1, 3,3); P_NEW(1);
 V("fade",scrCLASS_global,17,0, 1,4); P_FLOAT(1); P_CONST(2,0); P_CONST(3,1); P_CONST(4,1);
 // 17/1:  sinfade float_var start end time amp offs
 V("sinfade",scrCLASS_global,17,1, 1,6);P_FLOAT(1); P_CONST(2,0); P_CONST(3,1); P_CONST(4,1);P_CONST(5,1);P_CONST(6,0);
+// 17/2:  rndfade float_var min max delay
+V("rndfade",scrCLASS_global,17,2, 1,4);P_FLOAT(1); P_CONST(2,0); P_CONST(3,1); P_CONST(4,0);
 
 // 18/0:  write msg
 // 18/1:  writeln msg
@@ -114,11 +119,49 @@ V("corona_sprite",scrCLASS_global,25,0,1,1); P_PIC(1);
 // 26:
 V("ambient_light_color",scrCLASS_global,26,0,0,3); P_CONST(1,0);P_CONST(2,0);P_CONST(3,0);
 
+// 27: hjbtunnel txt1 txt2 [x_tile] [y_tile]
+V("hjbtunnel",scrCLASS_fx, 27,0, 2,4); P_PIC(1); P_PIC(2); P_CONST(3,2);P_CONST(4,1);
+// 28: hjbtunnel_init rndseed
+V("hjbtunnel_init",scrCLASS_global, 28,0, 0,1); P_CONST(1,63897457);
+
+// 29: swirl txt [scale]
+V("swirl",scrCLASS_fx, 29,0, 1,2); P_PIC(1); P_CONST(2,15);
+
+// 30: noise txt [color]
+// 30: addnoise txt [color]
+V("noise",scrCLASS_fx, 30,4, 1,4); P_PIC(1); P_CONST(2,1);P_CONST(3,1);P_CONST(4,1);
+V("addnoise",scrCLASS_fx, 30,5, 1,4); P_PIC(1); P_CONST(2,1);P_CONST(3,1);P_CONST(4,1);
+
+// 31: killfade float_var
+V("killfade",scrCLASS_global,31,0, 1,1); P_FLOAT(1);
+
+// 32: bsptunnel txt
+V("bsptunnel",scrCLASS_fx, 32,0, 1,1); P_PIC(1);
+// 33: bsptunnel_init rndseed
+V("bsptunnel_init",scrCLASS_global, 33,0, 0,1); P_CONST(1,2837457);
+
+// 34:  load_picanim picanim_var "basefilename" nummaps
+V("load_picanim",scrCLASS_global,34,0, 3,3); P_NEW(1); P_CONST(3,-1);
+
+// 35/0: projected_map pic [scale]
+// 35/1: projected_map_anim picanim [scale]
+V("projected_map",scrCLASS_object,35,0, 1,2); P_PIC(1); P_CONST(2,0.01);
+V("projected_map_anim",scrCLASS_object,35,1, 1,2); P_PICANIM(1); P_CONST(2,0.01);
+
+// 36/0: fdwater txt heightmap1 heightmap2 [color]
+// 36/1: fdripple txt [color]
+V("fdwater",scrCLASS_fx, 36,0, 3,6); P_PIC(1); P_CONST(4,0.5);P_CONST(5,0.5);P_CONST(6,0.8);
+V("fdripples",scrCLASS_fx, 36,1, 1,4); P_PIC(1); P_CONST(2,0.5);P_CONST(3,0.5);P_CONST(4,0.8);
+
+// 37: clone_fx
+V("clone_fx",scrCLASS_fx, 37,0, 1,1); P_CONST(1,0);
+
 //===========================================================================
 #undef V
 #undef P_INT
 #undef P_FLOAT
 #undef P_PIC
+#undef P_ANIM
 #undef P_SCENE
 #undef P_CONST
 #undef P_NEW

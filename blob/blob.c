@@ -140,7 +140,9 @@ static POINT2D_TSTRUCT * p2Dtable[12];
 
 static POINT2D_TSTRUCT cubepoints[nx][ny][nz][3];  // ez qrvanagy tomb lesz!!!
 
-#define MAX_POLYS 8192
+//#define MAX_POLYS 8192
+#define MAX_POLYS 16384
+
 static POINT2D_TSTRUCT *polys[MAX_POLYS][3];
 static int poly_db;
 
@@ -344,6 +346,8 @@ double x,y,z;
 
 }
 
+static float uscale,vscale;
+static float blob_zpos;
 
 static void blob_drawpoly_addp_GL(POINT2D_TSTRUCT *p1){
 float x,y,z;
@@ -354,20 +358,24 @@ float x,y,z;
 //  z=p1->zn; z/=0x1000000;
   glNormal3f(p1->xn,p1->yn,p1->zn);
 //  glTexCoord2f(p1->xn,p1->yn);
-  glTexCoord2f(0.5+0.5*p1->xn,0.5+0.5*p1->yn);
+  glTexCoord2f(0.5+uscale*p1->xn,0.5+vscale*p1->yn);
   glColor3ub(p1->rgb[0],p1->rgb[1],p1->rgb[2]);
 
   x=p1->xx; x/=3000;
   y=p1->yy; y/=3000;
   z=p1->zz; z/=-2000;
 //  printf("x=%f  y=%f  z=%f\n",x,y,z);
-  glVertex3f(x,y,z-10.0);
+  glVertex3f(x,y,z+blob_zpos);
 
 }
 
+//static float bflimit;
+
 static void blob_drawpoly(POINT2D_TSTRUCT *p1,POINT2D_TSTRUCT *p2,POINT2D_TSTRUCT *p3){
 
-//if( (double)(p1->xx-p2->xx)*(p1->yy-p3->yy)-(double)(p1->xx-p3->xx)*(p1->yy-p2->yy) >0 ){
+//if(p1->zn>bflimit && p2->zn>bflimit && p3->zn>bflimit){
+
+//if( (double)(p1->xx-p2->xx)*(p1->yy-p3->yy)-(double)(p1->xx-p3->xx)*(p1->yy-p2->yy) >bflimit ){
 
     polys[poly_db][0]=p1;
     polys[poly_db][1]=p2;
@@ -769,6 +777,11 @@ int i,j;
 
       line_blob=params->line_blob;
       Vlimit=params->vlimit;
+      uscale=params->uscale;
+      vscale=params->vscale;
+//      bflimit=params->bflimit;
+      blob_zpos=params->zpos;
+      
       poly_db=0;
       ++framenum;   // enelkul nem muxik!!!
       for(i=0;i<blob_db;i++){
@@ -780,6 +793,18 @@ int i,j;
 
 
 if(!line_blob){
+
+    aglZbuffer(AGL_ZBUFFER_NONE);
+//    aglTexture(blobmap);
+    aglTexture(params->texture);
+    aglBlend(AGL_BLEND_ADD);
+
+    if(params->blob_alpha>0){
+      glEnable(GL_ALPHA_TEST);
+      glAlphaFunc(GL_GEQUAL,params->blob_alpha);
+    }
+
+if(params->zsort){
     //----------- POLYGON-BLOB    ---------->ZSORT
     for(i=0;i<poly_db;i++){
       int p;
@@ -805,14 +830,6 @@ if(!line_blob){
       } bytesort_end[0][j]=bytesort_start[0][j]=0;
     }
 
-    aglZbuffer(AGL_ZBUFFER_NONE);
-    aglTexture(blobmap);
-    aglBlend(AGL_BLEND_ADD);
-
-    if(params->blob_alpha>0){
-      glEnable(GL_ALPHA_TEST);
-      glAlphaFunc(GL_GEQUAL,params->blob_alpha);
-    }
 
     glBegin(GL_TRIANGLES);
     for(j=0;j<256;j++){
@@ -825,6 +842,17 @@ if(!line_blob){
       } bytesort_end[1][j]=bytesort_start[1][j]=0;
     }
     glEnd();
+
+} else {
+    for(i=0;i<poly_db;i++){
+    glBegin(GL_TRIANGLES);
+        blob_drawpoly_addp_GL(polys[i][0]);
+        blob_drawpoly_addp_GL(polys[i][1]);
+        blob_drawpoly_addp_GL(polys[i][2]);
+    }
+    glEnd();
+}
+
     aglZbuffer(AGL_ZBUFFER_RW);
     glDisable(GL_ALPHA_TEST);
     
