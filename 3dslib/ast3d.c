@@ -37,6 +37,10 @@ int32     ast3d_flags=0;     /* curreng flags         */
 #include "optimvtx.c"
 #endif
 
+#ifdef LIGHTMAP_UV
+#include "lightmap.c"
+#endif
+
 static void calc_normals (){
 /*
   calc_normals: calculates face/vertex normals.
@@ -48,8 +52,11 @@ static void calc_normals (){
 #ifdef OTIMIZE_VERTEX
       optimize_vertex ((c_OBJECT *)node->object);
 #endif
-//      smoothing_group((c_OBJECT *)node->object);
+      smoothing_group((c_OBJECT *)node->object);
       calc_objnormals ((c_OBJECT *)node->object);
+#ifdef LIGHTMAP_UV
+      make_lightmap_uv((c_OBJECT *)node->object);
+#endif
     }
 }
 

@@ -214,6 +214,7 @@ if(l->flags&ast3d_light_attenuation){
 
 	    }
           }
+#if 0          
           obj->vertices[i].rgb[0]=clip_255(r);
           obj->vertices[i].rgb[1]=clip_255(g);
           obj->vertices[i].rgb[2]=clip_255(b);
@@ -223,6 +224,17 @@ if(l->flags&ast3d_light_attenuation){
             obj->vertices[i].refl_rgb[1]=clip_255_blend(g,ast3d_blend);
             obj->vertices[i].refl_rgb[2]=clip_255_blend(b,ast3d_blend);
           }
+#else
+// lightmap hack
+          obj->vertices[i].refl_rgb[0]=
+          obj->vertices[i].refl_rgb[1]=
+          obj->vertices[i].refl_rgb[2]=
+          obj->vertices[i].rgb[0]=
+          obj->vertices[i].rgb[1]=
+          obj->vertices[i].rgb[2]=255;
+          obj->vertices[i].rgb[3]=src_alpha;
+
+#endif
 //          printf("Lighting vertex %d color=%f %f %f\n",i,r,g,b);
         }
       }

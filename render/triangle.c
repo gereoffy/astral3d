@@ -38,8 +38,11 @@ INLINE void ast3d_DrawGLTriangle_gouraud(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_COLOR(p); TRI_VERTEX(p);
+//         printf("xyz1: %f  %f  %f\n",p->pvert.x,p->pvert.y,p->pvert.z);
         p=f->pb; TRI_COLOR(p); TRI_VERTEX(p);
+//         printf("xyz2: %f  %f  %f\n",p->pvert.x,p->pvert.y,p->pvert.z);
         p=f->pc; TRI_COLOR(p); TRI_VERTEX(p);
+//         printf("xyz3: %f  %f  %f\n",p->pvert.x,p->pvert.y,p->pvert.z);
 #else
         p=f->pa; TRI_NORMAL(p); TRI_VERTEX(p);
         p=f->pb; TRI_NORMAL(p); TRI_VERTEX(p);

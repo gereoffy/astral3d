@@ -544,6 +544,16 @@ v3.b  00/02/01 by A'rpi
 - par .OLD file es felesleges, regi konyvtar torlese
 
 
+v3.c  00/03/06-09 by A'rpi  - lightmap
+-
+- az ev szivasa:
+    } else {
+    //    |\
+      CALC_XADD(pxadd,p2,p3) CALC_YADD(pyadd,p1,p2)
+      CALC_XADD(nxadd,n2,n3) CALC_YADD(nyadd,n1,n2)
+  na ebben az a poen, hogy a comment vegen \ van, ami a fos cnek azt jelenti
+  hogy a komment a kovetkezo sorban folytatodik...
+
 
 TERVEK a 4.0-ba:
 - particlesys dt=0.015-ot fixelni!!

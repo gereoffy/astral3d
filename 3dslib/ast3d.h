@@ -12,6 +12,8 @@
 
 // #define TRIANGLE_STRIP
 
+#define LIGHTMAP_UV
+
 /* Minimum face number for pre-trans backface culling */
 // #define PRETRANS_CULL_FACELIMIT 2
 
@@ -178,7 +180,8 @@ enum ast3d_obj_flags_ { /* astral 3d object flags */
   ast3d_obj_allvisible = 128,              /* all faces&vertices visible */
   ast3d_obj_trianglestrip = 256,           /* triangle-stip capable   */
   ast3d_obj_frustumcull = 512,             /* frustum cull faces      */
-  ast3d_obj_particle = 1024                /* particle system */
+  ast3d_obj_particle = 1024,               /* particle system */
+  ast3d_obj_lmapmake = 2048                /* force lightmap generation */
 };
 
 enum ast3d_light_flags_ { /* astral 3d light flags */
@@ -292,12 +295,17 @@ typedef struct _c_FACE { /* face struct */
   c_VECTOR   norm;                         /* face normal             */
 //  c_VECTOR   pnorm;                        /* face normal             */
   float      D;                            /* distance from 0;0;0     */
+  float      A;                            /* terulet/felulet         */
 //  int        visible;                      /* visibility flag         */
   float u1,v1,u2,v2,u3,v3;                 /* texture coords          */
   float lu1,lv1,lu2,lv2,lu3,lv3;           /* lightmap coords         */
 #ifdef TRIANGLE_STRIP
   struct _c_FACE *prev;
   struct _c_FACE *next;
+#else
+#ifdef LIGHTMAP_UV
+  struct _c_FACE *next;
+#endif
 #endif
 } c_FACE;
 
@@ -412,6 +420,9 @@ typedef struct _c_OBJECT { /* object struct */
   float      vertexlights;           /* 0=disable   other=vertex light scale */
   float      explode_speed;
   float      explode_frame;
+  int lm_xs,lm_ys;                  /* lightmap size */
+  float A;                          /* teljes felulet */
+  int lightmap_id;
 } c_OBJECT;
 
 typedef struct _w_NODE { /* world node */

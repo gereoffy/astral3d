@@ -87,6 +87,7 @@
           if(obj->flags&ast3d_obj_allvisible || obj->face_visible[i])
             ast3d_DrawGLTriangle_texture(&obj->faces[i]);   /* %%%%%%%%%%% */
       } else {
+//        printf("Rendering %d gouraud faces\n",obj->numfaces);
         for (i=0;i<obj->numfaces;i++)
           if(obj->flags&ast3d_obj_allvisible || obj->face_visible[i])
             ast3d_DrawGLTriangle_gouraud(&obj->faces[i]);   /* %%%%%%%%%%% */

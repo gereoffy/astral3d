@@ -12,7 +12,10 @@ static void smoothing_group(c_OBJECT *obj){
   c_VERTEX *newverts;
   smoothing_info *smooth;
 
-  if(!obj->smoothing || obj->numfaces==0 || obj->numverts==0) return;
+  if(!obj->smoothing || obj->numfaces==0 || obj->numverts==0){
+    printf("Smoothing: no smoothgroup or numfaces=0\n");
+    return;
+  }
   
 //  printf("SMOOTHING:  verts=%d  faces=%d   maxverts=%d\n",obj->numverts,obj->numfaces,max_verts);
 

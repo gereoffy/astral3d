@@ -83,6 +83,14 @@ if(alpha>0.0 && morph->numkeys>2){
             SET_MINMAX(obj->pbbox.p[i].z,obj->pbbox.min.z,obj->pbbox.max.z)
           }
 
+        if(obj->flags&ast3d_obj_lmapmake){
+          // No transformation (lightmap generation)
+
+          obj->flags&=~ast3d_obj_frustumcull;
+          obj->flags|=ast3d_obj_visible|ast3d_obj_allvisible;
+
+        } else {
+
           /* Frustum test */
           if( (obj->numfaces>0) &&
             ( (ast3d_scene->frustum_cull==0) ||
@@ -123,7 +131,7 @@ if(alpha>0.0 && morph->numkeys>2){
 #endif
 
           } // if(numfaces && in frustum)
-
+        }  // no lightmap generation
 //        obj->flags|=ast3d_obj_allvisible|ast3d_obj_visible;
 //        obj->flags|=ast3d_obj_allvisible;
 

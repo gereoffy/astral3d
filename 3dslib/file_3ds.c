@@ -552,7 +552,7 @@ static int read_TRIMESH (afs_FILE *f)
   obj->vert_visible=NULL;
   obj->face_visible=NULL;
   obj->smoothing=NULL;
-  obj->flags = 0;
+  obj->flags = ast3d_obj_lmapmake;
   obj->bumpdepth=0.005;
   obj->enable_zbuffer=1;
   obj->vertexlights=0.0;

@@ -2,11 +2,14 @@ static void calc_objnormals (c_OBJECT *obj)
 {
   c_VECTOR  normal;
   int32     i, j;
-
+  float A=0;
+  
   /* PASS-1  vertexnormals=0 */
   for (i = 0; i < obj->numverts; i++) { 
     vec_zero (&obj->vertices[i].norm);
   }
+
+  if(obj->numfaces==0) return;
 
   /* PASS-2  calculate facenormals & vertexnormals in same time */
   for (i = 0; i < obj->numfaces; i++) { 
@@ -23,6 +26,7 @@ static void calc_objnormals (c_OBJECT *obj)
     j=obj->faces[i].b;vec_add (&normal, &obj->vertices[j].norm, &obj->vertices[j].norm);
     j=obj->faces[i].c;vec_add (&normal, &obj->vertices[j].norm, &obj->vertices[j].norm);
 
+    A+=(obj->faces[i].A=vec_length(&normal));
     vec_normalize (&normal, &normal);
     vec_copy (&normal, &obj->faces[i].norm);
     
@@ -35,6 +39,9 @@ static void calc_objnormals (c_OBJECT *obj)
     obj->vertices[i].weight=vec_length(&obj->vertices[i].norm);
     vec_normalize (&obj->vertices[i].norm, &obj->vertices[i].norm);
   }
+
+  obj->A=A;  
+  printf("A=%f   avg=%f   sqrt=%f\n",A,A/(float)obj->numfaces,sqrt(A/(float)obj->numfaces));
   
 }
 
