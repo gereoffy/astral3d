@@ -206,7 +206,9 @@ int i;
   //  PASS-1
   for(i=0;i<nodeno;i++){
     node_st *node=node_by_id(i);
-    if(classtype_by_node(node)==CLASSTYPE_PARAMBLOCK) init_ParamBlock(node);
+    if(classtype_by_node(node)==CLASSTYPE_PARAMBLOCK)
+      if(class_by_node(node)->subtype==0)
+        init_ParamBlock(node);
   }
   //  PASS-2
   for(i=0;i<nodeno;i++){

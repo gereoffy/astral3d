@@ -1,0 +1,66 @@
+
+Node #2: Placement (70)
+  Reference to 1: ParamBlock (pdb=13)      
+    Param #0 = F 0.260000   ; U offset
+    Param #1 = F 0.520000   ; V offset
+    Param #2 = F 10.900001  ; U tile
+    Param #3 = F 5.600000   ; V tile
+    Param #4 = F -0.122173  ; Z rot
+    Param #5 = F -0.226893  ; X rot
+    Param #6 = F -0.628319  ; Y rot
+    Param #7 = F 0.710000   ; Blur
+    Param #8 = F 4.500000   ; Noise Amount
+    Param #9 = F 1.090000   ; Noise Size
+    Param #10 = I 1         ; Noise Level
+    Param #11 = F 0.110000  ; Phase
+    Param #12 = F 0.026000  ; Blur offset
+  Chunk 9002 (4)
+  Chunk 9003 (4)
+  Chunk 9009 (4)
+  Chunk 9005 (4)
+  Chunk 9006 (4)
+  Chunk 900B (4)
+
+
+Node #3: ParamBlock2 (554)
+  Chunk 0009 (16)  ; 7/0: 1792 3000 (pdb=17) (parent_node=13)
+  Chunk 000A (15)  ; 0: [type=00000000] [flags=00920001] C0  0   ; U
+  Chunk 000A (15)  ; 1: [type=00000000] [flags=00920001] C0  0   ; V
+  Chunk 000A (15)  ; 2: [type=00000000] [flags=00920001] C0  1.0 ; Width
+  Chunk 000A (15)  ; 3: [type=00000000] [flags=00920001] C0  1.0 ; Height
+  Chunk 000A (15)  ; 4: [type=00000000] [flags=00920001] C0  1.0 ; Jitter placement
+  Chunk 000A (15)  ; 5: [type=00000004] [flags=00820000] 40  0   ; Bool
+  Chunk 000A (15)  ; 6: [type=00000004] [flags=00820000] 40  0   ; Bool
+  Chunk 000A (15)  ; 7: [type=00000001] [flags=00920000] 40  0   ; int
+  Chunk 000A (15)  ; 8: [type=00000001] [flags=00920000] 40  0   ; int
+  Chunk 000A (15)  ; 9: [type=00000001] [flags=00920000] 40  0   ; int
+  Chunk 000A (15)  ; 10: [type=00000001] [flags=00920000] 40  0  ; int
+  Chunk 000A (15)  ; 11: [type=00000001] [flags=00920000] 40  2  ; int
+  Chunk 000A (15)  ; 12: [type=00000004] [flags=00820000] 40  1  ; Bool
+  Chunk 000A (12)  ; 13: [type=00000010] [flags=00800000] 40     ; Bitmap:
+  Chunk 0003 R
+    Chunk 1201 (70)  ; 256 256 1.000000 1.000000 0.000000 0 0 8 *** 320 200  0 0 (0 0 255 127) (0 0 255 127) 1 0 1.000000 4 0
+    Chunk 1230 (42)  ; D:\3DS\MAPS\Coins.bmp
+    Chunk 1240 (28)  ; BMP Image File
+  Chunk 000A (15)  ; 14: [type=00000012] [flags=08810300] 40  -1  ; refTarget
+  Chunk 000A (15)  ; 15: [type=00000012] [flags=08810300] 40  -1  ; refTarget
+  Chunk 000A (15)  ; 16: [type=00000008] [flags=00800002] 40  -1  ; string
+  Chunk 0004 (8)  ; 01 00 00 00 00 00 00 00 
+
+Node #12: ParamBlock2 (99)  "Time" menu
+  Chunk 0009 (16)  ; 7/1: 1792 3000 (pdb=3) (parent_node=13)
+  Chunk 000A (15)  ; 0: [type=0000000C] [flags=00920000] 40  0   ; Start Frame
+  Chunk 000A (15)  ; 1: [type=00000000] [flags=00920000] 40  1.0 ; Playback rate
+  Chunk 000A (15)  ; 2: [type=00000001] [flags=00920000] 40  0   ; Loop mode
+  Chunk 0004 (8)  ; 00 00 00 00 00 00 34 3E 
+
+Node #13: Bitmap (88)
+  Reference to 2: Placement         ; "Coordinates" + "Noise"
+  Reference to 3: ParamBlock2       ; "Bitmap parameters"
+  Reference to 11: Output           ; "Output"
+  Reference to 12: ParamBlock2      ; "Time"
+  Chunk 4000 R
+  Map name: 'Map #1'
+    Chunk 4002 (4)
+    Chunk 4020 (4)
+    Chunk 4030 (16)

@@ -84,11 +84,16 @@ switch(chunk_id){
 //        if(node->data && strcmp(classtab[node->classid].name,"ParamBlock")==0 ){
         if(ref>=0 && ref<=nodeno)
           if(nodes[ref].data)
-            if(nodes[ref].classid<classdb)
+            if(nodes[ref].classid<classdb){
               if(strcmp(classtab[nodes[ref].classid].name,"ParamBlock")==0){
                 printf("\n");
                 paramblock_list(&nodes[ref],chelp->params[i],"    ");
+              } else
+              if(strcmp(classtab[nodes[ref].classid].name,"ParamBlock2")==0){
+                printf("\n");
+                paramblock2_list(&nodes[ref],chelp->params[i],"    ");
               }
+            }
       }
       printf("\n");
     }

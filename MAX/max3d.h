@@ -56,6 +56,51 @@ typedef struct {
   void** data;
 } Class_ParamBlock;
 
+//======================== ParamBlock2 ===============================
+
+typedef struct {
+  int xsize,ysize;
+  char* file;
+  char* type;
+} PB2_bitmap;
+
+typedef struct {
+  byte status;
+  union {
+    int i;
+    float f;
+    void* p;
+  } data;
+  char* name; // optional
+} PB2_arrayelement;
+
+typedef struct {
+  int type;
+  int flags;
+  byte status;
+  union {
+    int i;
+    float f;
+    void* p;
+    PB2_arrayelement* array;
+    PB2_bitmap* bm;
+  } data;
+  union {
+    char *name;
+    int arraysize;
+  } u;
+} PB2_param;
+
+typedef struct {
+  // Chunk 0009:
+  int id;
+  short sub_id;
+  int pdb;
+  int parent_node;
+  PB2_param *params;
+} Class_ParamBlock2;
+
+
 //======================== ORIENTATION ===============================
 
 typedef struct {

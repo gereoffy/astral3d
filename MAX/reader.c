@@ -6,6 +6,14 @@ int int_reader(FILE *f,int* size){
   return i;
 }
 
+int word_reader(FILE *f,int* size){
+  short int i;
+  if((*size)<sizeof(i)){ printf("Bad file\n");return 0;}
+  fread(&i,sizeof(i),1,f);
+  *size-=sizeof(i);
+  return i;
+}
+
 int byte_reader(FILE *f,int* size){
   int i=0;
   if((*size)<1){ printf("Bad file\n");return 0;}
@@ -48,6 +56,15 @@ char* string8_reader(FILE *f,int* size){
   return tempstr;
 }
 
+void property_reader(FILE *f,int *size){
+  int p=0;
+  while(*size>0){
+    printf("\n%3d. '%s' =",p++,string8_reader(f,size));
+    printf(" %d",word_reader(f,size));
+    printf("/%d",int_reader(f,size));
+  }
+}
+
 void dump_chunk_data(FILE *f,int *size){
   while(*size>=4){
     unsigned char data[4];
@@ -78,11 +95,15 @@ void format_chunk_data(FILE *f,int *chunk_size,char *s){
                   case '%': putchar(c);
                   case 'f': printf("%f",float_reader(f,chunk_size));break;
                   case 'i': printf("%d",int_reader(f,chunk_size));break;
+                  case 'w': printf("%d",word_reader(f,chunk_size));break;
                   case 'x': printf("%08X",int_reader(f,chunk_size));break;
-                  case 'b': printf("%d",byte_reader(f,chunk_size));break;
+                  case 'b': printf("%02X",byte_reader(f,chunk_size));break;
                   case 's': printf("%s",string_reader(f,chunk_size));break;
                   case 'S': printf("%s",string8_reader(f,chunk_size));break;
                   case '*': dump_chunk_data(f,chunk_size);break;
+                  case 'P': property_reader(f,chunk_size);break;
+                  case 'B': while(*chunk_size>=1) printf("%02X ",(unsigned char)byte_reader(f,chunk_size));break;
+                  case 'W': while(*chunk_size>=2) printf("%04X ",(unsigned short)word_reader(f,chunk_size));break;
                 }
                 continue;
               }

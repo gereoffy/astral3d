@@ -8,6 +8,7 @@ static int extra_refs=0;
 #include "noderdr.c"
 #include "materrdr.c"
 #include "pblock.c"
+#include "pblock2.c"
 #include "meshrdr.c"
 #include "lookatrd.c"
 //#include "scenerdr.c"
@@ -43,6 +44,7 @@ void init_classreaders(){
   register_classreader("Bitmap",CLASSTYPE_MAP,1,NULL,material_chunk_reader,NULL);
   // ParamBlock:
   register_classreader("ParamBlock",CLASSTYPE_PARAMBLOCK,0,paramblock_init,paramblock_chunk_reader,paramblock_uninit);
+  register_classreader("ParamBlock2",CLASSTYPE_PARAMBLOCK,1,paramblock2_init,paramblock2_chunk_reader,paramblock2_uninit);
   // Mesh/Objects:
   register_classreader("Editable Mesh",CLASSTYPE_MESH,0,mesh_init,mesh_chunk_reader,mesh_uninit);
   register_classreader("Torus Knot",CLASSTYPE_MESH,1,NULL,NULL,NULL);

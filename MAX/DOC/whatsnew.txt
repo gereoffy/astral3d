@@ -189,6 +189,24 @@ MAX3D v0.83  2000.04.26.  by A'rpi
   Tomcat kuldott kalner.max-et, egyelore nem sok latszik belole.
   'Edit mesh'-t is implementalni kell!!!
 
+MAX3D v0.84  2000.05.14-15.  by A'rpi
+===========================
+- ParamBlock2 formatum visszafejtese (ez volt a legdurvabb eddig)  (pblock2.txt)
+- Bitmap es Placement class-ok visszafejtese  (map.txt)
+- ParamBlock2 implementalasa (pblock2.c)
+  - beolvaso
+  - listazo
+  - param name kezelese (PB2/0005) (pl. diffuseMapAmount)
+  - help kezeles (classdef.txt alapjan)
+  - spec. value support: bitmap, rgb, point3
+
+MAX3D v0.85  2000.05.21.  by A'rpi
+===========================
+- paramblock2 bugfix: string-nel nem int hanem string8 van tarolva
+- material dolgok visszafejtese
+  mostmar megvan minden adat, ami szukseges a lighting-hoz
+
+
 ################################################################################
 RULEZ, a modifierek forrasa megvan a MAXSDK3-ban! (twist,taper,bend,skew etc...)
 RULEZ az FFD modifier, nagyon durva objecteket lehet vele csinalni egyszeruen!

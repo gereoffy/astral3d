@@ -1,4 +1,4 @@
-#define FPS 800
+#define FPS 1800
 
 #define INLINE inline
 

@@ -1,0 +1,31 @@
+Material structure     by A'rpi/ASTRAL
+==================
+
+Light models:
+
+1. Phong
+~~~~~~~~
+
+Node #16: Phong (20)
+  Reference to 15: ParamBlock2
+    Param #0 = C 0.179083 0.065359 0.065359
+    Param #1 = C 0.537255 0.196078 0.196078
+    Param #2 = C 0.900000 0.900000 0.900000
+    Param #3 = B 1
+    Param #4 = B 0
+    Param #5 = B 0
+    Param #6 = B 1
+    Param #7 = frac 0.000000
+    Param #8 = C 0.000000 0.000000 0.000000
+    Param #9 = frac 0.940000
+    Param #10 = frac 0.260000
+    Param #11 = F 0.000000
+  Chunk 5300 (4)
+
+
+
+
+
+
+
+

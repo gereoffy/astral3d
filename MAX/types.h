@@ -1,4 +1,6 @@
 
+typedef unsigned char byte;
+
 typedef struct { float x,y,z; } Point3;
 
 typedef struct { float x,y,z,w;} Quat;

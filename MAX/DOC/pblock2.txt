@@ -1,0 +1,109 @@
+ParamBlock2 desc. by A'rpi/ASTRAL
+~~~~~~~~~~~~~~~~~
+
+Struct:
+~~~~~~~
+typedef struct {
+  byte status;
+  union {
+    int i;
+    float f;
+    void* p;
+  } data;
+  char* name; // optional
+} PB2_arrayelement;
+
+typedef struct {
+  int type;
+  int flags;
+  byte status;
+  union {
+    int i;
+    float f;
+    void* p;
+    PB2_arrayelement* array;
+  } data;
+  union {
+    char *name;
+    int arraysize;
+  } u;
+} PB2_param;
+
+typedef struct {
+  // Chunk 0009:
+  short id,sub_id;
+  int pdb;
+  int parent_node;
+  PB2_param *params;
+} Class_ParamBlock2;
+
+
+FILE:
+~~~~~
+
+Chunk 0003:     bitmap
+===========
+  Chunk 0003 R
+    Chunk 1201 (70)  ; 80 02 E0 01 00 00 80 3F 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 00 40 01 C8 00 00 00 00 00 00 00 00 00 00 00 FF 7F 00 00 FF 7F 01 00 00 00 00 00 00 00 00 00 80 3F 04 00 00 00 00 00 00 00 00 00 
+    Chunk 1230 (92)  ; "D:\Program Files\3D Studio Max\Maps\SUNSET.jpg"
+    Chunk 1240 (18)  ; "JPEG File"
+
+  CHUNK 1201:
+    short x_res;
+    short y_res;
+    float ?
+    float ?
+    float ?
+    int ?
+    int ?
+    int flags ?
+    short 320
+    short 200
+    ... ???
+
+Chunk 0004:     single value ???
+===========
+  int  type;
+  [type] value;
+
+Chunk 0005:     element name list
+===========
+  short -pdb;
+  short ?;
+  pdb* {
+    int strlen;
+    char name[strlen];
+    short param_id;
+    int array_index;
+  }
+
+Chunk 0009:    paramblock2 header
+===========
+  int id
+  short sub_id
+  short ?
+  short ?
+  short pdb;
+  int parent_node;
+
+Chunk 000A:    param data
+===========
+  short param_id;
+  int type;
+  int flags;
+if(type&0x800){
+  // array
+  byte flag?;
+  int array_length;
+}else{
+  // single value
+  array_length=1
+}  
+  array_length* {
+    byte flag;
+    [type] value;
+  }
+
+
+
+
