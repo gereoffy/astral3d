@@ -3,7 +3,8 @@
 SRCS = load_map.c loadmaps.c loadmat.c loadtxtr.c
 OBJS = load_map.o loadmaps.o loadmat.o loadtxtr.o
 CC   = gcc
-CFLAGS = -g -O2 -Wall
+CFLAGS = -O2 -Wall
+LIB  = liblmap.a
 
 .SUFFIXES: .c .o
 
@@ -12,14 +13,18 @@ CFLAGS = -g -O2 -Wall
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-all:	$(OBJS)
+all:	$(LIB)
+
+$(LIB):	$(OBJS)
+	rm -f $(LIB)
+	ar -r $(LIB) $(OBJS)
 
 clean:
 	rm -f *~ *.o Makefile.bak
 
 distclean:
 	makedepend
-	rm -f *~ *.o
+	rm -f *~ *.o $(LIB)
 
 dep:	depend
 
@@ -40,8 +45,8 @@ load_map.o: /usr/include/bits/endian.h /usr/include/sys/select.h
 load_map.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
 load_map.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
 load_map.o: /usr/include/string.h ../afs/afs.h load_map.h load_raw.c
-load_map.o: load_jpg.c ../jpeglib/jpeglib.h ../jpeglib/jconfig.h
-load_map.o: ../jpeglib/jmorecfg.h
+load_map.o: load_jpg.c ../../libs/jpeglib/jpeglib.h
+load_map.o: ../../libs/jpeglib/jconfig.h ../../libs/jpeglib/jmorecfg.h
 loadmaps.o: /usr/include/stdio.h /usr/include/features.h
 loadmaps.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
 loadmaps.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/stddef.h

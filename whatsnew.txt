@@ -284,9 +284,23 @@ v2.6 99/12/1  by A'rpi
     utobbinal az ambient elore ki van szamolva, nem vertexenkent kell!
   - specular if()-ek osszevonva, igy talan gyorsabb picit amikor nincs specular
   A directional lighting implementalasa mostmar viszonylag egyszeru lesz.
+
+v2.61  99/12/11  by A'rpi
+- Specular szamolas (specmap es sima is) optimalizalva - normalizalas kiszedve
+- VERTEX ARRAY tamogatas - egyelore csak sima texturazasnal
+  ehhez OpenGL v1.1 kell! de nem lehet gond, mert BindTexture-hez es mashoz is...
+- loadmap es afs atirva obj-rol (.o) lib-re (.a), es ./c helyett Makefile van.
+- GLU es GLUT libek statikusra leforditva
+- GLU, GLUT es JPEG libek athelyezve ../libs-be, mivel ezeket nem
+  valtoztatjuk, ne legyenek allandoan benne a biztonsagi mentesben...
+  se ujraforditva mindig...
+- optimvert.c: mostantol ujra generalja a vertexeket, es a nem hasznaltakat
+  kiszedi (nem kell morpholni+transzformalni), es felhasznalasuk szerinti
+  sorrendben lesznek -> cache jobb kihasznalasa! CVA miatt is kell...
   
 
 KELL MEG:
+- profiling: meg mindig "elveszik" neha ido a 'draw' reszben. pl chevy, szoba
 - optimalt directional lighting attenuation nelkul, normal forgatas nelkul
 - objectek sortolasa: eloszor tomor obj-k, utana atlatszok z-sort-olva
   megpedig nem sulypont hanem bbox.min.Z szerint!

@@ -108,8 +108,7 @@ static void recalc_objnormals (c_OBJECT *obj)
     vec_normalize (&normal, &normal);
     vec_copy (&normal, &obj->faces[i].pnorm);
     /* vertexnormals: */
-    j=obj->faces[i].a;
-    vec_add (&normal, &obj->vertices[j].pnorm, &obj->vertices[j].pnorm);
+    j=obj->faces[i].a;vec_add (&normal, &obj->vertices[j].pnorm, &obj->vertices[j].pnorm);
     j=obj->faces[i].b;vec_add (&normal, &obj->vertices[j].pnorm, &obj->vertices[j].pnorm);
     j=obj->faces[i].c;vec_add (&normal, &obj->vertices[j].pnorm, &obj->vertices[j].pnorm);
   }

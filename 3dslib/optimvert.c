@@ -7,6 +7,8 @@ static void optimize_vertex (c_OBJECT *obj){
   int opt=0;
   int hash_table[HASH_SIZE];
   int hash;
+
+/* pass-1: mark duplicated vertex */
   
   for(i=0;i<HASH_SIZE;i++) hash_table[i]=-1;
 
@@ -33,25 +35,56 @@ static void optimize_vertex (c_OBJECT *obj){
   }
 //  putchar('2');fflush(stdout);
 
-/* pass-2 */
+/* pass-2: renumber faces */
         for(k=0;k<obj->numfaces;k++){
           int j;
           if((j=obj->faces[k].pa->visible)){
             obj->faces[k].a=j; obj->faces[k].pa=&obj->vertices[j];
-            obj->faces[k].pa->visible=0;
+//            obj->faces[k].pa->visible=0;
           }
           if((j=obj->faces[k].pb->visible)){
             obj->faces[k].b=j; obj->faces[k].pb=&obj->vertices[j];
-            obj->faces[k].pb->visible=0;
+//            obj->faces[k].pb->visible=0;
           }
           if((j=obj->faces[k].pc->visible)){
             obj->faces[k].c=j; obj->faces[k].pc=&obj->vertices[j];
-            obj->faces[k].pc->visible=0;
+//            obj->faces[k].pc->visible=0;
           }
         }
 
+#if 1
+
+/* pass-2: renumber vertices */
+{ c_VERTEX *newvert=malloc(sizeof(c_VERTEX)*(obj->numverts));
+  int j=0;
+  if(newvert){
+    for (i = 0; i < obj->numverts; i++) obj->vertices[i].visible=-1;
+    for(k=0;k<obj->numfaces;k++){
+      if(obj->faces[k].pa->visible==-1){
+        obj->faces[k].pa->visible=j; newvert[j] = *(obj->faces[k].pa); j++;
+      }
+      if(obj->faces[k].pb->visible==-1){
+        obj->faces[k].pb->visible=j; newvert[j] = *(obj->faces[k].pb); j++;
+      }
+      if(obj->faces[k].pc->visible==-1){
+        obj->faces[k].pc->visible=j; newvert[j] = *(obj->faces[k].pc); j++;
+      }
+      i=obj->faces[k].a=obj->faces[k].pa->visible;obj->faces[k].pa=&newvert[i];
+      i=obj->faces[k].b=obj->faces[k].pb->visible;obj->faces[k].pb=&newvert[i];
+      i=obj->faces[k].c=obj->faces[k].pc->visible;obj->faces[k].pc=&newvert[i];
+    }
+    free(obj->vertices); obj->vertices=newvert;
+    obj->numverts=j;
+    printf("OPTVERT: %d new vertices created!\n",j);
+  }
+}
+
+#endif
+
+  for (i = 0; i < obj->numverts; i++) obj->vertices[i].visible=0;
+
 //  putchar('3');fflush(stdout);
-  printf("optimvert: %d of %d vertices optimized!\n",opt,obj->numverts);
+  printf("optimvert: %d of %d vertices optimized!\n",(int)opt,(int)obj->numverts);
 }
 
 #undef HASH_FV

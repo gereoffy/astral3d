@@ -2,6 +2,9 @@
 /* Uses own lighting if defined. if commented out then OpenGL lighting is used */
 #define NO_LIGHTING
 
+/*  */
+//#define VERTEX_ARRAY
+
 /* Maximum number of faces in _transparent_ objects */
 #define MAXFACES 16384
 

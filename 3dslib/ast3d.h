@@ -280,7 +280,7 @@ typedef struct _c_FACE { /* face struct */
   float      D;                            /* distance from 0;0;0     */
   int        visible;                      /* visibility flag         */
   float u1,v1,u2,v2,u3,v3;                 /* texture coords          */
-  float lu1,lv1,lu2,lv2,lu3,lv3;           /* lightmap coords         */ 
+  float lu1,lv1,lu2,lv2,lu3,lv3;           /* lightmap coords         */
 #ifdef TRIANGLE_STRIP
   struct _c_FACE *prev;
   struct _c_FACE *next;

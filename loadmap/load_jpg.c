@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <stdio.h>
-#include "../jpeglib/jpeglib.h"
+#include "../../libs/jpeglib/jpeglib.h"
 
 struct jpeg_decompress_struct cinfo;
 struct jpeg_error_mgr jerr;

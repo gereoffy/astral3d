@@ -57,15 +57,15 @@ if(l->flags&ast3d_light_attenuation){
                 }
 
 		if(specular)
-                /* lightmap u,v */
+                /* specular-map u,v */
                 if(matflags&ast3d_mat_specularmap && li==0)
                 { float len2;
                   c_VECTOR t;
                   float d=2*(x*n->x+y*n->y+z*n->z);
-                  t.x=len*(n->x*d-x);
-                  t.y=len*(n->y*d-y);
-                  t.z=len*(n->z*d-z);
-                  len2=t.x*t.x+t.y*t.y+(1.0+t.z)*(1.0+t.z);
+                  t.x=(n->x*d-x);
+                  t.y=(n->y*d-y);
+                  t.z=(n->z*d-z);
+                  len2=t.x*t.x+t.y*t.y+(dist+t.z)*(dist+t.z);
                   if(len2>0) len2=1.0/sqrt(len2); else len2=1.0;
                   obj->vertices[i].specular.x=0.5+t.x*len2;
                   obj->vertices[i].specular.y=0.5+t.y*len2;
@@ -76,9 +76,9 @@ if(l->flags&ast3d_light_attenuation){
                   if(spec>specular_limit4 || 
                     (spec<(-specular_limit4) && matflags&(ast3d_mat_transparent|ast3d_mat_twosided))
                   ){
-                    float len2=len*len*(x*x+y*y) + (z*len+1.0)*(z*len+1.0);
+                    float len2=(x*x+y*y+(z+dist)*(z+dist));
                     if(len2>0){
-                      spec*=spec;spec/=len2;
+                      spec*=dist;spec*=spec;spec/=len2;
                       if(spec>specular_limit){
                         spec=atten*specular_mult*pow(spec,specular_coef);
                         r+=spec*l->MatSpec[0];
@@ -106,15 +106,15 @@ if(l->flags&ast3d_light_attenuation){
                 }
 
                 if(specular)
-		/* lightmap u,v */
+                /* specular-map u,v */
                 if(matflags&ast3d_mat_specularmap && li==0)
                 { float len2;
                   c_VECTOR t;
                   float d=2*(x*n->x+y*n->y+z*n->z);
-                  t.x=len*(n->x*d-x);
-                  t.y=len*(n->y*d-y);
-                  t.z=len*(n->z*d-z);
-                  len2=t.x*t.x+t.y*t.y+(1.0+t.z)*(1.0+t.z);
+                  t.x=(n->x*d-x);
+                  t.y=(n->y*d-y);
+                  t.z=(n->z*d-z);
+                  len2=t.x*t.x+t.y*t.y+(dist+t.z)*(dist+t.z);
                   if(len2>0) len2=1.0/sqrt(len2); else len2=1.0;
                   obj->vertices[i].specular.x=0.5+t.x*len2;
                   obj->vertices[i].specular.y=0.5+t.y*len2;
@@ -125,9 +125,9 @@ if(l->flags&ast3d_light_attenuation){
                   if(spec>specular_limit4 || 
                     (spec<(-specular_limit4) && matflags&(ast3d_mat_transparent|ast3d_mat_twosided))
                   ){
-                    float len2=len*len*(x*x+y*y) + (z*len+1.0)*(z*len+1.0);
+                    float len2=(x*x+y*y+(z+dist)*(z+dist));
                     if(len2>0){
-                      spec*=spec;spec/=len2;
+                      spec*=dist;spec*=spec;spec/=len2;
                       if(spec>specular_limit){
                         spec=specular_mult*pow(spec,specular_coef);
                         r+=spec*l->MatSpec[0];
