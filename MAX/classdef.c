@@ -4,11 +4,6 @@
 //   PARAM # "name"   (#=decimal)
 //   CHUNK # "name"   (#=hex)
 
-//typedef struct {
-//  char* refs[32];
-//  char** params[32];
-//} chelp_st;
-
 void read_classdef(){
 char sor[256];
 int classid=0;

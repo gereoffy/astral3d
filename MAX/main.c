@@ -5,31 +5,18 @@
 #include <math.h>
 #include <string.h>
 
-#define PRINT_CHUNKS
+#include "max3d.h"
 
 //========================================================================//
 //               Scene reader
 //========================================================================//
 
-typedef struct node_st_ {
-  int classid;
-  int refdb;
-  int* reflist;
-  void* data;
-} node_st;
-
 #include "classdir.c"
 
-
-typedef struct {
-  int pdb;
-  int* type;
-  void** data;
-} Class_ParamBlock;
-
-#define MAX_NODES 2048
 node_st nodes[MAX_NODES];
 int nodeno=0;
+
+Scene scene;
 
 #include "reader.c"
 
@@ -45,32 +32,35 @@ int nodeno=0;
 
 void init_classreaders(){
   // Track/Key reader:
-  register_classreader("Linear Float",0x01,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Bezier Float",0x11,track_init,track_chunk_reader,track_uninit);
-  register_classreader("TCB Float",0x21,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Linear Color",0x02,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Bezier Color",0x12,track_init,track_chunk_reader,track_uninit);
-  register_classreader("TCB Color",0x22,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Linear Position",0x03,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Bezier Position",0x13,track_init,track_chunk_reader,track_uninit);
-  register_classreader("TCB Position",0x23,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Linear Rotation",0x04,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Bezier Rotation",0x14,track_init,track_chunk_reader,track_uninit);
-  register_classreader("TCB Rotation",0x24,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Linear Scale",0x05,track_init,track_chunk_reader,track_uninit);
-  register_classreader("Bezier Scale",0x15,track_init,track_chunk_reader,track_uninit);
-  register_classreader("TCB Scale",0x25,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Linear Float",CLASSTYPE_TRACK,0x01,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Bezier Float",CLASSTYPE_TRACK,0x11,track_init,track_chunk_reader,track_uninit);
+  register_classreader("TCB Float",   CLASSTYPE_TRACK,0x21,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Linear Color",CLASSTYPE_TRACK,0x02,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Bezier Color",CLASSTYPE_TRACK,0x12,track_init,track_chunk_reader,track_uninit);
+  register_classreader("TCB Color",   CLASSTYPE_TRACK,0x22,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Linear Position",CLASSTYPE_TRACK,0x03,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Bezier Position",CLASSTYPE_TRACK,0x13,track_init,track_chunk_reader,track_uninit);
+  register_classreader("TCB Position",   CLASSTYPE_TRACK,0x23,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Linear Rotation",CLASSTYPE_TRACK,0x04,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Bezier Rotation",CLASSTYPE_TRACK,0x14,track_init,track_chunk_reader,track_uninit);
+  register_classreader("TCB Rotation",CLASSTYPE_TRACK,0x24,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Linear Scale",CLASSTYPE_TRACK,0x05,track_init,track_chunk_reader,track_uninit);
+  register_classreader("Bezier Scale",CLASSTYPE_TRACK,0x15,track_init,track_chunk_reader,track_uninit);
+  register_classreader("TCB Scale",CLASSTYPE_TRACK,0x25,track_init,track_chunk_reader,track_uninit);
   // Text:
-  register_classreader("Text",0,NULL,text_chunk_reader,NULL);
+  register_classreader("Text",CLASSTYPE_SHAPE,0,NULL,text_chunk_reader,NULL);
   // Node:
-  register_classreader("Node",0,NULL,nodeclass_chunk_reader,NULL);
+  register_classreader("Node",CLASSTYPE_NODE,0,nodeclass_init,nodeclass_chunk_reader,nodeclass_uninit);
   // Map/Material:
-  register_classreader("Standard",0,NULL,material_chunk_reader,NULL);
-  register_classreader("Bitmap",1,NULL,material_chunk_reader,NULL);
+  register_classreader("Standard",CLASSTYPE_MATERIAL,0,NULL,material_chunk_reader,NULL);
+  register_classreader("Bitmap",CLASSTYPE_MAP,1,NULL,material_chunk_reader,NULL);
   // ParamBlock:
-  register_classreader("ParamBlock",0,paramblock_init,paramblock_chunk_reader,paramblock_uninit);
+  register_classreader("ParamBlock",CLASSTYPE_PARAMBLOCK,0,paramblock_init,paramblock_chunk_reader,paramblock_uninit);
   // Editable Mesh
-  register_classreader("Editable Mesh",0,NULL,mesh_chunk_reader,NULL);
+  register_classreader("Editable Mesh",CLASSTYPE_OBJECT,0,mesh_init,mesh_chunk_reader,mesh_uninit);
+  // Orientation
+  register_classreader("Position/Rotation/Scale",CLASSTYPE_ORIENTATION,1,NULL,NULL,NULL);
+  register_classreader("Look At",CLASSTYPE_ORIENTATION,2,NULL,NULL,NULL);
   
 }
 
@@ -195,6 +185,7 @@ if(chunk_id<classdb){ nodeclass=&classtab[chunk_id];nodename=nodeclass->name;}
 node->classid=chunk_id;
 node->refdb=0;
 node->data=NULL;
+node->next=NULL;
 
 printf("\nNode #%d: %s (%d)\n",nodeno,nodename,chunk_size);
 
@@ -227,6 +218,7 @@ if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 //============================================================================
 
 #include "classdef.c"
+#include "linknode.c"
 
 int main(int argc,char* argv[]){
 FILE *f;
@@ -252,6 +244,16 @@ f=fopen((argc>2)?argv[2]:"scene","rb");if(!f) return 1;
   fclose(f);
 }
 printf("\n%d nodes readed\n",nodeno);
+
+scene.Tracks=link_nodes(CLASSTYPE_TRACK);
+scene.ParamBlocks=link_nodes(CLASSTYPE_PARAMBLOCK);
+scene.Shapes=link_nodes(CLASSTYPE_SHAPE);
+scene.Objects=link_nodes(CLASSTYPE_OBJECT);
+scene.Modifiers=link_nodes(CLASSTYPE_MODIFIER);
+scene.ModifiedObjs=link_nodes(CLASSTYPE_MODOBJ);
+scene.Nodes=link_nodes(CLASSTYPE_NODE);
+
+list_nodes(scene.Nodes);
 
 return 0;
 }

@@ -2,36 +2,10 @@
 //               ClassDir reader
 //========================================================================//
 
-#define MAX_CLASS 512
-
-typedef struct chunkhelp_st_ {
-  struct chunkhelp_st_ *next;
-  char *name;
-  int id;
-} chunkhelp_st;
-
-typedef struct {
-  char* refs[32];
-  char** params[32];
-  chunkhelp_st *chunks;
-} chelp_st;
-
-typedef struct {
-  char* name;
-  char* data;
-// Class reader registration:
-  int subtype; // class subtype
-  void (*class_init)(node_st *node);
-  int (*class_chunk_reader)(node_st *node,FILE *f,int level,int chunk_id,int chunk_size);
-  void (*class_uninit)(node_st *node);
-// Help
-  chelp_st* chelp;
-} class_st;
-
 class_st classtab[MAX_CLASS];
 int classdb=0;
 
-void register_classreader(char *name,int subtype,
+void register_classreader(char *name,int type,int subtype,
     void class_init(),
     int class_chunk_reader(),
     void class_uninit()
@@ -40,6 +14,7 @@ int i;
   for(i=0;i<classdb;i++){
     if(strcmp(classtab[i].name,name)==0){
       // Megvan!
+      classtab[i].type=type;
       classtab[i].subtype=subtype;
       classtab[i].class_init=class_init;
       classtab[i].class_chunk_reader=class_chunk_reader;
