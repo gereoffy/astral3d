@@ -6,7 +6,8 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
+#include "../agl/agl.h"
+//#include <GL/glut.h>
 
 #include "sinpart.h"
 
@@ -26,25 +27,17 @@ void draw_sinpart(float frame,fx_sinpart_struct *params){
   float szog=frame*params->speed;
   float d_szog;
 
-//    glDisable(GL_LIGHTING);
-
-  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_FOG);
-  glDisable(GL_DEPTH_TEST);glDepthMask(GL_FALSE);
-
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-//  glOrtho(0.0f, 400, 0.0f, 400, -10000.0f, 10000.0f);
   gluPerspective(60.0,(GLfloat) window_w/(GLfloat) window_h, 1.0, 10000.0);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, params->texture);
-  
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_FOG);
+  aglZbuffer(AGL_ZBUFFER_NONE);
+  aglTexture(params->texture);
+  aglBlend(AGL_BLEND_ADD);
 
   d_szog=2.0F*M_PI;
   d_szog/=params->partnum;
@@ -82,9 +75,6 @@ void draw_sinpart(float frame,fx_sinpart_struct *params){
   }
   glEnd();
   
-
-  glDisable(GL_BLEND);
-  glDepthMask(GL_TRUE); glEnable(GL_DEPTH_TEST);
 }
 
 void sinpart_init(fx_sinpart_struct *params,int texture,int partnum,int sinnum){

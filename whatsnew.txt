@@ -325,7 +325,7 @@ v3.3  99/12/22  by A'rpi & Strepto  - TP demo
   zbuffert is bekapcsolni ra.
 - blob pozicio es mozgasi sugar allithato scriptbol.  (alpha2-hoz kellett)
 
-v3.4  00/01/01-05  by  A'rpi    - uj scriptrendszer!!!
+v3.4  00/01/01-05  by  A'rpi    - uj scriptrendszer, 3dslib, agl
 - elkeszult az uj scriptsystem!
   new features:
   - nagyon konnyu uj valtozok, parancsok hozzaadasa  (vars.h es cmds.h)
@@ -337,6 +337,9 @@ v3.4  00/01/01-05  by  A'rpi    - uj scriptrendszer!!!
   - kepek kezelese texture_st strukturaval -> meret+pixelsize megmarad!
   - minden beallitas, struktura a script2.c elejen
   - [add]picture, [add]sprite, [add]colorbox  code egyszerusodott
+  - uj tipus: scrTYPE_flag. flag-ek allitasahoz...
+  - uj class: scrCLASS_material: material jelelmzokhoz. az 'object' parancs
+    beallitja a current_material-t is a kivalasztott obj anyagara.
 - 3dslib javitasok:
   - fixUV mellett mostmar van fixU es fixV is.  NoFixUV megszuntetve.
   - csak akkor szamol uvgrads-ot ha bumpmapos az obj. -> gyorsabb betoltes
@@ -344,10 +347,58 @@ v3.4  00/01/01-05  by  A'rpi    - uj scriptrendszer!!!
   - kioltem belole a face-enkenti materialt -> a pmat atkerult a c_OBJECT-be
   - minden objecten van material - amin nincs ahhoz hozzarendeli a
     Default_MATERIAL-t amit az ast3d_init() hoz letre.
-    -> egy rakas if(mat) kiszedheto a render-bol
+    -> egy rakas if(mat) kiszedheto a render-bol es 2_mater.c-bol
+  - scale bug javitva:  (wad's alfaaa.3ds (meduza) bugzott emiatt ezerrel)
+    update.c-ben egyszer regen leoptimalzialtuk az obj->matrix szamolasat,
+    de nem jol. nem eleg csak a foatloban levo elemeket szorozni scale-el,
+    hanem az egesz _oszlopokat_ kell!
+    
+- agl: astral opengl state manager  v0.1      (agl/agl.h)
+  amit kezel:  zbuffer mode, blend mode, texture_id
+  kell meg bele: fog, alpha_test
+  - csak az agl-en keresztul szabad ezeket allitgatni!!!
+    el kell felejteni a gl-es fuggvenyeket!
+  - felmerult problema: ha glDepthMask==false akkor a glClear(GL_DEPTH_BUFFER)
+    NEM MUKODIK!!!!! jo nagy szivas volt rajonni...
+  - emiatt a scr_draw.c-ben a zbuffer kezeles kicsit atdolgozva
+  - mivel a loadmap elallithatja a texturat, meg egyebkent is,
+    minden frame elott meghivodik az aglInit() ami beallitja a defaultokat
+- timer bug fixed:
+  s=tv.tv_usec+1000000*tv.tv_sec;
+  az 's' eddig int volt, mostantol float.
+  elkepzelheto hogy az s tulcsordult, es ez okozta hogy idonkent
+  megallt a kep, de a code futott tovabb. (hirtelen negativ
+  lett a time es a frame, igy az ast3d_setframe nem muxott, es
+  a play eventje sem teljesult tobbet) 
+  (2^31)/1000000 = 35.8 percenkent tulcsordult!!!!
+- render:
+  - felesleges dolgok kiolve (.OLD fileok, #if 0...#endif, vertex array)
+  - textureid es blend beallitas kiszedve 2_mater.c-bol 
+    ->current_mat-os optim visszaallitva
+  - obj->additivetexture helyett matflags&ast3d_mat_transadd flag.
+    ezt a 3ds material editorban az ADD/SUB kapcsoloval lehet allitani
+    scriptben 'additivetexture' atirva obj/int-rol material/flag-ra
+    scriptbol allithato meg: mat_twosided, transparency es self_illumination
+  - render.c-bol feleslegek kiolese, vertexlights code kulon fileba (vertlits.c)  
+  - SetupLightmode allitja Fog es Light beallitasokat (eddig a render.c is
+    allitgatta).  fog ki/visszakapcsolas atteve 7_speclr.c-be.
+  - atlatszo (transparent) objectek:
+    egy gyors ciklusban vegignezi a vertexeket -> z_min, z_max
+    ebbol kiszamolja z_scale es z_add erteket
+    igy gyakorlatilag a float Z tartomanyt lekepzi integer 0..65535-re
+     -> a leheto legnagyobb Zsort pontossag.
+    Problema meg hogy mi szerint rendezzunk.
+    probaltam: 3 vertex Z-jenek atlaga
+               legkisebb Z
+               legnagyobb Z
+               legkisebb Z es legnagyobb Z atlaga
+      -> meg mindig a 3 Z atlaga a legjobb, de ez se mindig.
+
+
 
 
 TERVEK a 4.0-ba:
+- voodoo3 fix
 - fdtunnel modositas: 2-nel tobb tunnel, fdtunnel_select most nem muxik
 - greets effekt befejezese
 - opengl state manager, multitexture?

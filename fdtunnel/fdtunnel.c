@@ -4,7 +4,8 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
+//#include <GL/glut.h>
+#include "../agl/agl.h"
 
 #include "fdtunnel.h"
 
@@ -90,8 +91,7 @@ void draw_fdtunnel(float frame,fx_fdtunnel_struct *params){
 
   // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDisable(GL_FOG);
-  glDisable(GL_DEPTH_TEST);
-  glDepthMask(GL_FALSE);  /* thanx to reptile/ai */
+  aglZbuffer(AGL_ZBUFFER_NONE);
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -102,8 +102,6 @@ void draw_fdtunnel(float frame,fx_fdtunnel_struct *params){
 
 //  glViewport(0, 0, window_w, window_h);
 
-  glEnable(GL_TEXTURE_2D);
-
   alpha=frame*params->speed[0];
   beta=frame*params->speed[1];
   zpos=frame*params->speed[2];
@@ -112,17 +110,13 @@ void draw_fdtunnel(float frame,fx_fdtunnel_struct *params){
 
 for(j=0;j<=1;j++) if(params->texture[j]>0){
   if(j==0){
-    if(ast3d_blend<1){
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    } else glDisable(GL_BLEND);  
+    aglBlend((ast3d_blend<1.0)?AGL_BLEND_ALPHA:AGL_BLEND_NONE);
     fd_bright=params->bright[j];
   } else {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
+    aglBlend(AGL_BLEND_ADD);
     fd_bright=params->bright[j]*ast3d_blend; //*BRIGHT/1556;
   }
-  glBindTexture(GL_TEXTURE_2D, params->texture[j]);
+  aglTexture(params->texture[j]);
   pvec.z=params->persp[j];
   radmod=params->rad_amp[j]*sin(frame*params->rad_speed[j]);
   radszog=params->rad_szog[j];
@@ -138,9 +132,6 @@ for(j=0;j<=1;j++) if(params->texture[j]>0){
   }
 }
 
-  glDepthMask(GL_TRUE);  /* thanx to reptile/ai */
-  glEnable(GL_DEPTH_TEST);
-//  glutSwapBuffers();
 }
 
 void fdtunnel_setup(fx_fdtunnel_struct *fd,int j,

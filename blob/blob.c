@@ -80,6 +80,7 @@ static long Vlimit=Vlimit1;
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "../agl/agl.h"
 
 extern int window_w,window_h;
 
@@ -805,14 +806,9 @@ if(!line_blob){
       } bytesort_end[0][j]=bytesort_start[0][j]=0;
     }
 
-    glDisable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);  /* thanx to reptile/ai */
-
-    glBindTexture(GL_TEXTURE_2D, blobmap);
-    glEnable(GL_TEXTURE_2D);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
+    aglZbuffer(AGL_ZBUFFER_NONE);
+    aglTexture(blobmap);
+    aglBlend(AGL_BLEND_ADD);
 
     if(params->blob_alpha>0){
       glEnable(GL_ALPHA_TEST);
@@ -830,14 +826,13 @@ if(!line_blob){
       } bytesort_end[1][j]=bytesort_start[1][j]=0;
     }
     glEnd();
-    glDepthMask(GL_TRUE);  /* thanx to reptile/ai */
-    glEnable(GL_DEPTH_TEST);
+    aglZbuffer(AGL_ZBUFFER_RW);
     glDisable(GL_ALPHA_TEST);
     
 } else {
     //----------- LINE-BLOB ----------
-      glDisable(GL_TEXTURE_2D);
-      glDisable(GL_BLEND);
+      aglTexture(0);
+      aglBlend(AGL_BLEND_NONE);
 
       glBegin(GL_LINES);
       for(i=0;i<poly_db;i++){

@@ -1,6 +1,6 @@
 // Astral Script System II.    (C) 1999. A'rpi/ASTRAL
 
-#define SCR_DEBUG
+//#define SCR_DEBUG
 #define FX_DEBUG
 
 #include <stdio.h>
@@ -18,6 +18,7 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "../agl/agl.h"
 
 #include "../3dslib/ast3d.h"
 #include "../timer/timer.h"
@@ -47,6 +48,7 @@
 #define scrTYPE_str 3
 #define scrTYPE_pic 5
 #define scrTYPE_scene 6
+#define scrTYPE_flag 7
 #define scrTYPE_const 10
 #define scrTYPE_newvar 11
 
@@ -55,6 +57,7 @@
 #define scrCLASS_scene 2
 #define scrCLASS_light 3
 #define scrCLASS_object 4
+#define scrCLASS_material 5
 
 #define FXTYPE_NONE 0
 #define FXTYPE_SCENE 1
@@ -79,13 +82,13 @@ typedef struct scrVarStruct_st {
    char *Name;
    int Type,Class;
    void* ptr;
+   int param;  // pl. scrTYPE_flag-hoz
    struct scrVarStruct_st *next;  // For HASH search!
 } scrVarStruct;
 
 scrVarStruct *scrHashTable[scrHASH];
 scrVarStruct scrVariables[scrMAXVARS];
 int scrVarDB=0;
-
 
 typedef struct {
   int type;        /* 0=linear  1=sinus */
@@ -160,7 +163,7 @@ static int scrHashFV(char *s){
   return (hash&(scrHASH-1));
 }
 
-scrVarStruct* scrAddNewVar(char *Name,int Type,int Class,void *ptr){
+scrVarStruct* scrAddNewVar(char *Name,int Type,int Class,int param,void *ptr){
 scrVarStruct *v;
 int hash=scrHashFV(Name);
   if(scrVarDB>=scrMAXVARS){ printf("scrAddNewVar: too many variables!\n");exit(1);}
@@ -171,6 +174,7 @@ int hash=scrHashFV(Name);
   v->Name=Name;
   v->Type=Type;
   v->Class=Class;
+  v->param=param;
   v->ptr=ptr;
   v->next=scrHashTable[hash]; scrHashTable[hash]=v;
   return v;
@@ -195,20 +199,21 @@ int i;
   c->pdb_min=pdb_min;
   c->pdb_max=pdb_max;
   for(i=0;i<=pdb_max;i++){ c->ptype[i]=0; c->defval[i]=0.0;}
-  return scrAddNewVar(Name,scrTYPE_command,Class,(void*)c);
+  return scrAddNewVar(Name,scrTYPE_command,Class,0,(void*)c);
 }
 
 void scrInit(){
 int i;
+  scrVarStruct *var=(scrVarStruct *)NULL;
   for(i=0;i<scrHASH;i++) scrHashTable[i]=(scrVarStruct *)NULL;
   { fx_struct *fx=(fx_struct *)NULL;
     c_OBJECT *obj=(c_OBJECT *)NULL;
     c_LIGHT *light=(c_LIGHT *)NULL;
     c_SCENE *scene=(c_SCENE *)NULL;
+    c_MATERIAL *mat=(c_MATERIAL *)NULL;
 #include "vars.h"
   }
   { scrCmdStruct *cmd=(scrCmdStruct *)NULL;
-    scrVarStruct *var=(scrVarStruct *)NULL;
 #include "cmds.h"
   }
 }

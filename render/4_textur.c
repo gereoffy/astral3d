@@ -1,47 +1,54 @@
-
-#if 0
-  if(matflags&ast3d_mat_wire){
-    int i;
-    glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0,1.0,1.0);
-      for(i=0;i<obj->numfaces;i++)
-        ast3d_DrawGLTriangle_wire(&obj->faces[i]);   /* %%%%%%%%%%% */
-    glEnable(GL_TEXTURE_2D);
-  }
-#endif
-
-/*---------------------- SETUP VERTEX ARRAYS -----------------------*/
-#ifdef VERTEX_ARRAY
-  glVertexPointer(3, GL_FLOAT, sizeof(c_VERTEX), &obj->vertices[0].pvert);
-  //glNormalPointer(   GL_FLOAT, sizeof(c_VERTEX), &obj->vertices[0].pnorm);
-  glColorPointer( 4, GL_UNSIGNED_BYTE, sizeof(c_VERTEX), &obj->vertices[0].rgb);
-  glTexCoordPointer(2,GL_FLOAT,sizeof(c_VERTEX), &obj->vertices[0].u);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  //glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glLockArraysEXT(0, obj->numverts);
-//  printf("%d vertices locked\n",obj->numverts);
-#endif
-
 /*---------------------- RENDER TRIANGLES -----------------------*/
-  if(matflags&ast3d_mat_transparent && obj->enable_zbuffer){
-    int i,j;
-    
+
+  if(mat->transparency || matflags&ast3d_mat_texturealpha || ast3d_blend<1.0)
+    aglBlend((matflags&ast3d_mat_transadd)?AGL_BLEND_ADD:AGL_BLEND_ALPHA);
+  else
+    aglBlend(AGL_BLEND_NONE);
+  aglTexture((matflags&ast3d_mat_texture)?(mat->texture_id):0);
+
+  if( (matflags&(ast3d_mat_transparent|ast3d_mat_transadd)) && (obj->enable_zbuffer)){
+
     /*  TRANSPARENT OBJECT -> Z-Sorting with 16-bit ByteSort method */
+
+    int i,j;
+    float z_min,z_max;
+    float z_add,z_scale;
+
+    z_min=z_max=obj->vertices[0].pvert.z;
+    for(i=1;i<obj->numverts;i++){
+      float z=obj->vertices[i].pvert.z;
+      if(z_min>z) z_min=z;
+      if(z_max<z) z_max=z;
+    }
+    z_scale=65500.0/(3*(z_max-z_min));
+    z_add=-3*z_min;
+//    printf("Zmin=%12f  Zmax=%12f\n",z_min,z_max);
+//    printf("Zscale=%12f  Zadd=%12f\n",z_scale,z_add);
     
     for(i=0;i<obj->numfaces;i++){
-      int z=obj->faces[i].pa->pvert.z;
-         z+=obj->faces[i].pb->pvert.z;
-         z+=obj->faces[i].pc->pvert.z;
-      if(z<0){
+#if 1
+      float zz = obj->faces[i].pa->pvert.z
+               + obj->faces[i].pb->pvert.z
+               + obj->faces[i].pc->pvert.z;
+#else
+      float zz;
+      float z1=obj->faces[i].pa->pvert.z;
+      float z2=z1;
+      if(z1<obj->faces[i].pb->pvert.z) z1=obj->faces[i].pb->pvert.z;
+      if(z1<obj->faces[i].pc->pvert.z) z1=obj->faces[i].pc->pvert.z;
+      if(z2>obj->faces[i].pb->pvert.z) z2=obj->faces[i].pb->pvert.z;
+      if(z2>obj->faces[i].pc->pvert.z) z2=obj->faces[i].pc->pvert.z;
+      zz=1.5*(z1+z2);
+#endif
+      { int z=(int)((z_add+zz)*z_scale);     // map Z value to [0..65530]
         int p;
-        z=65000+10*z; bytesortdata[i+1]=z; z&=255;
+        bytesortdata[i+1]=z; z&=255;
         /* beszuras lancolt lista vegere */
         if((p=bytesort_end[0][z])) bytesort_next[0][p]=bytesort_end[0][z]=i+1;
                               else bytesort_start[0][z]=bytesort_end[0][z]=i+1;
       }
     }
+//        printf("\n");
 
     for(j=0;j<256;j++){
       if((i=bytesort_start[0][j])) while(1){
@@ -59,16 +66,7 @@
     glBegin(GL_TRIANGLES);
     for(j=0;j<256;j++){
       if((i=bytesort_start[1][j])) while(1){
-#ifdef VERTEX_ARRAY
-        glArrayElement(obj->faces[i-1].a);
-        glArrayElement(obj->faces[i-1].b);
-        glArrayElement(obj->faces[i-1].c);
-#else
-//        if(matflags&ast3d_mat_wire)
-//          ast3d_DrawGLTriangle_wire(&obj->faces[i-1]);   /* %%%%%%%%%%% */
-//        else
-          ast3d_DrawGLTriangle_texture(&obj->faces[i-1]);   /* %%%%%%%%%%% */
-#endif
+        ast3d_DrawGLTriangle_texture(&obj->faces[i-1]);   /* %%%%%%%%%%% */
         if(i==bytesort_end[1][j]) break;
         i=bytesort_next[1][i];
       } bytesort_end[1][j]=bytesort_start[1][j]=0;
@@ -77,29 +75,11 @@
 
   } else {    /*---------------------------------------------*/
 
-    /*  OPAQUE OBJECT -> Using Backface-Culling if possible */
-    if(!(matflags&ast3d_mat_twosided) && obj->flags&ast3d_obj_allvisible){
-      glEnable(GL_CULL_FACE);
-      glCullFace(GL_BACK);
-    }
-
-#ifdef VERTEX_ARRAY
-    /* Draw faces: */
-{
-//    int maxel; glGetIntegerv( GL_MAX_ELEMENTS_VERTICES, &maxel);
-//    printf("MAXEL = %d\n",maxel);
-    glBegin(GL_TRIANGLES);
-    if(!(matflags&ast3d_mat_texture)) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    for (i=0;i<obj->numfaces;i++)
-      if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible){
-        glArrayElement(obj->faces[i].a);
-        glArrayElement(obj->faces[i].b);
-        glArrayElement(obj->faces[i].c);
+      /*  OPAQUE OBJECT -> Using Backface-Culling if possible */
+      if(!(matflags&ast3d_mat_twosided) && obj->flags&ast3d_obj_allvisible){
+        glEnable(GL_CULL_FACE); glCullFace(GL_BACK);
       }
-    glEnd();
-}
-#else
-#if 1
+
       /* Draw faces: */
       glBegin(GL_TRIANGLES);
       if(matflags&ast3d_mat_texture){
@@ -112,27 +92,7 @@
             ast3d_DrawGLTriangle_gouraud(&obj->faces[i]);   /* %%%%%%%%%%% */
       }
       glEnd();
-#endif
-#endif
 
   }
-
-#if 0
-{ int total=0;
-      for (i=0;i<obj->numfaces;i++)
-        if(obj->faces[i].visible || obj->flags&ast3d_obj_allvisible)
-          ++total;
-      printf("%d of %d faces rendered.\n",total,obj->numfaces);
-}
-#endif
-
-
-#ifdef VERTEX_ARRAY
-  glUnlockArraysEXT();
-  glDisableClientState(GL_VERTEX_ARRAY);
-  //glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-#endif
 
 

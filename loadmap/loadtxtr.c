@@ -10,6 +10,8 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+//#include "../agl/agl.h"
+
 #include "../loadmap/load_map.h"
 #include "../loadmap/loadtxtr.h"
 
@@ -176,7 +178,7 @@ int i;
 //  printf("Texture is ready to upload!\n");
 	glGenTextures(1, &t->id);
   printf("Putting %s texture %dx%d, id=%d, neg=%d\n",(t->pixelsize==4)?"RGBA":"RGB",t->xsize,t->ysize,t->id,negflags);
-	glBindTexture(GL_TEXTURE_2D, t->id);
+	glBindTexture(GL_TEXTURE_2D, t->id); //agl_textureid=t->id;
   if(negflags&256){
   	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP);
 	  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP);

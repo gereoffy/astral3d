@@ -11,25 +11,25 @@
 #define TRI_REFL_TEX(p) glTexCoord2fv((float*)&p->pnorm)
 #define TRI_SPEC_TEX(p) glTexCoord2fv((float*)&p->specular)
 
+#if 0
 INLINE void ast3d_DrawGLTriangle_wire(c_FACE *f){
   c_VERTEX *p;
-  glDisable(GL_TEXTURE_2D);
-  glDisable(GL_BLEND);
+//  aglTexture(0); aglBlend(AGL_BLEND_NONE);
   glBegin(GL_LINE_LOOP);
     glColor3f(1,1,1);
         p=f->pa; TRI_VERTEX(p);
         p=f->pb; TRI_VERTEX(p);
         p=f->pc; TRI_VERTEX(p);
   glEnd();
-  glEnable(GL_BLEND);
-  glEnable(GL_TEXTURE_2D);
+//  glEnable(GL_BLEND);
+//  glEnable(GL_TEXTURE_2D);
   glBegin(GL_TRIANGLES);
         p=f->pa; TRI_TEX1(p); TRI_COLOR(p); TRI_VERTEX(p);
         p=f->pb; TRI_TEX2(p); TRI_COLOR(p); TRI_VERTEX(p);
         p=f->pc; TRI_TEX3(p); TRI_COLOR(p); TRI_VERTEX(p);
   glEnd();
 }
-
+#endif
 
 INLINE void ast3d_DrawGLTriangle_gouraud(c_FACE *f){
   c_VERTEX *p;

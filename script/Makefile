@@ -45,8 +45,8 @@ script2.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
 script2.o: /usr/include/bits/mathcalls.h
 script2.o: /usr/lib/gcc-lib/i386-slackware-linux/egcs-2.91.66/include/float.h
 script2.o: /usr/include/sys/time.h /usr/include/bits/time.h
-script2.o: /usr/include/GL/gl.h /usr/include/GL/glu.h ../3dslib/ast3d.h
-script2.o: ../timer/timer.h ../mp3lib/mp3.h ../afs/afs.h
+script2.o: /usr/include/GL/gl.h /usr/include/GL/glu.h ../agl/agl.h
+script2.o: ../3dslib/ast3d.h ../timer/timer.h ../mp3lib/mp3.h ../afs/afs.h
 script2.o: ../loadmap/loadtxtr.h ../blob/blob.h ../fdtunnel/fdtunnel.h
 script2.o: ../spline/spline.h ../smoke/smoke.h ../sinpart/sinpart.h
 script2.o: ../greets/greets.h ../render/render.h vars.h cmds.h scr_event.c

@@ -86,6 +86,7 @@ int i;
     switch (cmdp->ptype[i]){
     case 0: printf("<string>"); break;
     case scrTYPE_int: printf("int_var"); break;
+    case scrTYPE_flag: printf("flag_var"); break;
     case scrTYPE_float: printf("float_var"); break;
     case scrTYPE_pic: printf("texture_var"); break;
     case scrTYPE_scene: printf("scene_var"); break;
@@ -140,6 +141,10 @@ void *ptr=NULL;
       case scrCLASS_object:
          ptr=(void*)current_object;
          if(!ptr) scrSyntax("using object-dependent variable, but no object selected");
+         break;
+      case scrCLASS_material:
+         ptr=(void*)current_material;
+         if(!ptr) scrSyntax("using material-dependent variable, but no material selected");
          break;
       default:
          scrSyntax("Unknown variable CLASS");
@@ -217,6 +222,13 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         *((int *)ptr)=str2int(p[1]);
         return;
       }
+      if(cmd->Type==scrTYPE_flag){
+        if(str2int(p[1]))
+          *((int *)ptr) |= cmd->param;
+        else
+          *((int *)ptr) &= ~(cmd->param);
+        return;
+      }
       if(cmd->Type==scrTYPE_float){
         *((float *)ptr)=str2float(p[1]);
         return;
@@ -239,6 +251,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
       for(i=1;i<=cmdp->pdb_max;i++){
         switch (cmdp->ptype[i]){
         case scrTYPE_int:
+        case scrTYPE_flag:
         case scrTYPE_float:
         case scrTYPE_str:
         case scrTYPE_scene:
@@ -300,7 +313,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
 // 2:  load_scene scene_var "filename"
       if(cmdp->code==2){
         if(ast3d_alloc_scene(&scene)!=ast3d_err_ok) scrFatal("Cannot allocate scene");
-        scrAddNewVar(strdup(p[1]),scrTYPE_scene,scrCLASS_global,(void*)scene);
+        scrAddNewVar(strdup(p[1]),scrTYPE_scene,scrCLASS_global,0,(void*)scene);
         printf("Loading scene '%s' to %s\n",p[2],p[1]);
         i=ast3d_load_world(p[2],scene); if(i!=ast3d_err_ok)scrFatal(ast3d_geterror(i));
         i=ast3d_load_motion(p[2],scene);if(i!=ast3d_err_ok)scrFatal(ast3d_geterror(i));
@@ -499,7 +512,7 @@ scrVarStruct *cmd=(scrVarStruct *)NULL;
         else
           t=load_texture( fix_mapname(p[2]), NULL, 1.0, NULL,NULL,0, NULL,NULL,0, 0);
         if(!t || !(t->flags&15)) scrSyntax("loadpic: File not found!");
-        scrAddNewVar(strdup(p[1]),scrTYPE_pic,scrCLASS_global,(void*)t);
+        scrAddNewVar(strdup(p[1]),scrTYPE_pic,scrCLASS_global,0,(void*)t);
         return;
       }
 //===============================================================================

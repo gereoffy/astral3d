@@ -496,15 +496,15 @@ void qt_make_objmat(c_OBJECT *obj){
     yy = a->y * y2;   yz = a->y * z2;   zz = a->z * z2;
   }
     obj->matrix[X][X] = obj->scale.x*(1.0 - (yy + zz));
-    obj->matrix[X][Y] = xy - wz;
-    obj->matrix[X][Z] = xz + wy;
+    obj->matrix[X][Y] = obj->scale.y*(xy - wz);
+    obj->matrix[X][Z] = obj->scale.z*(xz + wy);
     obj->matrix[X][W] = obj->translate.x;
-    obj->matrix[Y][X] = xy + wz;
+    obj->matrix[Y][X] = obj->scale.x*(xy + wz);
     obj->matrix[Y][Y] = obj->scale.y*(1.0 - (xx + zz));
-    obj->matrix[Y][Z] = yz - wx;
+    obj->matrix[Y][Z] = obj->scale.z*(yz - wx);
     obj->matrix[Y][W] = obj->translate.y;
-    obj->matrix[Z][X] = xz - wy;
-    obj->matrix[Z][Y] = yz + wx;
+    obj->matrix[Z][X] = obj->scale.x*(xz - wy);
+    obj->matrix[Z][Y] = obj->scale.y*(yz + wx);
     obj->matrix[Z][Z] = obj->scale.z*(1.0 - (xx + yy));
     obj->matrix[Z][W] = obj->translate.z;
 }

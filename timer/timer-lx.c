@@ -8,7 +8,7 @@
 float GetTimer(){
   struct timeval tv;
   struct timezone tz;
-  int s;
+  float s;
   gettimeofday(&tv,&tz);
   s=tv.tv_usec+1000000*tv.tv_sec;
   return (s*0.000001);

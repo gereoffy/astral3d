@@ -135,7 +135,7 @@ enum ast3d_mat_flags_ { /* astral 3d material flags */
   ast3d_mat_twosided = 1,                 /* two sided           */
   ast3d_mat_soften   = 2,                 /* soften              */
   ast3d_mat_wire     = 4,                 /* wireframe rendering */
-  ast3d_mat_transadd = 8,                 /* transparency add    */
+  ast3d_mat_transadd = 8,                 /* additive texture    */
   ast3d_mat_texture  = 16,                /* obj has texture     */
   ast3d_mat_texturealpha = 32,            /* texture has alpha   */
   ast3d_mat_reflect  = 64,                /* obj has reflect.map */
@@ -492,7 +492,7 @@ typedef struct _c_OBJECT { /* object struct */
   c_MAPPING  mapping;                    /* texture mapping info       */
   float      bumpdepth;
   c_PARTICLE particle;
-  int        additivetexture;
+//  int        additivetexture;
   int        enable_zbuffer;         /* 1=use zbuffer */
   float      vertexlights;           /* 0=disable   other=vertex light scale */
   float      explode_speed;

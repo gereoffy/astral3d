@@ -4,7 +4,8 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
+#include "../agl/agl.h"
+//#include <GL/glut.h>
 
 #include "smoke.h"
 
@@ -29,10 +30,6 @@ void draw_smoke(float frame,fx_smoke_struct *params){
   szog=frame*params->rot_speed;
   szog-=alpha_i*2.0F*M_PI/5.0F;
 
-  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_FOG);
-  glDisable(GL_DEPTH_TEST);glDepthMask(GL_FALSE);
-
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0.0f, 400, 0.0f, 400, -10000.0f, 10000.0f);
@@ -40,15 +37,10 @@ void draw_smoke(float frame,fx_smoke_struct *params){
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, params->texture);
-  
-  glEnable(GL_BLEND);
-if(params->additive)
-  glBlendFunc(GL_ONE, GL_ONE);
-else
-//  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+  glDisable(GL_FOG);
+  aglZbuffer(AGL_ZBUFFER_NONE);
+  aglTexture(params->texture);
+  aglBlend((params->additive)?AGL_BLEND_ADD:AGL_BLEND_COLOR);
 
 //  printf("-------------- alpha=%f   szog=%f\n",alpha,szog);
   for(j=0;j<5;j++){
@@ -84,7 +76,5 @@ else
   }
 
 
-  glDisable(GL_BLEND);
-  glDepthMask(GL_TRUE); glEnable(GL_DEPTH_TEST);
 }
 

@@ -147,7 +147,6 @@ void LoadMaterials(c_SCENE *scene){
       }
     }
 
-//   	glEnable(GL_TEXTURE_2D);
 }
 
 

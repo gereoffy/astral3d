@@ -9,6 +9,7 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+//#include "../agl/agl.h"
 
 #include "../3dslib/ast3d.h"
 #include "../render/render.h"
@@ -57,7 +58,7 @@ int load_blob_map(char *mapname){
           }
 #endif
         glGenTextures(1, &map_id);
-        glBindTexture(GL_TEXTURE_2D, map_id);
+        glBindTexture(GL_TEXTURE_2D, map_id); //agl_textureid=map_id;
         glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);

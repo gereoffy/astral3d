@@ -70,11 +70,11 @@ static void SetupLightMode(void){
         mat_mulvec(scene->cam->matrix,&lit->pos,&lit->ppos);  /* Transformation */
 
 #ifdef NO_LIGHTING
-	if(lit->attenuation[0]==1.0 &&
-	   lit->attenuation[1]==0.0 &&
-  	   lit->attenuation[2]==0.0 &&
-	   (!(lit->flags&ast3d_light_spot))
-	) lit->flags&=~ast3d_light_attenuation; else
+        if(lit->attenuation[0]==1.0 &&
+           lit->attenuation[1]==0.0 &&
+           lit->attenuation[2]==0.0 &&
+           (!(lit->flags&ast3d_light_spot))
+        ) lit->flags&=~ast3d_light_attenuation; else
           lit->flags|=ast3d_light_attenuation;
 #else
         glLightf (GL_LIGHT0+lightno, GL_CONSTANT_ATTENUATION,lit->attenuation[0]);
@@ -132,21 +132,13 @@ static void SetupLightMode(void){
         lightno++;
       }
    }
-   
+
    /* Setup FOG */
    if(scene->fog.type&ast3d_fog_fog){
      glEnable(GL_FOG);
      glFogi(GL_FOG_MODE, GL_LINEAR);
-//     glFogf(GL_FOG_START,scene->fog.znear*scene->fog.fognear/50);
-//     glFogf(GL_FOG_END,scene->fog.zfar*scene->fog.fogfar/50);
-
-//  printf("fog regi: %f %f\n",scene->fog.znear*scene->fog.fognear/50,
-//                             scene->fog.zfar*scene->fog.fogfar/50);
-
      glFogf(GL_FOG_START,scene->fog.fog_znear);
      glFogf(GL_FOG_END,scene->fog.fog_zfar);
-//  printf("fog znear/far:  %f  %f\n",scene->fog.fog_znear,scene->fog.fog_zfar);
-
      glFogfv(GL_FOG_COLOR,scene->fog.color.rgb);
      glClearColor(ast3d_blend*scene->fog.color.rgb[0],
                   ast3d_blend*scene->fog.color.rgb[1],
@@ -177,19 +169,12 @@ static void PutLightCoronas(void){
     int      i;
     if(!lightmap) return;
 
-    glDisable(GL_FOG);
-    glDisable(GL_LIGHTING);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, lightmap);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
+    aglTexture(lightmap);
+    aglBlend(AGL_BLEND_ADD);
     for(i=0; i<lightno; i++) if(lights[i]->ppos.z<0){
         factor=((scene->fog.zfar+lights[i]->ppos.z)/scene->fog.zfar)*lights[i]->corona_scale*10;
         glColor3fv(lights[i]->color.rgb);
-        if(lights[i]->use_zbuffer)
-          glEnable(GL_DEPTH_TEST);
-        else
-          glDisable(GL_DEPTH_TEST);
+        aglZbuffer((lights[i]->use_zbuffer)?AGL_ZBUFFER_RW:AGL_ZBUFFER_NONE);
     	  glBegin(GL_QUADS);
           glTexCoord2f(0.0f,0.0f);
           glVertex3f(lights[i]->ppos.x-factor,lights[i]->ppos.y-factor,lights[i]->ppos.z);
@@ -201,6 +186,4 @@ static void PutLightCoronas(void){
           glVertex3f(lights[i]->ppos.x-factor,lights[i]->ppos.y+factor,lights[i]->ppos.z);
         glEnd();
     }
-    glDisable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
 }

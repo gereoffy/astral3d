@@ -4,7 +4,8 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
+#include "../agl/agl.h"
+//#include <GL/glut.h>
 
 #define Local static
 
@@ -162,17 +163,15 @@ int i,j;
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-//  gluLookAt(0,500,500,    0,0,0,  0,1,0);
-//  glOrtho(0.0f, 640, 0.0f, 480, -10000.0f, 10000.0f);
   gluPerspective(40,1.0,10,1000);
   
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE,GL_ONE);
-
   glTranslatef(0,0,-600);
+
+  aglBlend(AGL_BLEND_ADD);
+  aglZbuffer(AGL_ZBUFFER_NONE);
+  aglTexture(0);
 
   megjelen(face_blend,wire_blend);   /* Interpolalt felulet rajzolasa */
 
@@ -202,58 +201,3 @@ void splinesurface_init(float rnd_scale,float szog_scale){
 
 }
 
-//========================= TEST CODE ========================
-#if 0
-
-static float frame=0.0;
-
-GLvoid draw_scene(){
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  splinesurface_redraw(frame,100.0,0.5);
-  frame+=1.0; //frame+=1.0F/25.0F;
-  glFinish();
-  glutSwapBuffers();
-}
-
-static void idle(void){ glutPostRedisplay();}
-
-GLvoid resize_window(int w, int h){ glViewport(0,0,w,h);}
-
-
-
-int main(argc, argv)
-int argc;
-char *argv[];
-{
-
-    splinesurface_init(0.01,5.0);
-
-    glutInit(&argc, argv);
-    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-//    glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
-    glutInitWindowSize (640, 480);
-//    glutInitWindowSize (1024, 768);
-//    glutInitWindowSize (1280, 1024);
-    glutInitWindowPosition (0, 0);
-    glutCreateWindow (argv[0]);
-//    glutFullScreen();
-
-    glClearColor( 0.0, 0.0, 0.0, 1.0 );
-    glClearDepth( 1.0 );
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-//    glEnable(GL_DEPTH_TEST);
-
-    resize_window(640,480);
-    glutDisplayFunc(draw_scene);
-    glutReshapeFunc(resize_window);
-    glutIdleFunc(idle);
-    glutMainLoop();
-
-
-  return 0;
-}
-
-#endif
-
-/* End. */

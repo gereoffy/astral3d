@@ -102,6 +102,24 @@ LOCAL void mat_mul (c_MATRIX a, c_MATRIX b, c_MATRIX out)
   mat_copy (temp, out);
 }
 
+/*
+  temp[X][X]=a[X][X]*b[X][X];
+  temp[X][Y]=a[X][Y]*b[Y][Y];
+  temp[X][Z]=a[X][Z]*b[Z][Z];
+  temp[X][W]=a[X][W];
+  
+  temp[Y][X]=a[Y][X]*b[X][X];
+  temp[Y][Y]=a[Y][Y]*b[Y][Y];
+  temp[Y][Z]=a[Y][Z]*b[Z][Z];
+  temp[Y][W]=a[Y][W];
+  
+  temp[Z][X]=a[Z][X]*b[X][X];
+  temp[Z][Y]=a[Z][Y]*b[Y][Y];
+  temp[Z][Z]=a[Z][Z]*b[Z][Z];
+  temp[Z][W]=a[Z][W];
+*/
+
+
 LOCAL void mat_transpose (c_MATRIX a, c_MATRIX out)
 {
 /*

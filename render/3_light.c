@@ -1,22 +1,9 @@
-
-// #define DUV_SCALE (0.005F);
-#define DUV_SCALE (obj->bumpdepth);
-
 /*----------------- CALCULATE LIGHTING ---------------------*/
-
-// specular=0;
-// lightno=1;
 
 #ifdef NO_LIGHTING
 
-    if(specular){
-      specular_limit=pow(0.004,(1.0/specular_coef));
-      specular_limit4=specular_limit/4.0;
-    }
-    if(matflags&ast3d_mat_specularmap) specular=1;
-    
-    if(matflags&ast3d_mat_bump){
-      c_LIGHT *l=lights[0];
+  if(matflags&ast3d_mat_bump){
+    c_LIGHT *l=lights[0];
 
 //------------------------- BUMP -----------------------
     for (i = 0; i < obj->numverts; i++){
@@ -42,19 +29,19 @@
           delta.x=x*u_normal.x+y*u_normal.y+z*u_normal.z;
           delta.y=x*v_normal.x+y*v_normal.y+z*v_normal.z;
           delta.z=x*normal->x+y*normal->y+z*normal->z;
+          
           if(delta.z<0.0){
             float t = (1.0f+delta.z) * 4.0f - 3.0f;
-            if (t < 0)
-            t = 0;
-            delta.x *= t;
-            delta.y *= t;  
+            if(t<0) t=0;
+            delta.x*= t;
+            delta.y*= t;
             delta.z = 0;
           }
           delta.z += 0.2f;  // ambient
           if(delta.z > 1.0f) delta.z = 1.0f; else
           if(delta.z < 0.0f) delta.z = 0.0f;
-          obj->vertices[i].bump_du=-delta.x*DUV_SCALE;
-          obj->vertices[i].bump_dv=delta.y*DUV_SCALE;
+          obj->vertices[i].bump_du=-delta.x*(obj->bumpdepth);
+          obj->vertices[i].bump_dv=delta.y*(obj->bumpdepth);
           obj->vertices[i].rgb[0]=clip_255(delta.z*(l->MatDiff[0]));
           obj->vertices[i].rgb[1]=clip_255(delta.z*(l->MatDiff[1]));
           obj->vertices[i].rgb[2]=clip_255(delta.z*(l->MatDiff[2]));
@@ -67,7 +54,14 @@
     } } }
 //------------------------- END OF BUMP -----------------------
 
-    } else
+  } else {
+
+    if(specular){
+      specular_limit=pow(0.004,(1.0/specular_coef));
+      specular_limit4=specular_limit/4.0;
+    }
+    if(matflags&ast3d_mat_specularmap) specular=1;
+  
     for (i = 0; i < obj->numverts; i++){
       if(obj->vertices[i].visible || obj->flags&ast3d_obj_allvisible){
         obj->vertices[i].visible=0;
@@ -212,5 +206,5 @@ if(l->flags&ast3d_light_attenuation){
         }
       }
     }
+  }
 #endif
-

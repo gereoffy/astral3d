@@ -10,7 +10,7 @@ float fx_debug_lasttime=0.0f;
 void draw_scene(){
 float rel_time=GetRelativeTime();
 int f;
-int zbuf_flag=0;
+int zbuf_flag=0;       // ha =1 akkor torolni kell a zbuffert az effekt elott!!
 int active_faders=0;
   adk_time+=rel_time;
   fx_debug_time+=rel_time;
@@ -59,11 +59,15 @@ int active_faders=0;
   }
 #endif
 
+  aglInit();
 
-  if(adk_clear_buffer_flag)
+  if(adk_clear_buffer_flag){
+    aglZbuffer(AGL_ZBUFFER_RW);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  else 
-    glClear( GL_DEPTH_BUFFER_BIT );
+  } else 
+    zbuf_flag=1;
+
+#define CLEAR_ZB if(zbuf_flag){aglZbuffer(AGL_ZBUFFER_RW);glClear(GL_DEPTH_BUFFER_BIT);} else zbuf_flag=1;
 
   /* Update and render effects */
   for(f=0;f<FX_DB;f++){
@@ -73,8 +77,8 @@ int active_faders=0;
     fx->frame+=rel_time*fx->fps;
     
     if(fx->type==FXTYPE_SCENE && fx->scene){
-      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT );
-      zbuf_flag=1;
+      CLEAR_ZB
+//      aglZbuffer(AGL_ZBUFFER_RW);
 //      printf("Playing SCENE for fx #%d\n",f);
       scene=fx->scene; ast3d_setactive_scene(scene);
       ast3d_setactive_camera(scene->cam);
@@ -94,23 +98,21 @@ int active_faders=0;
 
     if(fx->type==FXTYPE_BLOB){
 //      printf("Playing BLOB for fx #%d\n",f);
-      if(!fx->blob.line_blob)
-        if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+      if(fx->blob.line_blob){
+        CLEAR_ZB
+      }
       DrawBlob(fx->frame,&fx->blob);
     }
 
     if(fx->type==FXTYPE_SPLINESURFACE){
 //      printf("Playing SPLINESURFACE for fx #%d\n",f);
       // if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
-      glDisable(GL_TEXTURE_2D);
-      glDisable(GL_DEPTH_TEST); glDepthMask(GL_FALSE);
-        splinesurface_redraw(fx->frame,fx->spline_size,ast3d_blend*fx->face_blend,ast3d_blend*fx->wire_blend,(int)fx->spline_n);
-      glEnable(GL_DEPTH_TEST); glDepthMask(GL_TRUE);
+      splinesurface_redraw(fx->frame,fx->spline_size,ast3d_blend*fx->face_blend,ast3d_blend*fx->wire_blend,(int)fx->spline_n);
     }
 
     if(fx->type==FXTYPE_FDTUNNEL){
 //      printf("Playing FDTUNNEL for fx #%d\n",f);
-      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
+//      if(zbuf_flag) glClear( GL_DEPTH_BUFFER_BIT ); zbuf_flag=1;
       draw_fdtunnel(fx->frame,&fx->fdtunnel);
     }
 
@@ -133,13 +135,8 @@ int active_faders=0;
     }
 
     if(fx->type==FXTYPE_PICTURE){
-      if(fx->pic.zbuffer){
-        glDepthMask(GL_TRUE);
-        glEnable(GL_DEPTH_TEST);
-      } else {
-        glDisable(GL_DEPTH_TEST);
-        glDepthMask(GL_FALSE);  /* thanx to reptile/ai */
-      }
+    
+      // OpenGL STATE CHANGES:
       if(fx->pic.alphamode){
         glEnable(GL_ALPHA_TEST);
         if(fx->pic.alphamode<0)
@@ -149,30 +146,26 @@ int active_faders=0;
       }
       glDisable(GL_LIGHTING);
       if(fx->pic.alphamode){
-        glDisable(GL_BLEND);
+        aglBlend(AGL_BLEND_NONE);
       } else {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
-        if(fx->pic.type & 1)
-          glBlendFunc(GL_ONE, GL_ONE);
+        if(fx->pic.type&1)
+          aglBlend(AGL_BLEND_ADD);
         else
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          aglBlend(((fx->pic.type&2) && (fx->blend==1.0))?AGL_BLEND_NONE:AGL_BLEND_ALPHA);
       }
+      aglTexture((fx->pic.type&2)?AGL_TEXTURE_NONE:(fx->pic.id));
+//      aglZbuffer(AGL_ZBUFFER_NONE);
+      aglZbuffer((fx->pic.zbuffer)?AGL_ZBUFFER_RW:AGL_ZBUFFER_NONE);
+//      if(fx->pic.zbuffer) zbuf_flag=1;
 
-//      glViewport (0, 0, 640, 480);
+      // PROJECTION:
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
       glOrtho(0.0, 640.0, 0.0, 480.0, -1000.0, 1000.0);
-//      gluOrtho2D(0.0, 0.0, 640.0, 480.0);
+
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
 
-      if(fx->pic.type & 2){
-        glDisable(GL_TEXTURE_2D);
-      } else {
-        glBindTexture(GL_TEXTURE_2D, fx->pic.id);
-        glEnable(GL_TEXTURE_2D);
-      }
       if(fx->pic.type&1 || fx->pic.alphamode)
         glColor3f(fx->pic.rgb[0]*fx->blend,
                   fx->pic.rgb[1]*fx->blend,
@@ -192,8 +185,6 @@ int active_faders=0;
       glEnd();
 
       glDisable(GL_ALPHA_TEST);
-      glDepthMask(GL_TRUE);
-      glEnable(GL_DEPTH_TEST);
     }
   }
 }

@@ -13,6 +13,8 @@
 #endif
 
 #include <GL/gl.h>
+#include "../agl/agl.h"
+
 #include "../3dslib/ast3d.h"
 #include "render.h"
 //#include "particle.h"
@@ -54,13 +56,10 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
   int	j;
   c_PART *p=obj->particle.p;
 
-  glDisable(GL_DEPTH_TEST);
 //  glShadeModel(GL_FLAT);
-
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, lightmap);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE,GL_ONE);
+  aglZbuffer(AGL_ZBUFFER_NONE);
+  aglTexture(lightmap);
+  aglBlend(AGL_BLEND_ADD);
 
     glBegin(GL_QUADS);
     for(j=0;j<obj->particle.np;j++){
@@ -110,9 +109,6 @@ void particle_redraw(c_OBJECT *obj,c_MATRIX objmat, float dt){
       
     }
     glEnd();
-
-  glDisable(GL_BLEND);
-  glEnable(GL_DEPTH_TEST);
 
 }
 

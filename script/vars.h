@@ -2,7 +2,7 @@
 
 //=============================
 // globals:
-#define VAR_GLOB(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_global,(void*)(&realname))
+#define VAR_GLOB(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_global,0,(void*)(&realname))
 
 VAR_GLOB(scrTYPE_float,"time",adk_time);
 VAR_GLOB(scrTYPE_int  ,"clear_buffer",adk_clear_buffer_flag);
@@ -11,7 +11,7 @@ VAR_GLOB(scrTYPE_int  ,"clear_buffer",adk_clear_buffer_flag);
 
 //=============================
 // global FX vars:
-#define VAR_FX(vartype,varname,realname,defval) scrAddNewVar(varname,vartype,scrCLASS_fx,(void*)(&fx->realname));fxdefault.realname=defval
+#define VAR_FX(vartype,varname,realname,defval) scrAddNewVar(varname,vartype,scrCLASS_fx,0,(void*)(&fx->realname));fxdefault.realname=defval
 
 VAR_FX(scrTYPE_float,"frame",frame,0.0);
 VAR_FX(scrTYPE_float,"fps",fps,25.0);
@@ -78,7 +78,7 @@ VAR_FX(scrTYPE_float,"sinpart_sinspeed",sinpart.sinspeed,0.01);
 
 //=============================
 // light-dependent variables:
-#define VAR_LIGHT(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_light,(void*)(&light->realname))
+#define VAR_LIGHT(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_light,0,(void*)(&light->realname))
 
 VAR_LIGHT(scrTYPE_float,"corona_scale",corona_scale);
 VAR_LIGHT(scrTYPE_float,"attenuation0",attenuation[0]);
@@ -91,10 +91,10 @@ VAR_LIGHT(scrTYPE_float,"light_enabled",enabled);
 
 //=============================
 // object-dependent:
-#define VAR_OBJ(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_object,(void*)(&obj->realname))
+#define VAR_OBJ(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_object,0,(void*)(&obj->realname))
 
 VAR_OBJ(scrTYPE_float,"bumpdepth",bumpdepth);
-VAR_OBJ(scrTYPE_int  ,"additivetexture",additivetexture);
+//VAR_OBJ(scrTYPE_int  ,"additivetexture",additivetexture);
 VAR_OBJ(scrTYPE_int  ,"zbuffer",enable_zbuffer);
 
 // Vertex lights
@@ -119,8 +119,19 @@ VAR_OBJ(scrTYPE_int  ,"part_sizelimit",particle.sizelimit);
 #undef VAR_OBJ
 
 //=============================
+// material-dependent:
+#define VAR_MAT(vartype,varname,realname,flag) scrAddNewVar(varname,vartype,scrCLASS_material,flag,(void*)(&mat->realname))
+
+VAR_MAT(scrTYPE_flag ,"mat_twosided",flags,ast3d_mat_twosided);
+VAR_MAT(scrTYPE_flag ,"additivetexture",flags,ast3d_mat_transadd);
+VAR_MAT(scrTYPE_float,"transparency",transparency,0);
+VAR_MAT(scrTYPE_float,"self_illumination",self_illum,0);
+
+#undef VAR_MAT
+
+//=============================
 // scene-dependent:
-#define VAR_SCENE(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_scene,(void*)(&scene->realname))
+#define VAR_SCENE(vartype,varname,realname) scrAddNewVar(varname,vartype,scrCLASS_scene,0,(void*)(&scene->realname))
 
 VAR_SCENE(scrTYPE_int  ,"directional_lighting",directional_lighting);
 VAR_SCENE(scrTYPE_float,"znear",znear);
