@@ -55,6 +55,13 @@ typedef struct {
   int x1,x2,x3,x4,x5,x6;   // derivaltak?
 } TCB_Pos_Key;
 
+typedef struct {
+  int frame,flags;
+  Point3 value;
+  float x1,x2,x3,x4,x5,x6;   // derivaltak?
+  int y1,y2,y3;              // 0
+} Bezier_Pos_Key;
+
 //====================== Rot Key ====================
 
 typedef struct {

@@ -2,24 +2,42 @@
 //               ParamBlock Class reader
 //========================================================================//
 
-int paramno=0;
+/*
+// Chunk IDs for loading/saving
+#define PB_COUNT_CHUNK			0x0001
+#define PB_PARAM_CHUNK			0x0002
+#define PB_INDEX_CHUNK			0x0003
+#define PB_ANIMATABLE_CHUNK		0x0004
+#define PB_VERSION_CHUNK		0x0005
+#define PB_FLOAT_CHUNK			(TYPE_FLOAT + 0x100)
+#define PB_INT_CHUNK			(TYPE_INT + 0x100)
+#define PB_RGBA_CHUNK			(TYPE_RGBA + 0x100)
+#define PB_POINT3_CHUNK			(TYPE_POINT3 + 0x100)
+#define PB_BOOL_CHUNK			(TYPE_BOOL + 0x100)
 
-void paramblock_chunk_reader(FILE *f,Class_ParamBlock *pb,int level){
-unsigned short int chunk_id=0;
-unsigned int chunk_size=0;
-int recurse_flag=0;
-int pos=ftell(f);
-int endpos;
+#define PB_TYPE_CHUNK			0x0200
+#define PB_TYPE_FLOAT_CHUNK		(PB_TYPE_CHUNK + TYPE_FLOAT)
+#define PB_TYPE_INT_CHUNK		(PB_TYPE_CHUNK + TYPE_INT)
+#define PB_TYPE_RGBA_CHUNK		(PB_TYPE_CHUNK + TYPE_RGBA)
+#define PB_TYPE_POINT3_CHUNK	(PB_TYPE_CHUNK + TYPE_POINT3)
+#define PB_TYPE_BOOL_CHUNK		(PB_TYPE_CHUNK + TYPE_BOOL)
+#define PB_TYPE_USER_CHUNK		(PB_TYPE_CHUNK + TYPE_USER)
+*/
 
-if(fread(&chunk_id,2,1,f)!=1) return;
-if(fread(&chunk_size,4,1,f)!=1) return;
-if(chunk_size&0x80000000){ chunk_size&=0x7fffffff; recurse_flag=1;}
-endpos=pos+chunk_size; chunk_size-=6;
 
-if(recurse_flag){
-  while(ftell(f)<endpos) paramblock_chunk_reader(f,pb,level+1);
-  if(chunk_id==0x0002){
-    printf("  Param #%d = ",paramno);
+int paramno;
+
+void paramblock_init(node_st* node){
+  Class_ParamBlock *pb=malloc(sizeof(Class_ParamBlock));
+  pb->pdb=-1; pb->type=(int*)NULL; pb->data=(void**)NULL;
+  node->data = pb;
+  paramno=0;
+}
+
+void paramblock_list(node_st* node,char **help,char* tab){
+Class_ParamBlock *pb=node->data;
+  for(paramno=0;paramno<pb->pdb;paramno++){
+    printf("%sParam #%d = ",tab,paramno);
     switch(pb->type[paramno]){
       case 0x0100: printf("F %f",*((float*)(&pb->data[paramno])));break;
       case 0x0101: printf("I %d",*((int*)(&pb->data[paramno])));break;
@@ -32,12 +50,25 @@ if(recurse_flag){
           ((float*)(pb->data[paramno]))[1],
           ((float*)(pb->data[paramno]))[2]  );break;
       case 0x0104: printf("B %d",*((int*)(&pb->data[paramno])));break;
+      case 0x0200: printf("F <key>");break;
+      case 0x0201: printf("I <key>");break;
+      case 0x0202: printf("C <key>");break;
+      case 0x0203: printf("P <key>");break;
+      case 0x0204: printf("B <key>");break;
       default: printf("???");
     }
+    if(help && paramno<32 && help[paramno]) printf("  ; %s",help[paramno]);
     printf("\n");
   }
-  return;
 }
+
+void paramblock_uninit(node_st* node){
+  paramblock_list(node,NULL,"  ");
+}
+
+
+int paramblock_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
+Class_ParamBlock *pb=node->data;
 
 switch(chunk_id){
   case 0x0001:
@@ -51,10 +82,19 @@ switch(chunk_id){
     if(paramno<0 || paramno>=pb->pdb) printf("paramno is out of range!\n");
     break;
   case 0x0004:
+    printf("  Value animatable\n");
     // param flag   PB_ANIMATABLE_CHUNK
     break;
   case 0x0005:
+    printf("  Version (%d)\n",chunk_size);
     // version      PB_VERSION_CHUNK
+    break;
+  case 0x0200:
+  case 0x0201:
+  case 0x0202:
+  case 0x0203:
+  case 0x0204:
+    pb->type[paramno]=chunk_id; // Animated parameter (reference van value helyett)
     break;
   case 0x0100:
   case 0x0104: {
@@ -80,13 +120,10 @@ switch(chunk_id){
     fptr[2]=float_reader(f,&chunk_size);
     break; }
   default:
-#ifdef PRINT_CHUNKS
-    printf("  %*sChunk %04X (%d)\n",2*level,"",chunk_id,chunk_size);
-#endif
-
+    return 0;
 } // switch
-
-while(ftell(f)<endpos) fgetc(f); // HACK
+return 1;
+// while(ftell(f)<endpos) fgetc(f); // HACK
 
 }
 

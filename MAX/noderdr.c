@@ -2,7 +2,7 @@
 //                       Node Class reader
 //==========================================================================
 
-void nodeclass_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
+int nodeclass_chunk_reader(node_st *node,FILE *f,int level,int chunk_id,int chunk_size){
 //int subtype=classtab[node->classid].subtype;
 
 //    printf("  %*sChunk %04X (%d)\n",2*level,"",chunk_id,chunk_size);
@@ -24,11 +24,9 @@ switch(chunk_id){
     printf("  WireColor: %d %d %d (%d)\n",(c)&255,(c>>8)&255,(c>>16)&255,(c>>24)&255);
     break; }
   default:
-#ifdef PRINT_CHUNKS
-    printf("  %*sChunk %04X (%d)\n",2*level,"",chunk_id,chunk_size);
-#endif
+    return 0;
 }
 
-return;
+return 1;
 
 }

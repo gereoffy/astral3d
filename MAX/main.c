@@ -33,8 +33,6 @@ int nodeno=0;
 
 #include "reader.c"
 
-#include "pblock.c"
-
 //========================================================================//
 //               Class readers
 //========================================================================//
@@ -42,6 +40,7 @@ int nodeno=0;
 #include "textrdr.c"
 #include "noderdr.c"
 #include "materrdr.c"
+#include "pblock.c"
 
 void init_classreaders(){
   // Track/Key reader:
@@ -67,6 +66,9 @@ void init_classreaders(){
   // Map/Material:
   register_classreader("Standard",0,NULL,material_chunk_reader,NULL);
   register_classreader("Bitmap",1,NULL,material_chunk_reader,NULL);
+  // ParamBlock:
+  register_classreader("ParamBlock",0,paramblock_init,paramblock_chunk_reader,paramblock_uninit);
+  
 }
 
 //========================================================================//
@@ -118,6 +120,18 @@ switch(chunk_id){
           }
         }
       } else printf("???");
+      if(nodeclass && nodeclass->chelp){
+        chelp_st *chelp=nodeclass->chelp;
+        if(i<32 && chelp->refs[i]) printf("   ; %s",chelp->refs[i]);
+//        if(node->data && strcmp(classtab[node->classid].name,"ParamBlock")==0 ){
+        if(ref>=0 && ref<=nodeno)
+          if(nodes[ref].data)
+            if(nodes[ref].classid<classdb)
+              if(strcmp(classtab[nodes[ref].classid].name,"ParamBlock")==0){
+                printf("\n");
+                paramblock_list(&nodes[ref],chelp->params[i],"    ");
+              }
+      }
       printf("\n");
     }
     break;
@@ -127,11 +141,40 @@ switch(chunk_id){
   case 0x1240: printf("  Map type: '%s'\n",string_reader(f,chunk_size)); break;
 */
   default:
-    if(nodeclass && nodeclass->class_chunk_reader){
-      nodeclass->class_chunk_reader(node,f,level,chunk_id,chunk_size);
+    if(nodeclass && nodeclass->class_chunk_reader &&
+      nodeclass->class_chunk_reader(node,f,level,chunk_id,chunk_size)){
 #ifdef PRINT_CHUNKS
     } else {
-      printf("  %*sChunk %04X (%d)\n",2*level,"",chunk_id,chunk_size);
+      printf("  %*sChunk %04X (%d)",2*level,"",chunk_id,chunk_size);
+      if(nodeclass && nodeclass->chelp && nodeclass->chelp->chunks){
+        chunkhelp_st *p=nodeclass->chelp->chunks;
+        while(p){
+          if(p->id==chunk_id){
+            char *s=p->name;
+            printf("  ; ");
+            while(*s){
+              int c=*s++;
+              if(c=='%'){
+                c=*s++;
+                switch(c){
+                  case '%': putchar(c);
+                  case 'f': printf("%f",float_reader(f,&chunk_size));break;
+                  case 'i': printf("%d",int_reader(f,&chunk_size));break;
+                  case 'x': printf("%x",int_reader(f,&chunk_size));break;
+                  case 'b': printf("%d",byte_reader(f,&chunk_size));break;
+                  case 's': printf("%s",string_reader(f,&chunk_size));break;
+                  case 'S': printf("%s",string8_reader(f,&chunk_size));break;
+                }
+                continue;
+              }
+              putchar(c);
+            }
+            //printf("  ; %s",p->name);
+          }
+          p=p->next;
+        }
+      }
+      printf("\n");
 #endif
     }
 }
@@ -170,6 +213,7 @@ if(!recurse_flag){
 
 if(nodeclass && nodeclass->class_init) nodeclass->class_init(node);
 
+/*
 if(strcmp(nodename,"ParamBlock")==0){
   Class_ParamBlock *pb=malloc(sizeof(Class_ParamBlock));
   pb->pdb=-1; pb->type=(int*)NULL; pb->data=(void**)NULL;
@@ -177,6 +221,7 @@ if(strcmp(nodename,"ParamBlock")==0){
   node->data = pb;
   return;
 }
+*/
 
 while(ftell(f)<endpos) node_chunk_reader(f,node,0);
 
@@ -188,6 +233,8 @@ if(nodeclass && nodeclass->class_uninit) nodeclass->class_uninit(node);
 //                     M A I N
 //============================================================================
 
+#include "classdef.c"
+
 int main(int argc,char* argv[]){
 FILE *f;
 
@@ -197,6 +244,7 @@ fclose(f);
 
 init_classreaders();
 
+read_classdef();
 
 nodeno=0;
 f=fopen((argc>2)?argv[2]:"scene","rb");if(!f) return 1;
