@@ -18,8 +18,8 @@
 
 #include <math.h>
 #include <stdio.h>
-#include "clax.h"
-#include "claxi.h"
+#include "ast3d.h"
+#include "ast3di.h"
 
 void vec_make (float x, float y, float z, c_VECTOR *out)
 {

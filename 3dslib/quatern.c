@@ -20,8 +20,8 @@
 
 #include <math.h>
 #include <stdio.h>
-#include "clax.h"
-#include "claxi.h"
+#include "ast3d.h"
+#include "ast3di.h"
 
 void qt_fromang (float ang, float x, float y, float z, c_QUAT *out)
 {

@@ -11,10 +11,10 @@
 
 *****************************************************************************/
 
-#ifndef _CLAX_H_
-#define _CLAX_H_
+#ifndef _AST3D_H_
+#define _AST3D_H_
 
-#define CLAX_VERSION 0.10
+#define ast3d_VERSION 0.10
 #ifndef M_PI
 #define M_PI 3.14159265359
 #endif
@@ -40,113 +40,113 @@ typedef char         cbool;
   error codes
 *****************************************************************************/
 
-enum clax_error_ { /* error codes */
-  clax_err_ok        = 0,                /* no error                       */
-  clax_err_nomem     = 1,                /* not enough memory              */
-  clax_err_nofile    = 2,                /* file not found                 */
-  clax_err_badfile   = 3,                /* corrupted file                 */
-  clax_err_badver    = 4,                /* unsupported version            */
-  clax_err_badformat = 5,                /* unsupported format             */
-  clax_err_badframe  = 6,                /* illegal frame number           */
-  clax_err_badname   = 7,                /* illegal object name            */
-  clax_err_noframes  = 8,                /* no keyframer data              */
-  clax_err_notloaded = 9,                /* no scene loaded                */
-  clax_err_nullptr   = 10,               /* null pointer assignment        */
-  clax_err_invparam  = 11,               /* invalid parameter              */
-  clax_err_spline    = 12,               /* less than 2 keys in spline     */
-  clax_err_singular  = 13,               /* cannot inverse singular matrix */
-  clax_err_badid     = 14,               /* bad object id number           */
-  clax_err_exist     = 15,               /* object already exist           */
-  clax_err_undefined = 256               /* internal error                 */
+enum ast3d_error_ { /* error codes */
+  ast3d_err_ok        = 0,                /* no error                       */
+  ast3d_err_nomem     = 1,                /* not enough memory              */
+  ast3d_err_nofile    = 2,                /* file not found                 */
+  ast3d_err_badfile   = 3,                /* corrupted file                 */
+  ast3d_err_badver    = 4,                /* unsupported version            */
+  ast3d_err_badformat = 5,                /* unsupported format             */
+  ast3d_err_badframe  = 6,                /* illegal frame number           */
+  ast3d_err_badname   = 7,                /* illegal object name            */
+  ast3d_err_noframes  = 8,                /* no keyframer data              */
+  ast3d_err_notloaded = 9,                /* no scene loaded                */
+  ast3d_err_nullptr   = 10,               /* null pointer assignment        */
+  ast3d_err_invparam  = 11,               /* invalid parameter              */
+  ast3d_err_spline    = 12,               /* less than 2 keys in spline     */
+  ast3d_err_singular  = 13,               /* cannot inverse singular matrix */
+  ast3d_err_badid     = 14,               /* bad object id number           */
+  ast3d_err_exist     = 15,               /* object already exist           */
+  ast3d_err_undefined = 256               /* internal error                 */
 };
 
 /*****************************************************************************
   track/object types
 *****************************************************************************/
 
-enum clax_object_ { /* object types */
-  clax_obj_camera    = 1,                /* camera (c_CAMERA)     */
-  clax_obj_light     = 2,                /* light (c_LIGHT)       */
-  clax_obj_object    = 4,                /* object (c_OBJECT)     */
-  clax_obj_material  = 8,                /* material (c_MATERIAL) */
-  clax_obj_ambient   = 16                /* ambient (c_AMBIENT)   */
+enum ast3d_object_ { /* object types */
+  ast3d_obj_camera    = 1,                /* camera (c_CAMERA)     */
+  ast3d_obj_light     = 2,                /* light (c_LIGHT)       */
+  ast3d_obj_object    = 4,                /* object (c_OBJECT)     */
+  ast3d_obj_material  = 8,                /* material (c_MATERIAL) */
+  ast3d_obj_ambient   = 16                /* ambient (c_AMBIENT)   */
 };
 
-enum clax_track_ { /* track types */
-  clax_track_camera    = 1,              /* camera track        */
-  clax_track_cameratgt = 2,              /* camera target track */
-  clax_track_light     = 4,              /* light track         */
-  clax_track_spotlight = 8,              /* spotlight track     */
-  clax_track_lighttgt  = 16,             /* light target track  */
-  clax_track_object    = 32,             /* object track        */
-  clax_track_ambient   = 64              /* ambient track       */
+enum ast3d_track_ { /* track types */
+  ast3d_track_camera    = 1,              /* camera track        */
+  ast3d_track_cameratgt = 2,              /* camera target track */
+  ast3d_track_light     = 4,              /* light track         */
+  ast3d_track_spotlight = 8,              /* spotlight track     */
+  ast3d_track_lighttgt  = 16,             /* light target track  */
+  ast3d_track_object    = 32,             /* object track        */
+  ast3d_track_ambient   = 64              /* ambient track       */
 };
 
-enum clax_key_ { /* key types */
-  clax_key_pos      = 1,                 /* position track */
-  clax_key_rotate   = 2,                 /* rotation track */
-  clax_key_scale    = 3,                 /* scale track    */
-  clax_key_fov      = 4,                 /* fov track      */
-  clax_key_roll     = 5,                 /* roll track     */
-  clax_key_color    = 6,                 /* color track    */
-  clax_key_morph    = 7,                 /* morph track    */
-  clax_key_hide     = 8,                 /* hide track     */
+enum ast3d_key_ { /* key types */
+  ast3d_key_pos      = 1,                 /* position track */
+  ast3d_key_rotate   = 2,                 /* rotation track */
+  ast3d_key_scale    = 3,                 /* scale track    */
+  ast3d_key_fov      = 4,                 /* fov track      */
+  ast3d_key_roll     = 5,                 /* roll track     */
+  ast3d_key_color    = 6,                 /* color track    */
+  ast3d_key_morph    = 7,                 /* morph track    */
+  ast3d_key_hide     = 8,                 /* hide track     */
 };
 
 /*****************************************************************************
   flags
 *****************************************************************************/
 
-enum clax_flags_ { /* clax flags */
-  clax_hierarchy  = 1,                   /* hierarchical transformations */
-  clax_calcnorm   = 2,                   /* calculate normals            */
-  clax_domorph    = 4,                   /* internal object morph        */
-  clax_transform  = 8,                   /* internal transformations     */
-  clax_slerp      = 16,                  /* quaternion spherical interp. */
-  clax_normlerp   = 32,                  /* morph: lerp normals          */
-  clax_normcalc   = 64                   /* morph: recalculate normals   */
+enum ast3d_flags_ { /* astral 3d flags */
+  ast3d_hierarchy  = 1,                   /* hierarchical transformations */
+  ast3d_calcnorm   = 2,                   /* calculate normals            */
+  ast3d_domorph    = 4,                   /* internal object morph        */
+  ast3d_transform  = 8,                   /* internal transformations     */
+  ast3d_slerp      = 16,                  /* quaternion spherical interp. */
+  ast3d_normlerp   = 32,                  /* morph: lerp normals          */
+  ast3d_normcalc   = 64                   /* morph: recalculate normals   */
 };
 
-enum clax_mat_flags_ { /* clax material flags */
-  clax_mat_twosided = 1,                 /* two sided           */
-  clax_mat_soften   = 2,                 /* soften              */
-  clax_mat_wire     = 4,                 /* wireframe rendering */
-  clax_mat_transadd = 8                  /* transparency add    */
+enum ast3d_mat_flags_ { /* astral 3d material flags */
+  ast3d_mat_twosided = 1,                 /* two sided           */
+  ast3d_mat_soften   = 2,                 /* soften              */
+  ast3d_mat_wire     = 4,                 /* wireframe rendering */
+  ast3d_mat_transadd = 8                  /* transparency add    */
 };
 
-enum clax_map_flags_ { /* clax map flags */
-  clax_map_mirror   = 2,                 /* mirror   */
-  clax_map_negative = 8                  /* negative */
+enum ast3d_map_flags_ { /* astral 3d map flags */
+  ast3d_map_mirror   = 2,                 /* mirror   */
+  ast3d_map_negative = 8                  /* negative */
 };
 
-enum clax_shade_flags_ { /* clax material shading */
-  clax_mat_flat    = 1,                  /* flat shading    */
-  clax_mat_gouraud = 2,                  /* gouraud shading */
-  clax_mat_phong   = 3,                  /* phong shading   */
-  clax_mat_metal   = 4                   /* metal shading   */
+enum ast3d_shade_flags_ { /* astral 3d material shading */
+  ast3d_mat_flat    = 1,                  /* flat shading    */
+  ast3d_mat_gouraud = 2,                  /* gouraud shading */
+  ast3d_mat_phong   = 3,                  /* phong shading   */
+  ast3d_mat_metal   = 4                   /* metal shading   */
 };
 
-enum clax_face_flags_ { /* clax face flags */
-  clax_face_wrapU   = 1,                 /* face has texture wrapping (u) */
-  clax_face_wrapV   = 2,                 /* face has texture wrapping (v) */
-  clax_face_visible = 4                  /* visible flag (backface cull)  */
+enum ast3d_face_flags_ { /* astral 3d face flags */
+  ast3d_face_wrapU   = 1,                 /* face has texture wrapping (u) */
+  ast3d_face_wrapV   = 2,                 /* face has texture wrapping (v) */
+  ast3d_face_visible = 4                  /* visible flag (backface cull)  */
 };
 
-enum clax_obj_flags_ { /* clax object flags */
-  clax_obj_hidden  = 1,                   /* object is hidden        */
-  clax_obj_chidden = 2,                   /* object is always hidden */
-  clax_obj_dummy   = 4,                   /* object is dummy         */
-  clax_obj_morph   = 8                    /* object is morphing      */
+enum ast3d_obj_flags_ { /* astral 3d object flags */
+  ast3d_obj_hidden  = 1,                   /* object is hidden        */
+  ast3d_obj_chidden = 2,                   /* object is always hidden */
+  ast3d_obj_dummy   = 4,                   /* object is dummy         */
+  ast3d_obj_morph   = 8                    /* object is morphing      */
 };
 
-enum clax_light_flags_ { /* clax light flags */
-  clax_light_omni = 1,                    /* light is omni */
-  clax_light_spot = 2                     /* light is spotlight */
+enum ast3d_light_flags_ { /* astral 3d light flags */
+  ast3d_light_omni = 1,                    /* light is omni */
+  ast3d_light_spot = 2                     /* light is spotlight */
 };
 
-enum clax_track_flags_ { /* clax track flags */
-  clax_track_repeat = 1,                  /* track repeat */
-  clax_track_loop   = 2                   /* track loop   */
+enum ast3d_track_flags_ { /* astral 3d track flags */
+  ast3d_track_repeat = 1,                  /* track repeat */
+  ast3d_track_loop   = 2                   /* track loop   */
 };
 
 /*****************************************************************************
@@ -211,7 +211,7 @@ typedef struct _c_VERTEX { /* vertex struct */
 
 typedef struct _c_FACE { /* face struct */
   int32      a, b, c;                      /* vertices of triangle    */
-  int32      flags;                        /* face flags: clax_face_* */
+  int32      flags;                        /* face flags: ast3d_face_* */
   int32      mat;                          /* face material           */
   c_VERTEX   *pa, *pb, *pc;                /* pointers to vertices    */
   c_MATERIAL *pmat;                        /* pointer to material     */
@@ -244,7 +244,7 @@ typedef struct _c_OBJECT { /* object struct */
   int32      id, parent;                 /* object id, object parent   */
   int32      numverts;                   /* number of vertices         */
   int32      numfaces;                   /* number of faces            */
-  int32      flags;                      /* object flags: clax_obj_*   */
+  int32      flags;                      /* object flags: ast3d_obj_*   */
   c_VERTEX   *vertices;                  /* object vertices            */
   c_FACE     *faces;                     /* object faces               */
   c_VECTOR   pivot;                      /* object pivot point         */
@@ -359,84 +359,84 @@ typedef struct _c_SCENE { /* scene (world, keyframer) */
 extern "C" {
 #endif
 
-  extern char clax_version[];
-  extern char clax_copyright[];
+  extern char ast3d_version[];
+  extern char ast3d_copyright[];
 
 /*****************************************************************************
-  library functions (clax api)
+  library functions (astral 3d api)
 *****************************************************************************/
 
-  int32 clax_init (int32 flags);
+  int32 ast3d_init (int32 flags);
 /*
-  int32 clax_init (int32 flags)
-  initializes clax, and does some internal stuff.
-  returns error codes: clax_ok, clax_nomem, clax_undefined.
+  int32 ast3d_init (int32 flags)
+  initializes astral 3d, and does some internal stuff.
+  returns error codes: ast3d_ok, ast3d_nomem, ast3d_undefined.
 
   note: this function must be called once, before accessing any other
-        clax routines.
+        astral 3d routines.
 
-  see also: clax_flag_*
+  see also: ast3d_flag_*
 */
 
-  int32 clax_done ();
+  int32 ast3d_done ();
 /*
-  int32 clax_done ()
-  deinitializes clax, and does some internal stuff.
-  returns error codes: clax_ok, clax_undefined.
+  int32 ast3d_done ()
+  deinitializes astral 3d, and does some internal stuff.
+  returns error codes: ast3d_ok, ast3d_undefined.
 
   note: this function must be called once you exit your program.
 */
 
-  int32 clax_load_world (char *filename, c_SCENE *scene);
+  int32 ast3d_load_world (char *filename, c_SCENE *scene);
 /*
-  int32 clax_loadscene (char *filename, c_SCENE *scene)
+  int32 ast3d_loadscene (char *filename, c_SCENE *scene)
   loads scene from supported fileformat (not keyframer).
-  returns error codes: clax_ok, clax_nomem, clax_badfile, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_nomem, ast3d_badfile, ast3d_undefined.
 */
 
-  int32 clax_load_motion (char *filename, c_SCENE *scene);
+  int32 ast3d_load_motion (char *filename, c_SCENE *scene);
 /*
-  int32 clax_loadmotion (char *filename, c_SCENE *scene)
+  int32 ast3d_loadmotion (char *filename, c_SCENE *scene)
   loads keyframer from supported fileformat (not scene).
-  returns error codes: clax_ok, clax_nomem, clax_badfile, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_nomem, ast3d_badfile, ast3d_undefined.
 
-  note: clax_loadscene must be called before this.
+  note: ast3d_loadscene must be called before this.
 */
 
-  int32 clax_setactive_scene (c_SCENE *scene);
+  int32 ast3d_setactive_scene (c_SCENE *scene);
 /*
-  int32 clax_setactive (c_SCENE *scene)
+  int32 ast3d_setactive (c_SCENE *scene)
   sets active scene "scene".
-  returns error codes: clax_ok, clax_nullptr, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_nullptr, ast3d_undefined.
 
   note: this function must be called right after loading, and before
-        using any other clax functions.
+        using any other astral 3d functions.
 */
 
   void cam_lens_fov (float lens, float *fov);
-  int32 clax_getactive_scene (c_SCENE **scene);
-  int32 clax_getactive_camera (c_CAMERA **camera);
-  int32 clax_byname (char *name, w_NODE **node);
-  int32 clax_byid (int32 id, w_NODE **node);
-  int32 clax_findfirst (int32 attr, w_NODE **node);
-  int32 clax_findnext (int32 attr, w_NODE **node);
-  int32 clax_add_world (int32 type, void *obj);
-  int32 clax_add_track (int32 type, int32 id, int32 parent, void *track, void *obj);
-  int32 clax_free_world (c_SCENE *scene);
-  int32 clax_free_motion (c_SCENE *scene);
-  int32 clax_getkey_float (t_TRACK *track, float frame, float *out);
-  int32 clax_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out);
-  int32 clax_getkey_quat (t_TRACK *track, float frame, c_QUAT *out);
-  int32 clax_alloc_scene (c_SCENE **scene);
+  int32 ast3d_getactive_scene (c_SCENE **scene);
+  int32 ast3d_getactive_camera (c_CAMERA **camera);
+  int32 ast3d_byname (char *name, w_NODE **node);
+  int32 ast3d_byid (int32 id, w_NODE **node);
+  int32 ast3d_findfirst (int32 attr, w_NODE **node);
+  int32 ast3d_findnext (int32 attr, w_NODE **node);
+  int32 ast3d_add_world (int32 type, void *obj);
+  int32 ast3d_add_track (int32 type, int32 id, int32 parent, void *track, void *obj);
+  int32 ast3d_free_world (c_SCENE *scene);
+  int32 ast3d_free_motion (c_SCENE *scene);
+  int32 ast3d_getkey_float (t_TRACK *track, float frame, float *out);
+  int32 ast3d_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out);
+  int32 ast3d_getkey_quat (t_TRACK *track, float frame, c_QUAT *out);
+  int32 ast3d_alloc_scene (c_SCENE **scene);
   int32 spline_getkey_quat (t_TRACK *track, float frame, c_QUAT *out);
-  int32 clax_set_track (int32 type, int32 id, t_TRACK *track);
-  int32 clax_update ();
-  int32 clax_free_scene (c_SCENE *scene);
+  int32 ast3d_set_track (int32 type, int32 id, t_TRACK *track);
+  int32 ast3d_update ();
+  int32 ast3d_free_scene (c_SCENE *scene);
   void qt_identity (c_QUAT *out);
   void qt_zero (c_QUAT *out);
   void mat_zero (c_MATRIX out);
   void vec_zero (c_VECTOR *out);
-  int32 clax_load_scene (char *filename, c_SCENE *scene);
+  int32 ast3d_load_scene (char *filename, c_SCENE *scene);
   void qt_scale (c_QUAT *a, float s, c_QUAT *out);
   void qt_print (c_QUAT *a);
   void vec_print (c_VECTOR *a);
@@ -444,22 +444,22 @@ extern "C" {
   int32 mat_invscale (c_MATRIX a, c_MATRIX out);
   void mat_mulnorm (c_MATRIX a, c_VECTOR *b, c_VECTOR *out);
   void vec_midpoint (c_VECTOR *a, c_VECTOR *b, c_VECTOR *out);
-  int32 clax_free_mesh (c_SCENE *scene);
-  void clax_print_world ();
-  void clax_print_keyframer ();
+  int32 ast3d_free_mesh (c_SCENE *scene);
+  void ast3d_print_world ();
+  void ast3d_print_keyframer ();
   void qt_rescale (c_QUAT *a, float s, c_QUAT *out);
   void vec_rescale (c_VECTOR *a, float s, c_VECTOR *out);
-  int32 clax_getkey_hide (t_TRACK *track, float frame, int32 *out);
-  int32 clax_getkey_morph (t_TRACK *track, float frame, c_MORPH *out);
-  int32 clax_setactive_camera (c_CAMERA *cam);
-  int32 clax_save_scene (char *filename, c_SCENE *scene);
+  int32 ast3d_getkey_hide (t_TRACK *track, float frame, int32 *out);
+  int32 ast3d_getkey_morph (t_TRACK *track, float frame, c_MORPH *out);
+  int32 ast3d_setactive_camera (c_CAMERA *cam);
+  int32 ast3d_save_scene (char *filename, c_SCENE *scene);
   int32 mat_normalize (c_MATRIX a, c_MATRIX out);
   int32 qt_equal (c_QUAT *a, c_QUAT *b);
   void mat_toeuler (c_MATRIX mat, c_VECTOR *out);
   void mat_pretrans (c_VECTOR *v, c_MATRIX mat, c_MATRIX out);
   float spline_ease (float t, float a, float b);
   void mat_transpose (c_MATRIX a, c_MATRIX out);
-  int32 clax_collide (w_NODE *a, w_NODE *b, int32 *result);
+  int32 ast3d_collide (w_NODE *a, w_NODE *b, int32 *result);
   float qt_length (c_QUAT *a);
   float qt_dot (c_QUAT *a, c_QUAT *b);
   float qt_dotunit (c_QUAT *a, c_QUAT *b);
@@ -471,32 +471,32 @@ extern "C" {
   void qt_slerpl (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out);
   int32 spline_initrot (t_TRACK *track);
 
-  char *clax_geterror (int32 code);
+  char *ast3d_geterror (int32 code);
 /*
-  char *clax_geterror (int code)
+  char *ast3d_geterror (int code)
   returns an error string for given error code.
 */
 
-  int32 clax_getframes (float *start, float *end);
+  int32 ast3d_getframes (float *start, float *end);
 /*
-  int32 clax_getframes (float *start, float *end)
+  int32 ast3d_getframes (float *start, float *end)
   returns the start and end frame number in keyframer to start/end.
-  returns error codes: clax_ok, clax_noframes, clax_notloaded, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_noframes, ast3d_notloaded, ast3d_undefined.
 */
 
-  int32 clax_setframe (float frame);
+  int32 ast3d_setframe (float frame);
 /*
-  int32 clax_setframe (float frame)
+  int32 ast3d_setframe (float frame)
   sets current frame number in the keyframer.
-  returns error codes: clax_ok, clax_badframe, clax_noframes, clax_notloaded,
-                       clax_undefined.
+  returns error codes: ast3d_ok, ast3d_badframe, ast3d_noframes, ast3d_notloaded,
+                       ast3d_undefined.
 */
 
-  int32 clax_getframe (float *frame);
+  int32 ast3d_getframe (float *frame);
 /*
-  int32 clax_getframe (float *frame)
+  int32 ast3d_getframe (float *frame)
   returns current frame number in the keyframer.
-  returns error codes: clax_ok, clax_noframes, clax_notloaded, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_noframes, ast3d_notloaded, ast3d_undefined.
 */
 
   void cam_update (c_CAMERA *cam);
@@ -547,7 +547,7 @@ extern "C" {
 /*
   void mat_inverse (c_MATRIX a, c_MATRIX out)
   calculates inverse matrix of "a", giving result in "out".
-  returns error codes: clax_ok, clax_singular, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_singular, ast3d_undefined.
 */
 
   void mat_settrans (c_VECTOR *v, c_MATRIX out);
@@ -795,7 +795,7 @@ void qt_slerp (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out);
   int32 spline_init (t_TRACK *track)
   initializes spline interpolation, with an array of keys in "keys", given
   number of keys in "numkeys".
-  returns error codes: clax_ok, clax_spline, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_spline, ast3d_undefined.
 
   see also: t_KEY structure
 */
@@ -805,7 +805,7 @@ void qt_slerp (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out);
   int32 spline_getkey_float (t_KEY *keys, float frame, float *out)
   returns one-dimensional interpolated value for "frame", giving
   result in "out".
-  returns error codes: clax_ok, clax_badframe, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_badframe, ast3d_undefined.
 
   the value interpolated is t_KEY.a
 */
@@ -815,7 +815,7 @@ void qt_slerp (c_QUAT *a, c_QUAT *b, float spin, float alpha, c_QUAT *out);
   int32 spline_getkey_vect (t_KEY *keys, float frame, float *out)
   returns three-dimensional interpolated value for "frame", giving
   result in "out".
-  returns error codes: clax_ok, clax_badframe, clax_undefined.
+  returns error codes: ast3d_ok, ast3d_badframe, ast3d_undefined.
 
   the values interpolated are t_KEY.a, t_KEY.b, t_KEY.c
 */

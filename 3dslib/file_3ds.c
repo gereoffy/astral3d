@@ -24,14 +24,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "clax.h"
-#include "claxi.h"
+#include "ast3d.h"
+#include "ast3di.h"
 
 /*****************************************************************************
   chunks/readers definitions, structures
 *****************************************************************************/
 
-enum clax_3ds_chunks_ { /* Chunk ID */
+enum ast3d_3ds_chunks_ { /* Chunk ID */
   CHUNK_RGBF         = 0x0010, CHUNK_RGBB         = 0x0011,
   CHUNK_PRJ          = 0xC23D, CHUNK_MLI          = 0x3DAA,
   CHUNK_MAIN         = 0x4D4D, CHUNK_OBJMESH      = 0x3D3D,
@@ -71,7 +71,7 @@ enum clax_3ds_chunks_ { /* Chunk ID */
 };
 
 typedef struct { /* 3DS chunk structure */
-  word  chunk_id;                /* chunk id (clax_3ds_chunks_) */
+  word  chunk_id;                /* chunk id (ast3d_3ds_chunks_) */
   dword chunk_size;              /* chunk length                */
 } c_CHUNK;
 
@@ -220,7 +220,7 @@ static void vec_swap (c_VECTOR *a)
 */
   float tmp;
 
-#ifdef CLAX_SWAP_YZ
+#ifdef ast3d_SWAP_YZ
   tmp  = a->y;
   a->y = a->z;
   a->z = tmp;
@@ -234,7 +234,7 @@ static void qt_swap (c_QUAT *a)
 */
   float tmp;
 
-#ifdef CLAX_SWAP_YZ
+#ifdef ast3d_SWAP_YZ
   tmp  = a->y;
   a->y = a->z;
   a->z = tmp;
@@ -249,7 +249,7 @@ static void mat_swap (c_MATRIX a)
   int   i;
   float tmp;
 
-#ifdef CLAX_SWAP_YZ
+#ifdef ast3d_SWAP_YZ
   for (i = 0; i < 3; i++) { /* swap columns */
     tmp = a[i][Y];
     a[i][Y] = a[i][Z];
@@ -323,7 +323,7 @@ static int add_key (t_TRACK *track, t_KEY *key, int frame)
 /*
   add_key: add a key to track.
 */
-  if (track == NULL || key == NULL) return clax_err_nullptr;
+  if (track == NULL || key == NULL) return ast3d_err_nullptr;
   key->frame = frame;
   key->next = NULL;
   if (track->keys == NULL) {
@@ -336,7 +336,7 @@ static int add_key (t_TRACK *track, t_KEY *key, int frame)
   track->frames = key->frame;
   track->last = key;
   track->numkeys++;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 /*****************************************************************************
@@ -349,7 +349,7 @@ static int read_NULL (FILE *f)
   read_NULL: "dummy" chunk reader.
 */
   if (f) {} /* to skip the warning */
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_RGBF (FILE *f)
@@ -367,13 +367,13 @@ static int read_RGBF (FILE *f)
     case CHUNK_DIFFUSE:      rgb = &(mat->diffuse); break;
     case CHUNK_SPECULAR:     rgb = &(mat->specular); break;
   }
-  if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
+  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if (rgb) {
     rgb->r = c[0];
     rgb->g = c[1];
     rgb->b = c[2];
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_RGBB (FILE *f)
@@ -391,13 +391,13 @@ static int read_RGBB (FILE *f)
     case CHUNK_DIFFUSE:      rgb = &(mat->diffuse); break;
     case CHUNK_SPECULAR:     rgb = &(mat->specular); break;
   }
-  if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
+  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   if (rgb) {
     rgb->r = (float)c[0] / 255.0;
     rgb->g = (float)c[1] / 255.0;
     rgb->b = (float)c[2] / 255.0;
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_AMOUNTOF (FILE *f)
@@ -417,9 +417,9 @@ static int read_AMOUNTOF (FILE *f)
     case CHUNK_REFBLUR:      fl = &(mat->refblur); break;
     case CHUNK_SELFILLUM:    fl = &(mat->self_illum);
   }
-  if (fread (&w, sizeof (w), 1, f) != 1) return clax_err_badfile;
+  if (fread (&w, sizeof (w), 1, f) != 1) return ast3d_err_badfile;
   if (fl) *fl = (float)w / 100.0;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_ASCIIZ (FILE *f)
@@ -431,9 +431,9 @@ static int read_ASCIIZ (FILE *f)
   int   c;
 
   while ((c = fgetc (f)) != EOF && c != '\0') *s++ = (char)c;
-  if (c == EOF) return clax_err_badfile;
+  if (c == EOF) return ast3d_err_badfile;
   *s = '\0';
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_TRIMESH (FILE *f)
@@ -445,8 +445,8 @@ static int read_TRIMESH (FILE *f)
 
   if (f) {} /* to skip the warning */
   if ((obj = (c_OBJECT *)malloc (sizeof (c_OBJECT))) == NULL)
-    return clax_err_nomem;
-  if ((obj->name = strcopy (c_string)) == NULL) return clax_err_nomem;
+    return ast3d_err_nomem;
+  if ((obj->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
   obj->id = c_id++;
   obj->parent = -1;
   obj->flags = 0;
@@ -456,8 +456,8 @@ static int read_TRIMESH (FILE *f)
   qt_zero (&obj->rotate);
   mat_zero (obj->matrix);
   c_node = obj;
-  clax_add_world (clax_obj_object, obj);
-  return clax_err_ok;
+  ast3d_add_world (ast3d_obj_object, obj);
+  return ast3d_err_ok;
 }
 
 static int read_VERTLIST (FILE *f)
@@ -470,20 +470,20 @@ static int read_VERTLIST (FILE *f)
   float     c[3];
   word      nv;
 
-  if (fread (&nv, sizeof (nv), 1, f) != 1) return clax_err_badfile;
+  if (fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
   if ((v = (c_VERTEX *)malloc (nv * sizeof (c_VERTEX))) == NULL)
-    return clax_err_nomem;
+    return ast3d_err_nomem;
   obj->vertices = v;
   obj->numverts = nv;
   while (nv-- > 0) {
-    if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
+    if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
     vec_make (c[0], c[1], c[2], &v->vert);
     vec_swap (&v->vert);
     v->u = 0.0;
     v->v = 0.0;
     v++;
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_FACELIST (FILE *f)
@@ -496,14 +496,14 @@ static int read_FACELIST (FILE *f)
   word      c[3];
   word      nv, flags;
 
-  if (fread (&nv, sizeof (nv), 1, f) != 1) return clax_err_badfile;
+  if (fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
   if ((fc = (c_FACE *)malloc (nv * sizeof (c_FACE))) == NULL)
-    return clax_err_nomem;
+    return ast3d_err_nomem;
   obj->faces = fc;
   obj->numfaces = nv;
   while (nv-- > 0) {
-    if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
-    if (fread (&flags, sizeof (flags), 1, f) != 1) return clax_err_badfile;
+    if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+    if (fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
     fc->a = c[0];
     fc->b = c[1];
     fc->c = c[2];
@@ -512,11 +512,11 @@ static int read_FACELIST (FILE *f)
     fc->pc = &obj->vertices[c[2]];
     fc->flags = 0;
     fc->mat = 0;
-    if (flags & 0x08) fc->flags |= clax_face_wrapU;
-    if (flags & 0x10) fc->flags |= clax_face_wrapV;
+    if (flags & 0x08) fc->flags |= ast3d_face_wrapU;
+    if (flags & 0x10) fc->flags |= ast3d_face_wrapV;
     fc++;
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_FACEMAT (FILE *f)
@@ -529,17 +529,17 @@ static int read_FACEMAT (FILE *f)
   c_MATERIAL *mat;
   word        n, nf;
 
-  if (read_ASCIIZ (f)) return clax_err_badfile;
-  if (fread (&n, sizeof (n), 1, f) != 1) return clax_err_badfile;
-  clax_byname (c_string, &node);
-  if (!node) return clax_err_undefined;
+  if (read_ASCIIZ (f)) return ast3d_err_badfile;
+  if (fread (&n, sizeof (n), 1, f) != 1) return ast3d_err_badfile;
+  ast3d_byname (c_string, &node);
+  if (!node) return ast3d_err_undefined;
   mat = (c_MATERIAL *)node->object;
   while (n-- > 0) {
-    if (fread (&nf, sizeof (nf), 1, f) != 1) return clax_err_badfile;
+    if (fread (&nf, sizeof (nf), 1, f) != 1) return ast3d_err_badfile;
     fc[nf].mat = mat->id;
     fc[nf].pmat = mat;
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_MAPLIST (FILE *f)
@@ -551,14 +551,14 @@ static int read_MAPLIST (FILE *f)
   float     c[2];
   word      nv;
 
-  if (fread (&nv, sizeof (nv), 1, f) != 1) return clax_err_badfile;
+  if (fread (&nv, sizeof (nv), 1, f) != 1) return ast3d_err_badfile;
   while (nv-- > 0) {
-    if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
+    if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
     v->u = c[0];
     v->v = c[1];
     v++;
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_TRMATRIX (FILE *f)
@@ -577,8 +577,8 @@ static int read_TRMATRIX (FILE *f)
   for (i = 0; i < 3; i++)
     for (j = 0; j < 3; j++)
       if (fread (&mat[i][j], sizeof (float), 1, f) != 1)
-        return clax_err_badfile;
-  if (fread (pivot, sizeof (pivot), 1, f) != 1) return clax_err_badfile;
+        return ast3d_err_badfile;
+  if (fread (pivot, sizeof (pivot), 1, f) != 1) return ast3d_err_badfile;
   vec_make (pivot[0], pivot[1], pivot[2], &piv);
   vec_swap (&piv);
   mat_swap (mat);
@@ -588,7 +588,7 @@ static int read_TRMATRIX (FILE *f)
     mat_mulvec (mat, &v->vert, &v->vert);
     v++;
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_LIGHT (FILE *f)
@@ -600,16 +600,16 @@ static int read_LIGHT (FILE *f)
   c_LIGHT *light;
 
   if ((light = (c_LIGHT *)malloc (sizeof (c_LIGHT))) == NULL)
-    return clax_err_nomem;
-  if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
-  if ((light->name = strcopy (c_string)) == NULL) return clax_err_nomem;
+    return ast3d_err_nomem;
+  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  if ((light->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
   light->id = c_id++;
-  light->flags = clax_light_omni;
+  light->flags = ast3d_light_omni;
   vec_make (c[0], c[1], c[2], &light->pos);
   vec_swap (&light->pos);
   c_node = light;
-  clax_add_world (clax_obj_light, light);
-  return clax_err_ok;
+  ast3d_add_world (ast3d_obj_light, light);
+  return ast3d_err_ok;
 }
 
 static int read_SPOTLIGHT (FILE *f)
@@ -620,16 +620,16 @@ static int read_SPOTLIGHT (FILE *f)
   float   c[5];
   c_LIGHT *light = (c_LIGHT *)c_node;
 
-  if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
+  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
   light->target.x = c[0];
   light->target.y = c[1];
   light->target.z = c[2];
   light->hotspot = c[3];
   light->falloff = c[4];
-  light->flags = clax_light_spot;
+  light->flags = ast3d_light_spot;
   light->roll = 0.0;
   vec_swap (&light->target);
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_CAMERA (FILE *f)
@@ -641,9 +641,9 @@ static int read_CAMERA (FILE *f)
   c_CAMERA *cam;
 
   if ((cam = (c_CAMERA *)malloc (sizeof (c_CAMERA))) == NULL)
-    return clax_err_nomem;
-  if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
-  if ((cam->name = strcopy (c_string)) == NULL) return clax_err_nomem;
+    return ast3d_err_nomem;
+  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  if ((cam->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
   cam->id = c_id++;
   cam->roll = c[6];
   cam_lens_fov (c[7], &cam->fov);
@@ -652,8 +652,8 @@ static int read_CAMERA (FILE *f)
   vec_swap (&cam->pos);
   vec_swap (&cam->target);
   c_node = cam;
-  clax_add_world (clax_obj_camera, cam);
-  return clax_err_ok;
+  ast3d_add_world (ast3d_obj_camera, cam);
+  return ast3d_err_ok;
 }
 
 static int read_MATERIAL (FILE *f)
@@ -665,12 +665,12 @@ static int read_MATERIAL (FILE *f)
 
   if (f) {} /* to skip the warning */
   if ((mat = (c_MATERIAL *)malloc (sizeof (c_MATERIAL))) == NULL)
-    return clax_err_nomem;
+    return ast3d_err_nomem;
   clear_mat (mat);
   mat->id = c_id++;
   c_node = mat;
-  clax_add_world (clax_obj_material, mat);
-  return clax_err_ok;
+  ast3d_add_world (ast3d_obj_material, mat);
+  return ast3d_err_ok;
 }
 
 static int read_MATNAME (FILE *f)
@@ -680,9 +680,9 @@ static int read_MATNAME (FILE *f)
 */
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
 
-  if (read_ASCIIZ (f)) return clax_err_badfile;
-  if ((mat->name = strcopy (c_string)) == NULL) return clax_err_nomem;
-  return clax_err_ok;
+  if (read_ASCIIZ (f)) return ast3d_err_badfile;
+  if ((mat->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
+  return ast3d_err_ok;
 }
 
 static int read_MATTYPE (FILE *f)
@@ -693,9 +693,9 @@ static int read_MATTYPE (FILE *f)
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
   word        type;
 
-  if (fread (&type, sizeof (type), 1, f) != 1) return clax_err_badfile;
+  if (fread (&type, sizeof (type), 1, f) != 1) return ast3d_err_badfile;
   mat->shading = type;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_MATTWOSIDED (FILE *f)
@@ -706,8 +706,8 @@ static int read_MATTWOSIDED (FILE *f)
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
 
   if (f) {} /* to skip the warning */
-  mat->flags |= clax_mat_twosided;
-  return clax_err_ok;
+  mat->flags |= ast3d_mat_twosided;
+  return ast3d_err_ok;
 }
 
 static int read_MATSOFTEN (FILE *f)
@@ -718,8 +718,8 @@ static int read_MATSOFTEN (FILE *f)
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
 
   if (f) {} /* to skip the warning */
-  mat->flags |= clax_mat_soften;
-  return clax_err_ok;
+  mat->flags |= ast3d_mat_soften;
+  return ast3d_err_ok;
 }
 
 static int read_MATWIRE (FILE *f)
@@ -730,8 +730,8 @@ static int read_MATWIRE (FILE *f)
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
 
   if (f) {} /* to skip the warning */
-  mat->flags |= clax_mat_wire;
-  return clax_err_ok;
+  mat->flags |= ast3d_mat_wire;
+  return ast3d_err_ok;
 }
 
 static int read_MATTRANSADD (FILE *f)
@@ -742,8 +742,8 @@ static int read_MATTRANSADD (FILE *f)
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
 
   if (f) {} /* to skip the warning */
-  mat->flags |= clax_mat_transadd;
-  return clax_err_ok;
+  mat->flags |= ast3d_mat_transadd;
+  return ast3d_err_ok;
 }
 
 static int read_MAPFILE (FILE *f)
@@ -754,15 +754,15 @@ static int read_MAPFILE (FILE *f)
   c_MATERIAL *mat = (c_MATERIAL *)c_node;
   c_MAP      *map = NULL;
 
-  if (read_ASCIIZ (f)) return clax_err_badfile;
+  if (read_ASCIIZ (f)) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
     case CHUNK_REFLECTION: map = &(mat->reflection);
   }
   if (map)
-    if ((map->file = strcopy (c_string)) == NULL) return clax_err_nomem;
-  return clax_err_ok;
+    if ((map->file = strcopy (c_string)) == NULL) return ast3d_err_nomem;
+  return ast3d_err_ok;
 }
 
 static int read_MAPFLAGS (FILE *f)
@@ -774,14 +774,14 @@ static int read_MAPFLAGS (FILE *f)
   c_MAP      *map = NULL;
   word        flags;
 
-  if (fread (&flags, sizeof (flags), 1, f) != 1) return clax_err_badfile;
+  if (fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
     case CHUNK_REFLECTION: map = &(mat->reflection);
   }
   if (map) map->flags = flags;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_MAPUSCALE (FILE *f)
@@ -793,14 +793,14 @@ static int read_MAPUSCALE (FILE *f)
   c_MAP      *map = NULL;
   float       U;
 
-  if (fread (&U, sizeof (U), 1, f) != 1) return clax_err_badfile;
+  if (fread (&U, sizeof (U), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
     case CHUNK_REFLECTION: map = &(mat->reflection);
   }
   if (map) map->U_scale = U;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_MAPVSCALE (FILE *f)
@@ -812,14 +812,14 @@ static int read_MAPVSCALE (FILE *f)
   c_MAP      *map = NULL;
   float       V;
 
-  if (fread (&V, sizeof (V), 1, f) != 1) return clax_err_badfile;
+  if (fread (&V, sizeof (V), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
     case CHUNK_REFLECTION: map = &(mat->reflection);
   }
   if (map) map->V_scale = V;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_MAPUOFFSET (FILE *f)
@@ -831,14 +831,14 @@ static int read_MAPUOFFSET (FILE *f)
   c_MAP      *map = NULL;
   float       U;
 
-  if (fread (&U, sizeof (U), 1, f) != 1) return clax_err_badfile;
+  if (fread (&U, sizeof (U), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
     case CHUNK_REFLECTION: map = &(mat->reflection);
   }
   if (map) map->U_offset = U;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_MAPVOFFSET (FILE *f)
@@ -850,14 +850,14 @@ static int read_MAPVOFFSET (FILE *f)
   c_MAP      *map = NULL;
   float       V;
 
-  if (fread (&V, sizeof (V), 1, f) != 1) return clax_err_badfile;
+  if (fread (&V, sizeof (V), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
     case CHUNK_REFLECTION: map = &(mat->reflection);
   }
   if (map) map->V_offset = V;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_MAPROTANGLE (FILE *f)
@@ -869,14 +869,14 @@ static int read_MAPROTANGLE (FILE *f)
   c_MAP      *map = NULL;
   float       angle;
 
-  if (fread (&angle, sizeof (angle), 1, f) != 1) return clax_err_badfile;
+  if (fread (&angle, sizeof (angle), 1, f) != 1) return ast3d_err_badfile;
   switch (c_chunk_last) {
     case CHUNK_TEXTURE: map = &(mat->texture); break;
     case CHUNK_BUMPMAP: map = &(mat->bump); break;
     case CHUNK_REFLECTION: map = &(mat->reflection);
   }
   if (map) map->rot_angle = angle;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 /*****************************************************************************
@@ -890,10 +890,10 @@ static int read_FRAMES (FILE *f)
 */
   dword c[2];
 
-  if (fread (c, sizeof (c), 1, f) != 1) return clax_err_badfile;
-  clax_scene->f_start = c[0];
-  clax_scene->f_end = c[1];
-  return clax_err_ok;
+  if (fread (c, sizeof (c), 1, f) != 1) return ast3d_err_badfile;
+  ast3d_scene->f_start = c[0];
+  ast3d_scene->f_end = c[1];
+  return ast3d_err_ok;
 }
 
 static int read_OBJNUMBER (FILE *f)
@@ -903,9 +903,9 @@ static int read_OBJNUMBER (FILE *f)
 */
   word n;
 
-  if (fread (&n, sizeof (n), 1, f) != 1) return clax_err_badfile;
+  if (fread (&n, sizeof (n), 1, f) != 1) return ast3d_err_badfile;
   c_id = n;
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_DUMMYNAME (FILE *f)
@@ -915,9 +915,9 @@ static int read_DUMMYNAME (FILE *f)
 */
   c_OBJECT *obj = (c_OBJECT *)c_node;
 
-  if (read_ASCIIZ (f)) return clax_err_badfile;
-  if ((obj->name = strcopy (c_string)) == NULL) return clax_err_nomem;
-  return clax_err_ok;
+  if (read_ASCIIZ (f)) return ast3d_err_badfile;
+  if ((obj->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
+  return ast3d_err_ok;
 }
 
 static int read_TRACKOBJNAME (FILE *f)
@@ -939,19 +939,19 @@ static int read_TRACKOBJNAME (FILE *f)
   /* for 3DS 3.0 compatibility */
   if (c_chunk_prev != CHUNK_OBJNUMBER) c_id++;
 
-  if (read_ASCIIZ (f)) return clax_err_badfile;
+  if (read_ASCIIZ (f)) return ast3d_err_badfile;
   if (strcmp (c_string, "$AMBIENT$") == 0) {
     if ((amb = (c_AMBIENT *)malloc (sizeof (c_AMBIENT))) == NULL)
-      return clax_err_nomem;
-    if ((amb->name = strcopy (c_string)) == NULL) return clax_err_nomem;
+      return ast3d_err_nomem;
+    if ((amb->name = strcopy (c_string)) == NULL) return ast3d_err_nomem;
     amb->id = 1024+c_id;
     vec_zero ((c_VECTOR *)&amb->color);
-    clax_add_world (clax_obj_ambient, amb);
+    ast3d_add_world (ast3d_obj_ambient, amb);
   } else if (strcmp (c_string, "$$$DUMMY") == 0) {
     if ((obj = (c_OBJECT *)malloc (sizeof (c_OBJECT))) == NULL)
-      return clax_err_nomem;
+      return ast3d_err_nomem;
     obj->id = 1024+c_id;
-    obj->flags = clax_obj_dummy;
+    obj->flags = ast3d_obj_dummy;
     obj->numverts = 0;
     obj->numfaces = 0;
     obj->vertices = NULL;
@@ -959,68 +959,68 @@ static int read_TRACKOBJNAME (FILE *f)
     vec_zero (&obj->translate);
     vec_zero (&obj->scale);
     qt_zero (&obj->rotate);
-    clax_add_world (clax_obj_object, obj);
+    ast3d_add_world (ast3d_obj_object, obj);
   } else {
-    clax_byname (c_string, &node);
-    if (!node) return clax_err_undefined;
+    ast3d_byname (c_string, &node);
+    if (!node) return ast3d_err_undefined;
     obj = (c_OBJECT *)node->object;
     cam = (c_CAMERA *)node->object;
     light = (c_LIGHT *)node->object;
   }
-  if (fread (flags, sizeof (flags), 1, f) != 1) return clax_err_badfile;
-  if (fread (&parent, sizeof (parent), 1, f) != 1) return clax_err_badfile;
+  if (fread (flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
+  if (fread (&parent, sizeof (parent), 1, f) != 1) return ast3d_err_badfile;
   if (parent != -1) {
-    for (pnode = clax_scene->keyframer; pnode; pnode = pnode->next)
+    for (pnode = ast3d_scene->keyframer; pnode; pnode = pnode->next)
       if (pnode->id == parent)
         wparent = ((c_OBJECT *)pnode->object)->id;
   }
   if (c_chunk_last == CHUNK_TRACKINFO) {
     obj->parent = wparent;
-    if (flags[0] & 0x800) obj->flags |= clax_obj_chidden;
-    if ((track = malloc (sizeof (t_OBJECT))) == NULL) return clax_err_nomem;
+    if (flags[0] & 0x800) obj->flags |= ast3d_obj_chidden;
+    if ((track = malloc (sizeof (t_OBJECT))) == NULL) return ast3d_err_nomem;
     memset (track, 0, sizeof (t_OBJECT));
-    clax_add_track (clax_track_object, c_id, parent, track, obj);
+    ast3d_add_track (ast3d_track_object, c_id, parent, track, obj);
     c_node = obj;
   }
   if (c_chunk_last == CHUNK_TRACKCAMERA) {
     cam->parent1 = wparent;
-    if ((track = malloc (sizeof (t_CAMERA))) == NULL) return clax_err_nomem;
+    if ((track = malloc (sizeof (t_CAMERA))) == NULL) return ast3d_err_nomem;
     memset (track, 0, sizeof (t_CAMERA));
-    clax_add_track (clax_track_camera, c_id, parent, track, cam);
+    ast3d_add_track (ast3d_track_camera, c_id, parent, track, cam);
   }
   if (c_chunk_last == CHUNK_TRACKCAMTGT) {
     cam->parent2 = wparent;
     if ((track = malloc (sizeof (t_CAMERATGT))) == NULL)
-      return clax_err_nomem;
+      return ast3d_err_nomem;
     memset (track, 0, sizeof (t_CAMERATGT));
-    clax_add_track (clax_track_cameratgt, c_id, parent, track, cam);
+    ast3d_add_track (ast3d_track_cameratgt, c_id, parent, track, cam);
   }
   if (c_chunk_last == CHUNK_TRACKLIGHT) {
     light->parent1 = wparent;
-    if ((track = malloc (sizeof (t_LIGHT))) == NULL) return clax_err_nomem;
+    if ((track = malloc (sizeof (t_LIGHT))) == NULL) return ast3d_err_nomem;
     memset (track, 0, sizeof (t_LIGHT));
-    clax_add_track (clax_track_light, c_id, parent, track, light);
+    ast3d_add_track (ast3d_track_light, c_id, parent, track, light);
   }
   if (c_chunk_last == CHUNK_TRACKSPOTL) {
     light->parent1 = wparent;
     if ((track = malloc (sizeof (t_SPOTLIGHT))) == NULL)
-      return clax_err_nomem;
+      return ast3d_err_nomem;
     memset (track, 0, sizeof (t_SPOTLIGHT));
-    clax_add_track (clax_track_spotlight, c_id, parent, track, light);
+    ast3d_add_track (ast3d_track_spotlight, c_id, parent, track, light);
   }
   if (c_chunk_last == CHUNK_TRACKLIGTGT) {
     light->parent2 = wparent;
     if ((track = malloc (sizeof (t_LIGHTTGT))) == NULL)
-      return clax_err_nomem;
+      return ast3d_err_nomem;
     memset (track, 0, sizeof (t_LIGHTTGT));
-    clax_add_track (clax_track_lighttgt, c_id, parent, track, light);
+    ast3d_add_track (ast3d_track_lighttgt, c_id, parent, track, light);
   }
   if (c_chunk_last == CHUNK_AMBIENTKEY) {
-    if ((track = malloc (sizeof (t_AMBIENT))) == NULL) return clax_err_nomem;
+    if ((track = malloc (sizeof (t_AMBIENT))) == NULL) return ast3d_err_nomem;
     memset (track, 0, sizeof (t_AMBIENT));
-    clax_add_track (clax_track_ambient, c_id, parent, track, amb);
+    ast3d_add_track (ast3d_track_ambient, c_id, parent, track, amb);
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_TRACKPIVOT (FILE *f)
@@ -1032,12 +1032,12 @@ static int read_TRACKPIVOT (FILE *f)
   float     pos[3];
   int       i;
 
-  if (fread (pos, sizeof (pos), 1, f) != 1) return clax_err_badfile;
+  if (fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
   vec_make (pos[0], pos[1], pos[2], &obj->pivot);
   vec_swap (&obj->pivot);
   for (i = 0; i < obj->numverts; i++)
     vec_sub (&obj->vertices[i].vert, &obj->pivot, &obj->vertices[i].vert);
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_KFLAGS (FILE *f, word *nf, t_KEY *key)
@@ -1054,12 +1054,12 @@ static int read_KFLAGS (FILE *f, word *nf, t_KEY *key)
   key->bias = 0.0;
   key->easeto = 0.0;
   key->easefrom = 0.0;
-  if (fread (nf, sizeof (word), 1, f) != 1) return clax_err_badfile;
-  if (fread (&unknown, sizeof (word), 1, f) != 1) return clax_err_badfile;
-  if (fread (&flags, sizeof (flags), 1, f) != 1) return clax_err_badfile;
+  if (fread (nf, sizeof (word), 1, f) != 1) return ast3d_err_badfile;
+  if (fread (&unknown, sizeof (word), 1, f) != 1) return ast3d_err_badfile;
+  if (fread (&flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
   for (i = 0; i < 16; i++) {
     if (flags & (1 << i)) {
-      if (fread (&dat, sizeof (dat), 1, f) != 1) return clax_err_badfile;
+      if (fread (&dat, sizeof (dat), 1, f) != 1) return ast3d_err_badfile;
       switch (i) {
         case 0: key->tens = dat; break;
         case 1: key->cont = dat; break;
@@ -1069,7 +1069,7 @@ static int read_KFLAGS (FILE *f, word *nf, t_KEY *key)
       }
     }
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_TFLAGS (FILE *f, t_TRACK *track, word *n)
@@ -1079,11 +1079,11 @@ static int read_TFLAGS (FILE *f, t_TRACK *track, word *n)
 */
   word flags[7];
 
-  if (fread (flags, sizeof (flags), 1, f) != 1) return clax_err_badfile;
-  if ((flags[0] & 0x02) == 0x02) track->flags = clax_track_repeat;
-  if ((flags[0] & 0x03) == 0x03) track->flags = clax_track_loop;
+  if (fread (flags, sizeof (flags), 1, f) != 1) return ast3d_err_badfile;
+  if ((flags[0] & 0x02) == 0x02) track->flags = ast3d_track_repeat;
+  if ((flags[0] & 0x03) == 0x03) track->flags = ast3d_track_loop;
   *n = flags[5];
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int read_TRACKPOS (FILE *f)
@@ -1097,19 +1097,19 @@ static int read_TRACKPOS (FILE *f)
   word   n, nf;
 
   track = alloc_track();
-  if (read_TFLAGS (f, track, &n) != 0) return clax_err_badfile;
+  if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
-      return clax_err_nomem;
-    if (read_KFLAGS (f, &nf, key)) return clax_err_badfile;
-    if (fread (pos, sizeof (pos), 1, f) != 1) return clax_err_badfile;
+      return ast3d_err_nomem;
+    if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
+    if (fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
     vec_make (pos[0], pos[1], pos[2], &key->val._vect);
     vec_swap (&key->val._vect);
     add_key (track, key, nf);
   }
   spline_init (track);
-  clax_set_track (clax_key_pos, c_id, track);
-  return clax_err_ok;
+  ast3d_set_track (ast3d_key_pos, c_id, track);
+  return ast3d_err_ok;
 }
 
 static int read_TRACKCOLOR (FILE *f)
@@ -1123,19 +1123,19 @@ static int read_TRACKCOLOR (FILE *f)
   word   n, nf;
 
   track = alloc_track();
-  if (read_TFLAGS (f, track, &n) != 0) return clax_err_badfile;
+  if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
-      return clax_err_nomem;
-    if (read_KFLAGS (f, &nf, key)) return clax_err_badfile;
-    if (fread (pos, sizeof (pos), 1, f) != 1) return clax_err_badfile;
+      return ast3d_err_nomem;
+    if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
+    if (fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
     vec_make (pos[0], pos[1], pos[2], &key->val._vect);
     vec_swap (&key->val._vect);
     add_key (track, key, nf);
   }
   spline_init (track);
-  clax_set_track (clax_key_color, c_id, track);
-  return clax_err_ok;
+  ast3d_set_track (ast3d_key_color, c_id, track);
+  return ast3d_err_ok;
 }
 
 static int read_TRACKROT (FILE *f)
@@ -1152,13 +1152,13 @@ static int read_TRACKROT (FILE *f)
 
   track = alloc_track();
   qt_identity (&old);
-  if (read_TFLAGS (f, track, &n) != 0) return clax_err_badfile;
+  if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   keys = n;
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
-      return clax_err_nomem;
-    if (read_KFLAGS (f, &nf, key)) return clax_err_badfile;
-    if (fread (pos, sizeof(pos), 1, f) != 1) return clax_err_badfile;
+      return ast3d_err_nomem;
+    if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
+    if (fread (pos, sizeof(pos), 1, f) != 1) return ast3d_err_badfile;
     qt_fromang (pos[0], pos[1], pos[2], pos[3], &q);
 	// !!! FIX !!! I SAID ANGLE IS ABSOLUTE!!!!!!!!!
     if (keys == n-1) angle = pos[0]; else angle += pos[0];
@@ -1170,8 +1170,8 @@ static int read_TRACKROT (FILE *f)
     add_key (track, key, nf);
   }
   spline_initrot (track);
-  clax_set_track (clax_key_rotate, c_id, track);
-  return clax_err_ok;
+  ast3d_set_track (ast3d_key_rotate, c_id, track);
+  return ast3d_err_ok;
 }
 
 static int read_TRACKSCALE (FILE *f)
@@ -1185,19 +1185,19 @@ static int read_TRACKSCALE (FILE *f)
   word   n, nf;
 
   track = alloc_track();
-  if (read_TFLAGS (f, track, &n) != 0) return clax_err_badfile;
+  if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
-      return clax_err_nomem;
-    if (read_KFLAGS (f, &nf, key)) return clax_err_badfile;
-    if (fread (pos, sizeof (pos), 1, f) != 1) return clax_err_badfile;
+      return ast3d_err_nomem;
+    if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
+    if (fread (pos, sizeof (pos), 1, f) != 1) return ast3d_err_badfile;
     vec_make (pos[0], pos[1], pos[2], &key->val._vect);
     vec_swap (&key->val._vect);
     add_key (track, key, nf);
   }
   spline_init (track);
-  clax_set_track (clax_key_scale, c_id, track);
-  return clax_err_ok;
+  ast3d_set_track (ast3d_key_scale, c_id, track);
+  return ast3d_err_ok;
 }
 
 static int read_TRACKFOV (FILE *f)
@@ -1211,18 +1211,18 @@ static int read_TRACKFOV (FILE *f)
   float fov;
 
   track = alloc_track();
-  if (read_TFLAGS (f, track, &n) != 0) return clax_err_badfile;
+  if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
-      return clax_err_nomem;
-    if (read_KFLAGS (f, &nf, key)) return clax_err_badfile;
-    if (fread (&fov, sizeof (fov), 1, f) != 1) return clax_err_badfile;
+      return ast3d_err_nomem;
+    if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
+    if (fread (&fov, sizeof (fov), 1, f) != 1) return ast3d_err_badfile;
     key->val._float = fov;
     add_key (track, key, nf);
   }
   spline_init (track);
-  clax_set_track (clax_key_fov, c_id, track);
-  return clax_err_ok;
+  ast3d_set_track (ast3d_key_fov, c_id, track);
+  return ast3d_err_ok;
 }
 
 static int read_TRACKROLL (FILE *f)
@@ -1236,18 +1236,18 @@ static int read_TRACKROLL (FILE *f)
   float  roll;
 
   track = alloc_track();
-  if (read_TFLAGS (f, track, &n) != 0) return clax_err_badfile;
+  if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
-      return clax_err_nomem;
-    if (read_KFLAGS (f, &nf, key)) return clax_err_badfile;
-    if (fread(&roll, sizeof(roll), 1, f) != 1) return clax_err_badfile;
+      return ast3d_err_nomem;
+    if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
+    if (fread(&roll, sizeof(roll), 1, f) != 1) return ast3d_err_badfile;
     key->val._float = roll;
     add_key (track, key, nf);
   }
   spline_init (track);
-  clax_set_track (clax_key_roll, c_id, track);
-  return clax_err_ok;
+  ast3d_set_track (ast3d_key_roll, c_id, track);
+  return ast3d_err_ok;
 }
 
 static int read_TRACKMORPH (FILE *f)
@@ -1261,19 +1261,19 @@ static int read_TRACKMORPH (FILE *f)
   word    n, nf;
 
   track = alloc_track();
-  if (read_TFLAGS (f, track, &n) != 0) return clax_err_badfile;
+  if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
-      return clax_err_nomem;
-    if (read_KFLAGS (f, &nf, key)) return clax_err_badfile;
-    if (read_ASCIIZ (f)) return clax_err_badfile;
-    clax_byname (c_string, &node);
-    if (!node) return clax_err_undefined;
+      return ast3d_err_nomem;
+    if (read_KFLAGS (f, &nf, key)) return ast3d_err_badfile;
+    if (read_ASCIIZ (f)) return ast3d_err_badfile;
+    ast3d_byname (c_string, &node);
+    if (!node) return ast3d_err_undefined;
     key->val._int = ((c_OBJECT *)node->object)->id;
     add_key (track, key, nf);
   }
-  clax_set_track (clax_key_morph, c_id, track);
-  return clax_err_ok;
+  ast3d_set_track (ast3d_key_morph, c_id, track);
+  return ast3d_err_ok;
 }
 
 static int read_TRACKHIDE (FILE *f)
@@ -1288,17 +1288,17 @@ static int read_TRACKHIDE (FILE *f)
   int    hide = 0;
 
   track = alloc_track();
-  if (read_TFLAGS (f, track, &n) != 0) return clax_err_badfile;
+  if (read_TFLAGS (f, track, &n) != 0) return ast3d_err_badfile;
   while (n-- > 0) {
     if ((key = (t_KEY *)malloc (sizeof (t_KEY))) == NULL)
-      return clax_err_nomem;
-    if (fread (&nf, sizeof (nf), 1, f) != 1) return clax_err_badfile;
-    if (fread (unknown, sizeof (word), 2, f) != 2) return clax_err_badfile;
+      return ast3d_err_nomem;
+    if (fread (&nf, sizeof (nf), 1, f) != 1) return ast3d_err_badfile;
+    if (fread (unknown, sizeof (word), 2, f) != 2) return ast3d_err_badfile;
     key->val._int = (hide ^= 1);
     add_key (track, key, nf);
   }
-  clax_set_track (clax_key_hide, c_id, track);
-  return clax_err_ok;
+  ast3d_set_track (ast3d_key_hide, c_id, track);
+  return ast3d_err_ok;
 }
 
 static int read_CHUNK (FILE *f, c_CHUNK *h)
@@ -1307,10 +1307,10 @@ static int read_CHUNK (FILE *f, c_CHUNK *h)
   read_CHUNK: Chunk reader.
 */
   if (fread (&h->chunk_id, sizeof (word), 1, f) != 1)
-    return clax_err_badfile;
+    return ast3d_err_badfile;
   if (fread (&h->chunk_size, sizeof (dword), 1, f) != 1)
-    return clax_err_badfile;
-  return clax_err_ok;
+    return ast3d_err_badfile;
+  return ast3d_err_ok;
 }
 
 /*****************************************************************************
@@ -1328,7 +1328,7 @@ static int ChunkReaderWorld (FILE *f, long p, word parent)
 
   c_chunk_last = parent;
   while ((pc = ftell (f)) < p) {
-    if (read_CHUNK (f, &h) != 0) return clax_err_badfile;
+    if (read_CHUNK (f, &h) != 0) return ast3d_err_badfile;
     c_chunk_curr = h.chunk_id;
     n = -1;
     for (i = 0; i < sizeof (world_chunks) / sizeof (world_chunks[0]); i++)
@@ -1346,9 +1346,9 @@ static int ChunkReaderWorld (FILE *f, long p, word parent)
       fseek (f, pc, SEEK_SET);
       c_chunk_prev = h.chunk_id;
     }
-    if (ferror (f)) return clax_err_badfile;
+    if (ferror (f)) return ast3d_err_badfile;
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 static int ChunkReaderKey (FILE *f, long p, word parent)
@@ -1362,7 +1362,7 @@ static int ChunkReaderKey (FILE *f, long p, word parent)
 
   c_chunk_last = parent;
   while ((pc = ftell (f)) < p) {
-    if (read_CHUNK (f, &h) != 0) return clax_err_badfile;
+    if (read_CHUNK (f, &h) != 0) return ast3d_err_badfile;
     c_chunk_curr = h.chunk_id;
     n = -1;
     for (i = 0; i < sizeof (key_chunks) / sizeof (key_chunks[0]); i++)
@@ -1379,19 +1379,19 @@ static int ChunkReaderKey (FILE *f, long p, word parent)
       fseek (f, pc, SEEK_SET);
       c_chunk_prev = h.chunk_id;
     }
-    if (ferror (f)) return clax_err_badfile;
+    if (ferror (f)) return ast3d_err_badfile;
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 /*****************************************************************************
   world/motion load routines
 *****************************************************************************/
 
-int32 clax_load_mesh_3DS (FILE *f)
+int32 ast3d_load_mesh_3DS (FILE *f)
 {
 /*
-  clax_load_mesh_3DS: loads mesh data from 3ds file "filename"
+  ast3d_load_mesh_3DS: loads mesh data from 3ds file "filename"
                       into scene "scene".
 */
   byte version;
@@ -1401,16 +1401,16 @@ int32 clax_load_mesh_3DS (FILE *f)
   fseek (f, 0, SEEK_END);
   length = ftell (f);
   fseek (f, 28L, SEEK_SET);
-  if (fread (&version, sizeof (byte), 1, f) != 1) return clax_err_badfile;
-  if (version < 2) return clax_err_badver; /* 3DS 3.0+ supported */
+  if (fread (&version, sizeof (byte), 1, f) != 1) return ast3d_err_badfile;
+  if (version < 2) return ast3d_err_badver; /* 3DS 3.0+ supported */
   fseek (f, 0, SEEK_SET);
   return ChunkReaderWorld (f, length, 0);
 }
 
-int32 clax_load_motion_3DS (FILE *f)
+int32 ast3d_load_motion_3DS (FILE *f)
 {
 /*
-  clax_loadmotion: loads motion data from 3ds file "filename"
+  ast3d_loadmotion: loads motion data from 3ds file "filename"
                    into scene "scene".
 */
   byte version;
@@ -1420,8 +1420,8 @@ int32 clax_load_motion_3DS (FILE *f)
   fseek (f, 0, SEEK_END);
   length = ftell (f);
   fseek (f, 28L, SEEK_SET);
-  if (fread (&version, sizeof (byte), 1, f) != 1) return clax_err_badfile;
-  if (version < 2) return clax_err_badver; /* 3DS 3.0+ supported */
+  if (fread (&version, sizeof (byte), 1, f) != 1) return ast3d_err_badfile;
+  if (version < 2) return ast3d_err_badver; /* 3DS 3.0+ supported */
   fseek (f, 0, SEEK_SET);
   return ChunkReaderKey (f, length, 0);
 }

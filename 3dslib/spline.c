@@ -25,8 +25,8 @@
 
 #include <math.h>
 #include <stdio.h>
-#include "clax.h"
-#include "claxi.h"
+#include "ast3d.h"
+#include "ast3di.h"
 
 static void CompElementDeriv (float pp,  float p,   float pn,
                               float *ds, float *dd, float ksm,
@@ -327,13 +327,13 @@ int32 spline_init (t_TRACK *track)
   t_KEY *keys = track->keys;
   t_KEY *last = track->last;
 
-  if (!keys) return clax_err_nullptr;
-  if (!keys->next) return clax_err_spline;
+  if (!keys) return ast3d_err_nullptr;
+  if (!keys->next) return ast3d_err_spline;
 
   if (keys->next->next) { /* 3 or more keys */
     for (curr = keys->next; curr->next; curr = curr->next)
       CompDeriv (curr->prev, curr, curr->next);
-    if (track->flags & clax_track_loop) {
+    if (track->flags & ast3d_track_loop) {
       CompDerivLoopFirst (last->prev, keys, keys->next, track->frames);
       CompDerivLoopLast (last->prev, last, keys->next, track->frames);
     } else {
@@ -341,7 +341,7 @@ int32 spline_init (t_TRACK *track)
       CompDerivLast (curr->prev->prev, curr->prev, curr);
     }
   } else CompDerivTwo (keys); /* 2 keys */
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 int32 spline_initrot (t_TRACK *track)
@@ -353,13 +353,13 @@ int32 spline_initrot (t_TRACK *track)
   t_KEY *keys = track->keys;
   t_KEY *last = track->last;
 
-  if (!keys) return clax_err_nullptr;
-  if (!keys->next) return clax_err_spline;
+  if (!keys) return ast3d_err_nullptr;
+  if (!keys->next) return ast3d_err_spline;
 
   if (keys->next->next) { /* 3 or more keys */
     for (curr = keys->next; curr->next; curr = curr->next)
       CompAB (curr->prev, curr, curr->next);
-/*    if (track->flags & clax_track_loop) {
+/*    if (track->flags & ast3d_track_loop) {
       CompAB (last->prev, keys, keys->next);
       CompAB (keys->prev, last, keys->next);
     } else { */
@@ -370,7 +370,7 @@ int32 spline_initrot (t_TRACK *track)
     CompAB (NULL, keys, keys->next);
     CompAB (keys, last, NULL);
   }
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 int32 spline_getkey_float (t_TRACK *track, float frame, float *out)
@@ -382,8 +382,8 @@ int32 spline_getkey_float (t_TRACK *track, float frame, float *out)
   float  t, t2, t3;
   float  h[4];
 
-  if (frame < 0.0) return clax_err_badframe;
-  if (!track || !track->keys) return clax_err_nullptr;
+  if (frame < 0.0) return ast3d_err_badframe;
+  if (!track || !track->keys) return ast3d_err_nullptr;
 
   if (frame < track->last->frame) keys = track->keys; else
     keys = track->last;
@@ -391,7 +391,7 @@ int32 spline_getkey_float (t_TRACK *track, float frame, float *out)
   track->last = keys;
   if (!keys->next || frame < keys->frame) { /* frame is above last key */
     *out = keys->val._float;
-    return clax_err_ok;
+    return ast3d_err_ok;
   }
   t = (frame - keys->frame) / (keys->next->frame - keys->frame);
   t = spline_ease (t, keys->easefrom, keys->next->easeto);
@@ -403,7 +403,7 @@ int32 spline_getkey_float (t_TRACK *track, float frame, float *out)
   h[3] = t3 - t2;
   *out = (h[0]*keys->val._float) + (h[1]*keys->next->val._float) +
          (h[2]*keys->dda) +        (h[3]*keys->next->dsa);
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 int32 spline_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out)
@@ -415,8 +415,8 @@ int32 spline_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out)
   float  t, t2, t3;
   float  h[4];
 
-  if (frame < 0.0) return clax_err_badframe;
-  if (!track || !track->keys) return clax_err_nullptr;
+  if (frame < 0.0) return ast3d_err_badframe;
+  if (!track || !track->keys) return ast3d_err_nullptr;
 
   if (frame < track->last->frame) keys = track->keys; else
     keys = track->last;
@@ -424,7 +424,7 @@ int32 spline_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out)
   track->last = keys;
   if (!keys->next || frame < keys->frame) { /* frame is above last key */
     vec_copy (&keys->val._vect, out);
-    return clax_err_ok;
+    return ast3d_err_ok;
   }
   t = (frame - keys->frame) / (keys->next->frame - keys->frame);
   t = spline_ease (t, keys->easefrom, keys->next->easeto);
@@ -440,7 +440,7 @@ int32 spline_getkey_vect (t_TRACK *track, float frame, c_VECTOR *out)
            (h[2]*keys->ddb) +         (h[3]*keys->next->dsb);
   out->z = (h[0]*keys->val._vect.z) + (h[1]*keys->next->val._vect.z) +
            (h[2]*keys->ddc) +         (h[3]*keys->next->dsc);
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 int32 spline_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
@@ -452,8 +452,8 @@ int32 spline_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
   c_QUAT a, b, p, q, q1;
   float  t, angle, spin;
   
-  if (frame < 0.0) return clax_err_badframe;
-  if (!track || !track->keys) return clax_err_nullptr;
+  if (frame < 0.0) return ast3d_err_badframe;
+  if (!track || !track->keys) return ast3d_err_nullptr;
 
   if (frame < track->last->frame) keys = track->keys; else
     keys = track->last;
@@ -461,7 +461,7 @@ int32 spline_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
   track->last = keys;
   if (!keys->next || frame < keys->frame) { /* frame is above last key */
     qt_copy (&keys->qa, out);
-    return clax_err_ok;
+    return ast3d_err_ok;
   }
   t = (frame - keys->frame) / (keys->next->frame - keys->frame);
   t = spline_ease (t, keys->easefrom, keys->next->easeto);
@@ -485,5 +485,5 @@ int32 spline_getkey_quat (t_TRACK *track, float frame, c_QUAT *out)
 //    qt_slerp (&p,&q,0,t,&q1);
 //  }
   qt_copy (&q1, out);
-  return clax_err_ok;
+  return ast3d_err_ok;
 }

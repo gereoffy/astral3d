@@ -21,8 +21,8 @@
 
 #include <math.h>
 #include <stdio.h>
-#include "clax.h"
-#include "claxi.h"
+#include "ast3d.h"
+#include "ast3di.h"
 
 static c_MATRIX Tidentity = {
   {1, 0, 0, 0},
@@ -157,7 +157,7 @@ int32 mat_inverse (c_MATRIX a, c_MATRIX out)
     scale = a[i][X]*a[i][X] + a[i][Y]*a[i][Y] + a[i][Z]*a[i][Z];
     if (scale == 0.0) {
       mat_identity (out);
-      return clax_err_singular;
+      return ast3d_err_singular;
     }
     scale = 1.0 / scale;
     for (j = 0; j < 3; j++) temp[i][j] = a[j][i] * scale;
@@ -165,7 +165,7 @@ int32 mat_inverse (c_MATRIX a, c_MATRIX out)
                    temp[i][Z]*a[Z][W]);
   }
   mat_copy (temp, out);
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 int32 mat_invscale (c_MATRIX a, c_MATRIX out)
@@ -181,14 +181,14 @@ int32 mat_invscale (c_MATRIX a, c_MATRIX out)
     scale = a[i][X]*a[i][X] + a[i][Y]*a[i][Y] + a[i][Z]*a[i][Z];
     if (scale == 0.0) {
       mat_identity (out);
-      return clax_err_singular;
+      return ast3d_err_singular;
     }
     scale = 1.0 / scale;
     for (j = 0; j < 3; j++) temp[i][j] = a[i][j] * scale;
     temp[i][W] = a[i][W];
   }
   mat_copy (temp, out);
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 int32 mat_normalize (c_MATRIX a, c_MATRIX out)
@@ -207,7 +207,7 @@ int32 mat_normalize (c_MATRIX a, c_MATRIX out)
     temp[i][W] = a[i][W];
   }
   mat_copy (temp, out);
-  return clax_err_ok;
+  return ast3d_err_ok;
 }
 
 void mat_toeuler (c_MATRIX mat, c_VECTOR *out)

@@ -20,8 +20,8 @@
 
 #include <math.h>
 #include <stdio.h>
-#include "clax.h"
-#include "claxi.h"
+#include "ast3d.h"
+#include "ast3di.h"
 
 void cam_lens_fov (float lens, float *fov)
 {
