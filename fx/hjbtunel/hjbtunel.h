@@ -8,6 +8,6 @@ typedef struct {
   float morph_speed;
 } fx_hjbtunnel_struct;
 
-void HJBTUNNEL_Render(fx_hjbtunnel_struct* param,float pos);
+void HJBTUNNEL_Render(float pos,fx_hjbtunnel_struct* param);
 
 void HJBTUNNEL_Init(int seed);

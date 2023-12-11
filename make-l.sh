@@ -9,21 +9,19 @@ export CC=gcc
 export AR=ar
 export LD=ld
 
-cd UTIL;c;cd ..
+(cd afs; make clean; make)
+(cd agl; ./c)
+(cd timer; ./c)
+(cd mp3lib; ./c)
 
-cd mp3lib;c;cd ..
-cd timer;c;cd ..
-cd script;c;cd ..
+(cd 3dslib; make clean; make)
+(cd loadmap; make clean; make)
+(cd render; make clean; make)
 
-cd agl;c;cd ..
-cd afs;c;cd ..
-cd loadmap;c;cd ..
+(cd MAX; ./c)
+(cd fx; ./c)
 
-cd fx;c;cd ..
-
-cd 3dslib;c;cd ..
-cd render;c;cd ..
-cd MAX;c;cd ..
+(cd script; make clean; make)
 
 ./demo-l.sh
 

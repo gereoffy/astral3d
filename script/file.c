@@ -2,6 +2,7 @@
 char *script=NULL;
 int script_size=0;
 int script_pos=0;
+int script_restart_pos=0;
 int scr_lineno=0;
 int scr_comment=0;
 char *scr_filename="";
