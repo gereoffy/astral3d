@@ -1,9 +1,7 @@
 /*  Load MATERIALS and upload to 3D card */
 
 #include "../config.h"
-#include <GL/gl.h>
-#include <GL/glu.h>
-
+#include "../agl/agl.h"
 #include "../3dslib/ast3d.h"
 #include "../render/render.h"
 //#include "../loadmap/load_map.h"

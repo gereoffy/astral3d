@@ -1,8 +1,14 @@
 // Astral OpenGL State Manager  v0.11    (C) 2000. by A'rpi/Astral
 // simple routines to reduce OGL calls.
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+//#include <GLUT/glut.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
 
 // aglBlend:  set BLEND mode
 #define AGL_BLEND_NONE 0

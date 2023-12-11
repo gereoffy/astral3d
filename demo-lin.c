@@ -2,10 +2,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#endif
 
 #include "3dslib/ast3d.h"
 
@@ -14,6 +21,7 @@
 #include "timer/timer.h"
 #include "loadmap/load_map.h"
 #include "loadmap/loadmaps.h"
+#include "loadmap/loadtxtr.h"
 #include "fx/blob/blob.h"
 #include "afs/afs.h"
 #include "script/script.h"
