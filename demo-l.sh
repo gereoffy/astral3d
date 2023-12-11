@@ -7,6 +7,4 @@ export LIBS="-L3dslib -last3d -Lfx -lastFX -Lloadmap -llmap -Lafs -lafs -Lmp3lib
 export LIBS2="-lm -lGL -ljpeg -lglut -lGLU"
 export XLIBS="-L/usr/X11/lib -lX11 -lXext -lXmu -lXi"
 
-gcc -O3 demo-lin.c -o demo $OBJS $LIBS $LIBS2 $XLIBS &>errors
-cat errors
-# strip demo
+gcc -O3 demo-lin.c -o demo $OBJS $LIBS $LIBS2 $XLIBS

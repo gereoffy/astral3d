@@ -13,7 +13,7 @@ extern float ast3d_blend;
 #define SCR_x 400
 #define SCR_y 400
 
-inline float interppixel(map_st* map,float u,float v){
+inline static float interppixel(map_st* map,float u,float v){
   int ui,ui1,vi;
   float h1,h2;
   u-=(int)u; v-=(int)v;

@@ -16,7 +16,7 @@
 #define TRI_SPEC_TEX(p) glTexCoord2fv((float*)&p->specular)
 
 #if 0
-INLINE void ast3d_DrawGLTriangle_wire(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_wire(c_FACE *f){
   c_VERTEX *p;
 //  aglTexture(0); aglBlend(AGL_BLEND_NONE);
   glBegin(GL_LINE_LOOP);
@@ -35,7 +35,7 @@ INLINE void ast3d_DrawGLTriangle_wire(c_FACE *f){
 }
 #endif
 
-INLINE void ast3d_DrawGLTriangle_gouraud(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_gouraud(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_COLOR(p); TRI_VERTEX(p);
@@ -52,7 +52,7 @@ INLINE void ast3d_DrawGLTriangle_gouraud(c_FACE *f){
 }
 
 
-INLINE void ast3d_DrawGLTriangle_texture(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_texture(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_TEX1(p); TRI_COLOR(p); TRI_VERTEX(p);
@@ -65,14 +65,14 @@ INLINE void ast3d_DrawGLTriangle_texture(c_FACE *f){
 #endif
 }
 
-INLINE void ast3d_DrawGLTriangle_bump(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_bump(c_FACE *f){
   c_VERTEX *p;
         p=f->pa; glTexCoord2f(f->u1+p->bump_du,f->v1+p->bump_dv); TRI_BUMP_COLOR(p); TRI_VERTEX(p);
         p=f->pb; glTexCoord2f(f->u2+p->bump_du,f->v2+p->bump_dv); TRI_BUMP_COLOR(p); TRI_VERTEX(p);
         p=f->pc; glTexCoord2f(f->u3+p->bump_du,f->v3+p->bump_dv); TRI_BUMP_COLOR(p); TRI_VERTEX(p);
 }
 
-INLINE void ast3d_DrawGLTriangle_envmap(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_envmap(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_REFL_TEX(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
@@ -85,7 +85,7 @@ INLINE void ast3d_DrawGLTriangle_envmap(c_FACE *f){
 #endif
 }
 
-INLINE void ast3d_DrawGLTriangle_real_envmap(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_real_envmap(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_REFL_EUV(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
@@ -98,7 +98,7 @@ INLINE void ast3d_DrawGLTriangle_real_envmap(c_FACE *f){
 #endif
 }
 
-INLINE void ast3d_DrawGLTriangle_projectedmap(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_projectedmap(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_REFL_EUV(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
@@ -111,7 +111,7 @@ INLINE void ast3d_DrawGLTriangle_projectedmap(c_FACE *f){
 #endif
 }
 
-INLINE void ast3d_DrawGLTriangle_projectedmap_alpha(c_FACE *f,int a){
+INLINE static void ast3d_DrawGLTriangle_projectedmap_alpha(c_FACE *f,int a){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_REFL_EUV(p); TRI_REFL_COLOR_A(p); TRI_VERTEX(p);
@@ -124,7 +124,7 @@ INLINE void ast3d_DrawGLTriangle_projectedmap_alpha(c_FACE *f,int a){
 #endif
 }
 
-INLINE void ast3d_DrawGLTriangle_projectedmap_color(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_projectedmap_color(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_REFL_EUV(p); TRI_COLOR(p); TRI_VERTEX(p);
@@ -137,7 +137,7 @@ INLINE void ast3d_DrawGLTriangle_projectedmap_color(c_FACE *f){
 #endif
 }
 
-INLINE void ast3d_DrawGLTriangle_spheremap(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_spheremap(c_FACE *f){
   c_VERTEX *p;
 #ifdef NO_LIGHTING
         p=f->pa; TRI_NORMAL(p); TRI_REFL_COLOR(p); TRI_VERTEX(p);
@@ -150,7 +150,7 @@ INLINE void ast3d_DrawGLTriangle_spheremap(c_FACE *f){
 #endif
 }
 
-INLINE void ast3d_DrawGLTriangle_specularmap(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_specularmap(c_FACE *f){
   if(f->pa->specular.z>0 || f->pb->specular.z>0 || f->pc->specular.z>0){
     c_VERTEX *p;
         p=f->pa; TRI_SPEC_TEX(p); TRI_VERTEX(p);
@@ -159,7 +159,7 @@ INLINE void ast3d_DrawGLTriangle_specularmap(c_FACE *f){
   }
 }
 
-INLINE void ast3d_DrawGLTriangle_lightmap(c_FACE *f){
+INLINE static void ast3d_DrawGLTriangle_lightmap(c_FACE *f){
   c_VERTEX *p;
         p=f->pa; glTexCoord2fv(&f->lu1); TRI_VERTEX(p);
         p=f->pb; glTexCoord2fv(&f->lu2); TRI_VERTEX(p);

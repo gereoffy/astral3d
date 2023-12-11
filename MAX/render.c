@@ -10,6 +10,8 @@
 #include "../timer/timer.h"
 #include "../loadmap/loadmaps.h"
 
+#define INLINE inline static
+
 #include "max3d.h"
 
 static node_st *nodes=NULL;
