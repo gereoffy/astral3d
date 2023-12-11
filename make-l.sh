@@ -3,7 +3,11 @@
 ./clean.sh
 
 # export OPTFLAGS="-O4 -fomit-frame-pointer -pipe -march=i686 -ffast-math"
-export OPTFLAGS="-O4 -fomit-frame-pointer -pipe -march=k6 -mcpu=k6 -ffast-math"
+# export OPTFLAGS="-O4 -fomit-frame-pointer -pipe -march=k6 -mcpu=k6 -ffast-math"
+export OPTFLAGS="-O3 -ffast-math"
+export CC=gcc
+export AR=ar
+export LD=ld
 
 cd UTIL;c;cd ..
 

@@ -10,8 +10,8 @@ typedef struct {
 extern int LoadMAP(char *n,map_st *map);
 extern void FreeMAP(map_st *m);
 
-extern int map_memory_used;
-extern int map_memory_used_16bpp;
+//extern int map_memory_used;
+//extern int map_memory_used_16bpp;
 
 
 

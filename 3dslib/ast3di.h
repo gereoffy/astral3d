@@ -14,10 +14,10 @@ extern int32     ast3d_flags;
 
 typedef unsigned char  byte;
 typedef unsigned short word;
-typedef unsigned long  dword;
+typedef unsigned int  dword;
 typedef signed char    sbyte;
 typedef signed short   sword;
-typedef signed long    sdword;
+typedef signed int    sdword;
 
 int32 ast3d_load_mesh_3DS   (afs_FILE *f);
 int32 ast3d_load_motion_3DS (afs_FILE *f);

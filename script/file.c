@@ -156,7 +156,7 @@ void *ptr=NULL;
          scrSyntax("Unknown variable CLASS");
       }
 //      printf("GetPtr:  class=%d  type=%d  baseptr=%x   offset=%x\n",cmd->Class,  cmd->Type, (unsigned int)ptr, (unsigned int)cmd->ptr);
-      ptr=(void*)(((unsigned int)ptr)+((unsigned int)(cmd->ptr)));
+      ptr=(void*)(((unsigned long)ptr)+((unsigned long)(cmd->ptr))); // WTF FIXME !!!
       return ptr;
 }
 
