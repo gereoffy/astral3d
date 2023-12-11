@@ -24,31 +24,35 @@ float default_corona_scale=1.0;
 /****************************************************************************/
 
 INLINE static int afs_fread_word(word *ptr,int s1,int s2,afs_FILE *f){
+#ifdef REVERSE_BYTEORDER
   word c;
   int s=s1*s2/sizeof(c);
   while(s>0){
     if(afs_fread(&c,sizeof(c),1,f)!=1) return 0;
-#ifdef REVERSE_BYTEORDER
     c=(c>>8)|(c<<8);
-#endif
     *ptr=c; ++ptr;
     --s;
   }
   return s2;
+#else
+  return afs_fread(ptr,s1,s2,f);
+#endif
 }
 
 INLINE static int afs_fread_dword(dword *ptr,int s1,int s2,afs_FILE *f){
+#ifdef REVERSE_BYTEORDER
   dword c;
   int s=s1*s2/sizeof(c);
   while(s>0){
     if(afs_fread(&c,sizeof(c),1,f)!=1) return 0;
-#ifdef REVERSE_BYTEORDER
     c= ((c>>24)&0xFF) | (((c>>16)&0xFF)<<8) | (((c>>8)&0xFF)<<16) | ((c&0xFF)<<24);
-#endif
     *ptr=c; ++ptr;
     --s;
   }
   return s2;
+#else
+  return afs_fread(ptr,s1,s2,f);
+#endif
 }
 
 INLINE static int afs_fread_float(float *ptr,int s1,int s2,afs_FILE *f){
