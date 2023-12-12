@@ -15,7 +15,7 @@
  /* new WRITE_SAMPLE */
    /* sizeof(int) == 4 */
 #define WRITE_SAMPLE(samples,sum,clip) { \
-  double dtemp; long v;                  \
+  double dtemp; int v;                   \
   dtemp = ((((65536.0 * 65536.0 * 16)+(65536.0 * 0.5))* 65536.0)) + (sum);\
   v = ((*(int *)&dtemp) - 0x80000000); \
   if( v > 32767) { *(samples) = 0x7fff; (clip)++; } \
